@@ -1,0 +1,63 @@
+<table class="signature-table" style="background-color: #000; color: #FFF;">
+  <tbody>
+  <tr>
+    <td>
+      <table class="main-table" style="border: 1px solid #FFF; border-radius: 5px; padding: 25px; background-color: #000;">
+        <tbody>
+        <tr>
+          <td>
+            <table>
+              <tbody>
+              <tr>
+                <td class="name-row" style="font-weight: bold; font-size: 20px; color: #FFF;">Gjovani Gorvokaj</td>
+                <td><img src="https://app.customesignature.com/images/verify.gif" width="15" height="15" /></td>
+              </tr>
+              <tr>
+                <td class="title-row" colspan="2" style="font-size: 12px; color: #FFF;">CEO/Co-Founder</td>
+              </tr>
+              </tbody>
+            </table>
+            <table>
+              <tbody>
+              <tr>
+                <td><a><img src="https://app.customesignature.com/upload/signature/5911/5911.svg" width="100" style="width:100px;" /></a></td>
+              </tr>
+              </tbody>
+            </table>
+          </td>
+          <td class="divider" style="border-left: 1px solid #FFF; padding-left: 15px;">
+            <table class="contact-info">
+              <tbody>
+              <tr>
+                <td class="company-info" style="font-weight: bold; font-size: 12px; color: #FFF;">Milk-E Way Studios</td>
+              </tr>
+              <tr>
+                <td><a href="tel:(248) 838-8678" style="color: #FFF; text-decoration: none;">(248) 838-8678</a></td>
+              </tr>
+              <tr>
+                <td><a href="mailto:ggorvokaj@milk-eway.studio" style="color: #FFF; text-decoration: none;">ggorvokaj@milk-eway.studio</a></td>
+              </tr>
+              <tr>
+                <td><a href="https://www.milk-eway.studio" style="color: #FFF; text-decoration: none;">www.milk-eway.studio</a></td>
+              </tr>
+              </tbody>
+            </table>
+            <table class="social-icons">
+              <tbody>
+              <tr>
+                <td><a href="https://www.milk-eway.studio" rel="noopener"><img src="https://app.customesignature.com/images/social/animation/4/web-icon.gif" style="width:24px;" /></a></td>
+                <td><a href="https://www.instagram.com/gorvok_5" rel="noopener"><img src="https://app.customesignature.com/images/social/animation/4/insta-icon.gif" style="width:24px;" /></a></td>
+                <td><a href="https://www.linkedin.com/in/gjovanigorvokaj" rel="noopener"><img src="https://app.customesignature.com/images/social/animation/4/linkedin-icon.gif" style="width:24px;" /></a></td>
+                <td><a href="https://www.facebook.com/Gorvok" rel="noopener"><img src="https://app.customesignature.com/images/social/animation/4/facebook-icon.gif" style="width:24px;" /></a></td>
+                <td><a href="https://www.twitter.com/gorvok_5" rel="noopener"><img src="https://app.customesignature.com/images/social/animation/4/twitter-icon.gif" style="width:24px;" /></a></td>
+              </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+  </tbody>
+</table>
