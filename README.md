@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# Email Signature Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A free, open-source web app for creating professional email signatures. No login required — everything runs in your browser. No data is stored or sent to any server.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **3 signature templates**: Classic Dark, Modern Light, Minimal
+- **Live preview** that updates as you type
+- **Full customization**: colors, fonts, logo upload, social links
+- **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
+- **Copy to clipboard** (rich HTML) or **download as .html** file
+- **Self-contained**: social icons are embedded as inline SVGs, logos are converted to base64 — no external dependencies in the generated signature
+- **Fully client-side**: zero backend, zero tracking, zero data collection
 
-## React Compiler
+## Quick Start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## How to Use
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Pick a template (Classic Dark, Modern Light, or Minimal)
+2. Fill in your details — name, title, company, contact info, social links
+3. Customize colors, font, and upload a logo
+4. Choose your email provider (Gmail, Outlook, etc.)
+5. Follow the instructions to copy/paste or install the signature
+
+## Tech Stack
+
+- [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/) (build tool)
+- [Tailwind CSS](https://tailwindcss.com/) (app styling)
+
+## Deployment
+
+This is a static site with no backend. Build and deploy anywhere:
+
+```bash
+npm run build
 ```
+
+The `dist/` folder can be deployed to:
+- **GitHub Pages**
+- **Netlify** (connect repo, auto-deploys)
+- **Vercel** (connect repo, auto-deploys)
+- **Any static web server** (Nginx, Apache, S3, etc.)
+
+## Contributing
+
+Contributions are welcome! Some ideas:
+- Add new signature templates
+- Add more social platform icons
+- Improve email client compatibility
+- Add i18n / translations
+
+## License
+
+Open source. See repository for license details.
