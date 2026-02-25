@@ -1,5 +1,6 @@
 import type { SignatureData } from '../types';
 import { socialPlatforms } from '../data/socialPlatforms';
+import { getSocialIconSvg } from '../utils/socialIcons';
 import ImageUploader from './ImageUploader';
 import ColorPicker from './ColorPicker';
 
@@ -15,13 +16,13 @@ function InputField({ label, value, onChange, placeholder, type = 'text' }: {
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-300 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+        className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
       />
     </div>
   );
@@ -39,8 +40,8 @@ export default function SignatureForm({ data, onChange }: Props) {
   return (
     <div className="space-y-6">
       {/* Personal Info */}
-      <section>
-        <h3 className="text-lg font-semibold text-white mb-3">Personal Info</h3>
+      <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Personal Info</h3>
         <div className="space-y-3">
           <InputField label="Full Name" value={data.fullName} onChange={(v) => update({ fullName: v })} placeholder="John Doe" />
           <InputField label="Job Title" value={data.jobTitle} onChange={(v) => update({ jobTitle: v })} placeholder="CEO / Designer" />
@@ -49,8 +50,8 @@ export default function SignatureForm({ data, onChange }: Props) {
       </section>
 
       {/* Contact */}
-      <section>
-        <h3 className="text-lg font-semibold text-white mb-3">Contact</h3>
+      <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Contact</h3>
         <div className="space-y-3">
           <InputField label="Phone" value={data.phone} onChange={(v) => update({ phone: v })} placeholder="(555) 123-4567" type="tel" />
           <InputField label="Email" value={data.email} onChange={(v) => update({ email: v })} placeholder="you@example.com" type="email" />
@@ -59,19 +60,22 @@ export default function SignatureForm({ data, onChange }: Props) {
       </section>
 
       {/* Social Links */}
-      <section>
-        <h3 className="text-lg font-semibold text-white mb-3">Social Links</h3>
+      <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Social Links</h3>
         <div className="space-y-3">
           {socialPlatforms.map((platform) => (
             <div key={platform.id} className="flex items-center gap-2">
-              <img src={`/icons/${platform.id}.svg`} alt="" className="w-5 h-5 opacity-60 invert" />
-              <label className="text-sm text-gray-300 min-w-20">{platform.name}</label>
+              <span
+                className="w-5 h-5 flex-shrink-0 text-gray-500 dark:text-gray-400"
+                dangerouslySetInnerHTML={{ __html: getSocialIconSvg(platform.id, 'currentColor') }}
+              />
+              <label className="text-sm text-gray-600 dark:text-gray-300 min-w-20">{platform.name}</label>
               <input
                 type="text"
                 value={data.socials[platform.id] || ''}
                 onChange={(e) => updateSocial(platform.id, e.target.value)}
                 placeholder={platform.placeholder}
-                className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                className="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
               />
             </div>
           ))}
@@ -79,18 +83,18 @@ export default function SignatureForm({ data, onChange }: Props) {
       </section>
 
       {/* Branding */}
-      <section>
-        <h3 className="text-lg font-semibold text-white mb-3">Branding</h3>
+      <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Branding</h3>
         <div className="space-y-4">
           <ImageUploader value={data.logoUrl} onChange={(v) => update({ logoUrl: v })} />
           <ColorPicker label="Primary Color" value={data.primaryColor} onChange={(v) => update({ primaryColor: v })} />
           <ColorPicker label="Secondary Color" value={data.secondaryColor} onChange={(v) => update({ secondaryColor: v })} />
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Font</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Font</label>
             <select
               value={data.fontFamily}
               onChange={(e) => update({ fontFamily: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
             >
               {FONTS.map((f) => (
                 <option key={f} value={f}>{f}</option>
