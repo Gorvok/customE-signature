@@ -1,108 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <style>
-    .signature-table {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      border-collapse: collapse;
-    }
-    .main-table {
-      background-color: #000; /* Black background applied here */
-      color: #FFF; /* White text */
-      border: 1px solid #FFF; /* White border for consistency */
-      border-radius: 5px;
-      padding: 25px;
-      margin: 10px 0;
-    }
-    .name-row {
-      font-weight: bold;
-      font-size: 20px;
-      color: #FFF;
-    }
-    .title-row {
-      font-size: 12px;
-      color: #FFF;
-    }
-    .company-info {
-      font-weight: bold;
-      font-size: 12px;
-      color: #FFF;
-    }
-    .contact-info a, .social-icons a {
-      color: #FFF; /* White links */
-      text-decoration: none; /* No underline */
-    }
-    .contact-info a:hover, .social-icons a:hover {
-      text-decoration: underline; /* Underline on hover for better user experience */
-    }
-    .social-icons img {
-      width: 24px;
-      display: block;
-      margin-right: 4px;
-    }
-    .divider {
-      border-left: 1px solid #FFF; /* White divider */
-      padding-left: 15px;
-    }
-  </style>
-</head>
-<body>
-<table class="signature-table">
-  <tr>
-    <td>
-      <table class="main-table">
-        <tr>
-          <td>
-            <!-- Name and Verification -->
-            <table>
-              <tr>
-                <td class="name-row">Gjovani Gorvokaj</td>
-                <td><img src="https://app.customesignature.com/images/verify.gif" width="15" height="15"></td>
-              </tr>
-              <tr>
-                <td colspan="2" class="title-row">CEO/Co-Founder</td>
-              </tr>
-            </table>
-            <!-- Logo -->
-            <table>
-              <tr>
-                <td><a href="javascript:void(0);"><img src="https://app.customesignature.com/upload/signature/5911/5911.svg" width="100"></a></td>
-              </tr>
-            </table>
-          </td>
-          <!-- Divider and Contact Info -->
-          <td class="divider">
-            <table class="contact-info">
-              <tr>
-                <td class="company-info">Milk-E Way Studios</td>
-              </tr>
-              <tr>
-                <td><a href="tel:(248) 838-8678">(248) 838-8678</a></td>
-              </tr>
-              <tr>
-                <td><a href="mailto:ggorvokaj@milk-eway.studio">ggorvokaj@milk-eway.studio</a></td>
-              </tr>
-              <tr>
-                <td><a href="https://www.milk-eway.studio">www.milk-eway.studio</a></td>
-              </tr>
-            </table>
-            <!-- Social Icons -->
-            <table class="social-icons">
-              <tr>
-                <td><a href="https://www.milk-eway.studio" target="_blank"><img src="https://app.customesignature.com/images/social/animation/4/web-icon.gif"></a></td>
-                <td><a href="https://www.instagram.com/gorvok_5" target="_blank"><img src="https://app.customesignature.com/images/social/animation/4/insta-icon.gif"></a></td>
-                <td><a href="https://www.linkedin.com/in/gjovanigorvokaj" target="_blank"><img src="https://app.customesignature.com/images/social/animation/4/linkedin-icon.gif"></a></td>
-                <td><a href="https://www.facebook.com/Gorvok" target="_blank"><img src="https://app.customesignature.com/images/social/animation/4/facebook-icon.gif"></a></td>
-                <td><a href="https://www.twitter.com/gorvok_5" target="_blank"><img src="https://app.customesignature.com/images/social/animation/4/twitter-icon.gif"></a></td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Signature Generator</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
