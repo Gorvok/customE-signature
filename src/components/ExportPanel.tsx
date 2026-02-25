@@ -27,7 +27,7 @@ export default function ExportPanel({ data, template }: Props) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-white">Export</h3>
+      <h3 className="text-base font-semibold text-gray-900 dark:text-white">Export</h3>
 
       {/* Provider grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -38,8 +38,8 @@ export default function ExportPanel({ data, template }: Props) {
             onClick={() => setSelectedProvider(p.id)}
             className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
               selectedProvider === p.id
-                ? 'border-blue-500 bg-blue-500/10 text-blue-400'
-                : 'border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white'
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-gray-900'
             }`}
           >
             {p.name}
@@ -49,9 +49,9 @@ export default function ExportPanel({ data, template }: Props) {
 
       {/* Provider instructions + actions */}
       {provider && (
-        <div className="bg-gray-800/60 rounded-lg p-4 space-y-4">
-          <h4 className="font-medium text-white">Setup Instructions for {provider.name}</h4>
-          <ol className="list-decimal list-inside space-y-1 text-sm text-gray-300">
+        <div className="bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-4">
+          <h4 className="font-medium text-gray-900 dark:text-white">Setup Instructions for {provider.name}</h4>
+          <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
             {provider.instructions.map((step, i) => (
               <li key={i}>{step}</li>
             ))}
@@ -77,7 +77,7 @@ export default function ExportPanel({ data, template }: Props) {
               <button
                 type="button"
                 onClick={handleDownload}
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors"
               >
                 Download HTML
               </button>
@@ -103,7 +103,7 @@ export default function ExportPanel({ data, template }: Props) {
           <button
             type="button"
             onClick={handleDownload}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors"
           >
             Download HTML
           </button>

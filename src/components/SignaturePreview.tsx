@@ -11,8 +11,8 @@ export default function SignaturePreview({ data, template }: Props) {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-white">Preview</h3>
-      <div className="bg-white rounded-lg p-6 overflow-auto">
+      <h3 className="text-base font-semibold text-gray-900 dark:text-white">Preview</h3>
+      <div className="bg-white rounded-xl border border-gray-200 dark:border-gray-300 p-6 overflow-auto shadow-sm">
         <div dangerouslySetInnerHTML={{ __html: html }} />
       </div>
     </div>
