@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { SignatureData } from './types';
 import { templates } from './templates';
+import { useTheme } from './ThemeContext';
 import SignatureForm from './components/SignatureForm';
 import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
@@ -23,26 +24,41 @@ const defaultData: SignatureData = {
 export default function App() {
   const [data, setData] = useState<SignatureData>(defaultData);
   const [templateId, setTemplateId] = useState(templates[0].id);
+  const { theme, toggle } = useTheme();
 
   const template = templates.find((t) => t.id === templateId) ?? templates[0];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white transition-colors">
       {/* Header */}
-      <header className="border-b border-gray-800 px-6 py-4">
+      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-4 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Email Signature Generator</h1>
-            <p className="text-sm text-gray-400">Free &amp; open source — no login required</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Email Signature Generator</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Free &amp; open source — no login required</p>
           </div>
-          <a
-            href="https://github.com/Gorvok/customE-signature"
-            target="_blank"
-            rel="noopener"
-            className="text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            GitHub
-          </a>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={toggle}
+              className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              )}
+            </button>
+            <a
+              href="https://github.com/Gorvok/customE-signature"
+              target="_blank"
+              rel="noopener"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              GitHub
+            </a>
+          </div>
         </div>
       </header>
 
@@ -53,7 +69,7 @@ export default function App() {
         {/* Two-column: Form + Preview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <SignatureForm data={data} onChange={setData} />
-          <div className="space-y-8">
+          <div className="space-y-8 lg:sticky lg:top-24 lg:self-start">
             <SignaturePreview data={data} template={template} />
             <ExportPanel data={data} template={template} />
           </div>
@@ -61,8 +77,8 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 px-6 py-4 mt-12">
-        <div className="max-w-7xl mx-auto text-center text-sm text-gray-500">
+      <footer className="border-t border-gray-200 dark:border-gray-800 px-6 py-4 mt-12">
+        <div className="max-w-7xl mx-auto text-center text-sm text-gray-500 dark:text-gray-500">
           Open source email signature generator. No data is stored — everything runs in your browser.
         </div>
       </footer>
