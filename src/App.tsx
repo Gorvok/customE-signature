@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import type { SignatureData } from './types';
 import { templates } from './templates';
 import { socialPlatforms } from './data/socialPlatforms';
+import { sampleData } from './data/sampleData';
 import { useTheme } from './theme';
+import { useToast } from './toast';
 import SignatureForm from './components/SignatureForm';
 import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
@@ -60,7 +62,9 @@ function loadTemplateId(): string {
 export default function App() {
   const [data, setData] = useState<SignatureData>(loadData);
   const [templateId, setTemplateId] = useState(loadTemplateId);
+  const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const { theme, toggle } = useTheme();
+  const { addToast } = useToast();
 
   function applyConfig(config: SharedConfig) {
     setData({ ...defaultData, ...config.data });
@@ -87,7 +91,14 @@ export default function App() {
   function handleReset() {
     if (window.confirm('Clear all fields and start over?')) {
       setData(defaultData);
+      addToast('Cleared all fields', 'info');
     }
+  }
+
+  function handleLoadSample() {
+    setData(sampleData);
+    setMobileTab('preview');
+    addToast('Loaded sample data');
   }
 
   const template = templates.find((t) => t.id === templateId) ?? templates[0];
@@ -95,13 +106,25 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white transition-colors">
       {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Email Signature Generator</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Free &amp; open source — no login required</p>
+      <header className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-4 sm:px-6 py-4 sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+            </span>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate">Email Signature Generator</h1>
+              <p className="hidden sm:block text-sm text-gray-500 dark:text-gray-400">Free &amp; open source — no login required</p>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <button
+              type="button"
+              onClick={handleLoadSample}
+              className="hidden sm:inline-flex text-sm font-medium px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+            >
+              Load sample
+            </button>
             <button
               type="button"
               onClick={handleReset}
@@ -125,7 +148,8 @@ export default function App() {
               href="https://github.com/Gorvok/customE-signature"
               target="_blank"
               rel="noopener"
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              aria-label="View source on GitHub"
+              className="hidden sm:inline text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               GitHub
             </a>
@@ -133,15 +157,38 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {/* Template Selector */}
         <TemplateSelector selected={templateId} onSelect={setTemplateId} previewData={data} />
 
+        {/* Mobile edit/preview switcher */}
+        <div className="lg:hidden sticky top-[68px] z-10 -mx-4 px-4 py-2 bg-gray-50/90 dark:bg-gray-950/90 backdrop-blur">
+          <div role="group" aria-label="View" className="inline-flex w-full rounded-lg border border-gray-200 dark:border-gray-700 p-0.5 bg-gray-100 dark:bg-gray-800">
+            {(['edit', 'preview'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                aria-pressed={mobileTab === tab}
+                onClick={() => setMobileTab(tab)}
+                className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md capitalize transition-colors ${
+                  mobileTab === tab
+                    ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Two-column: Form + Preview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <SignatureForm data={data} onChange={setData} />
-          <div className="space-y-8 lg:sticky lg:top-24 lg:self-start">
-            <SignaturePreview data={data} template={template} />
+          <div className={mobileTab === 'edit' ? 'block' : 'hidden lg:block'}>
+            <SignatureForm data={data} onChange={setData} />
+          </div>
+          <div className={`${mobileTab === 'preview' ? 'block' : 'hidden lg:block'} space-y-8 lg:sticky lg:top-24 lg:self-start`}>
+            <SignaturePreview data={data} template={template} onLoadSample={handleLoadSample} />
             <ExportPanel data={data} template={template} />
             <SharePanel data={data} templateId={templateId} onLoad={applyConfig} />
           </div>

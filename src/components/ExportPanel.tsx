@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import type { SignatureData, SignatureTemplate } from '../types';
 import { providers } from '../data/providers';
 import { copyHtmlToClipboard, downloadHtmlFile } from '../utils/exportHelpers';
+import { useToast } from '../toast';
 
 interface Props {
   data: SignatureData;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function ExportPanel({ data, template }: Props) {
+  const { addToast } = useToast();
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
@@ -18,11 +20,13 @@ export default function ExportPanel({ data, template }: Props) {
   async function handleCopy() {
     const ok = await copyHtmlToClipboard(html);
     setCopyStatus(ok ? 'success' : 'error');
+    addToast(ok ? 'Signature copied — paste it into your email settings' : 'Copy failed — try Download HTML', ok ? 'success' : 'error');
     setTimeout(() => setCopyStatus('idle'), 2000);
   }
 
   function handleDownload() {
     downloadHtmlFile(html, `signature-${template.id}.html`);
+    addToast('Downloaded signature HTML');
   }
 
   return (
