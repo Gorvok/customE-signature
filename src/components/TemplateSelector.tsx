@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { SignatureData, SignatureTemplate } from '../types';
 import { templates } from '../templates';
+import { LOCAL_ICON_BASE } from '../utils/templateHelpers';
 
 interface Props {
   selected: string;
@@ -9,7 +10,10 @@ interface Props {
 }
 
 function MiniPreview({ template, data }: { template: SignatureTemplate; data: SignatureData }) {
-  const html = useMemo(() => template.render(data), [template, data]);
+  const html = useMemo(
+    () => template.render(data, { iconBaseUrl: LOCAL_ICON_BASE }),
+    [template, data],
+  );
   return (
     <div
       className="bg-white rounded p-2 overflow-hidden pointer-events-none"

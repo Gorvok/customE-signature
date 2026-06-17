@@ -1,66 +1,77 @@
 import type { SignatureData, SignatureTemplate } from '../types';
-import { getSocialIconDataUri } from '../utils/socialIcons';
-import { socialPlatforms } from '../data/socialPlatforms';
-
-function buildSocialUrl(platformId: string, value: string): string {
-  if (!value) return '';
-  if (value.startsWith('http://') || value.startsWith('https://')) return value;
-  const platform = socialPlatforms.find((p) => p.id === platformId);
-  if (!platform || !platform.urlPrefix) return value;
-  return platform.urlPrefix + value;
-}
+import {
+  esc,
+  finalizeHtml,
+  roleLine,
+  renderCtaButton,
+  renderDisclaimer,
+  sanitizeImageUrl,
+  sanitizeLinkUrl,
+  normalizeWebsite,
+  displayWebsite,
+  telDigits,
+  renderSocialLinks,
+} from '../utils/templateHelpers';
 
 export const classicDark: SignatureTemplate = {
   id: 'classic-dark',
   name: 'Classic Dark',
   description: 'Professional dark theme with two-column layout',
-  render: (data: SignatureData) => {
-    const socialLinks = Object.entries(data.socials)
-      .filter(([, val]) => val.trim())
-      .map(([platform, value]) => {
-        const url = buildSocialUrl(platform, value);
-        const iconUri = getSocialIconDataUri(platform, data.secondaryColor || '#FFFFFF');
-        return `<td style="padding-right: 6px;"><a href="${url}" target="_blank" rel="noopener" style="text-decoration: none;"><img src="${iconUri}" width="18" height="18" alt="${platform}" style="display: block; width: 18px; height: 18px;" /></a></td>`;
-      })
-      .join('');
+  render: (data: SignatureData, options = {}) => {
+    const primary = esc(data.primaryColor);
+    const secondary = esc(data.secondaryColor || '#FFFFFF');
+    const font = esc(data.fontFamily);
 
-    const logoHtml = data.logoUrl
-      ? `<tr><td style="padding-top: 10px;"><img src="${data.logoUrl}" width="100" style="width: 100px; display: block;" alt="Logo" /></td></tr>`
+    const socialLinks = renderSocialLinks(data.socials, {
+      style: data.iconStyle,
+      size: 18,
+      baseUrl: options.iconBaseUrl,
+      order: data.socialOrder,
+    });
+
+    const logoSrc = sanitizeImageUrl(data.logoUrl);
+    const logoHtml = logoSrc
+      ? `<tr><td style="padding-top: 10px;"><img src="${logoSrc}" width="100" style="width: 100px; display: block;" alt="Logo" /></td></tr>`
       : '';
 
-    const phoneHtml = data.phone
-      ? `<tr><td style="padding: 2px 0;"><a href="tel:${data.phone.replace(/[^+\d]/g, '')}" style="color: ${data.secondaryColor}; text-decoration: none; font-size: 12px; font-family: ${data.fontFamily}, sans-serif;">${data.phone}</a></td></tr>`
-      : '';
+    const role = roleLine(data.jobTitle, data.department);
+    const link = (label: string, href: string) =>
+      `<tr><td style="padding: 2px 0;"><a href="${href}" style="color: ${secondary}; text-decoration: none; font-size: 12px; font-family: ${font}, sans-serif;">${label}</a></td></tr>`;
 
-    const emailHtml = data.email
-      ? `<tr><td style="padding: 2px 0;"><a href="mailto:${data.email}" style="color: ${data.secondaryColor}; text-decoration: none; font-size: 12px; font-family: ${data.fontFamily}, sans-serif;">${data.email}</a></td></tr>`
-      : '';
+    const rows: string[] = [];
+    if (data.phone) rows.push(link(esc(data.phone), sanitizeLinkUrl(`tel:${telDigits(data.phone)}`)));
+    if (data.email) rows.push(link(esc(data.email), sanitizeLinkUrl(`mailto:${data.email}`)));
+    if (data.website) rows.push(link(esc(displayWebsite(data.website)), sanitizeLinkUrl(normalizeWebsite(data.website))));
+    if (data.bookingLink) rows.push(link('Book a meeting', sanitizeLinkUrl(normalizeWebsite(data.bookingLink))));
+    if (data.address) rows.push(`<tr><td style="padding: 2px 0; color: ${secondary}; font-size: 12px; font-family: ${font}, sans-serif;">${esc(data.address)}</td></tr>`);
 
-    const websiteHtml = data.website
-      ? `<tr><td style="padding: 2px 0;"><a href="${data.website.startsWith('http') ? data.website : 'https://' + data.website}" style="color: ${data.secondaryColor}; text-decoration: none; font-size: 12px; font-family: ${data.fontFamily}, sans-serif;">${data.website.replace(/^https?:\/\//, '')}</a></td></tr>`
-      : '';
+    const cta = renderCtaButton(data.ctaLabel, data.ctaUrl, {
+      bg: data.secondaryColor || '#FFFFFF',
+      fg: data.primaryColor,
+      font: data.fontFamily,
+    });
 
-    return `<table cellpadding="0" cellspacing="0" border="0" style="background-color: ${data.primaryColor}; border: 1px solid ${data.secondaryColor}; border-radius: 5px; padding: 25px; font-family: ${data.fontFamily}, sans-serif;">
+    return finalizeHtml(`<table cellpadding="0" cellspacing="0" border="0" style="background-color: ${primary}; border: 1px solid ${secondary}; border-radius: 5px; padding: 25px; font-family: ${font}, sans-serif;">
   <tr>
     <td style="vertical-align: top; padding-right: 15px;">
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="font-weight: bold; font-size: 20px; color: ${data.secondaryColor}; font-family: ${data.fontFamily}, sans-serif; white-space: nowrap;">${data.fullName || 'Your Name'}</td>
+          <td style="font-weight: bold; font-size: 20px; color: ${secondary}; font-family: ${font}, sans-serif; white-space: nowrap;">${esc(data.fullName) || 'Your Name'}${data.pronouns ? ` <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">(${esc(data.pronouns)})</span>` : ''}</td>
         </tr>
-        ${data.jobTitle ? `<tr><td style="font-size: 12px; color: ${data.secondaryColor}; font-family: ${data.fontFamily}, sans-serif; padding-top: 2px;">${data.jobTitle}</td></tr>` : ''}
+        ${role ? `<tr><td style="font-size: 12px; color: ${secondary}; font-family: ${font}, sans-serif; padding-top: 2px;">${role}</td></tr>` : ''}
         ${logoHtml}
       </table>
     </td>
-    <td style="border-left: 1px solid ${data.secondaryColor}; padding-left: 15px; vertical-align: top;">
+    <td style="border-left: 1px solid ${secondary}; padding-left: 15px; vertical-align: top;">
       <table cellpadding="0" cellspacing="0" border="0">
-        ${data.company ? `<tr><td style="font-weight: bold; font-size: 12px; color: ${data.secondaryColor}; font-family: ${data.fontFamily}, sans-serif; padding-bottom: 4px;">${data.company}</td></tr>` : ''}
-        ${phoneHtml}
-        ${emailHtml}
-        ${websiteHtml}
+        ${data.company ? `<tr><td style="font-weight: bold; font-size: 12px; color: ${secondary}; font-family: ${font}, sans-serif; padding-bottom: 4px;">${esc(data.company)}</td></tr>` : ''}
+        ${rows.join('')}
       </table>
+      ${cta ? `<div style="padding-top: 10px;">${cta}</div>` : ''}
       ${socialLinks ? `<table cellpadding="0" cellspacing="0" border="0" style="padding-top: 8px;"><tr>${socialLinks}</tr></table>` : ''}
     </td>
   </tr>
-</table>`;
+</table>
+${renderDisclaimer(data.disclaimer, data.fontFamily, secondary)}`);
   },
 };

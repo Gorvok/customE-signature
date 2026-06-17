@@ -1,30 +1,94 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { SignatureData } from './types';
 import { templates } from './templates';
-import { useTheme } from './ThemeContext';
+import { socialPlatforms } from './data/socialPlatforms';
+import { useTheme } from './theme';
 import SignatureForm from './components/SignatureForm';
 import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
+import SharePanel from './components/SharePanel';
+import { readConfigFromHash, type SharedConfig } from './utils/shareConfig';
 
 const defaultData: SignatureData = {
   fullName: '',
+  pronouns: '',
   jobTitle: '',
+  department: '',
   company: '',
   phone: '',
   email: '',
   website: '',
+  address: '',
+  bookingLink: '',
   socials: {},
+  socialOrder: socialPlatforms.map((p) => p.id),
   logoUrl: '',
+  ctaLabel: '',
+  ctaUrl: '',
+  disclaimer: '',
   primaryColor: '#000000',
   secondaryColor: '#FFFFFF',
   fontFamily: 'Inter',
+  iconStyle: 'brand',
 };
 
+const STORAGE_KEY = 'signature-data';
+
+// A shared link (#cfg=...) takes precedence over local storage on first load.
+const sharedConfig = typeof window !== 'undefined' ? readConfigFromHash() : null;
+
+function loadData(): SignatureData {
+  if (sharedConfig) return { ...defaultData, ...sharedConfig.data };
+  if (typeof window === 'undefined') return defaultData;
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return { ...defaultData, ...JSON.parse(saved) };
+  } catch {
+    // Ignore malformed/unavailable storage and fall back to defaults.
+  }
+  return defaultData;
+}
+
+function loadTemplateId(): string {
+  if (sharedConfig?.templateId && templates.some((t) => t.id === sharedConfig.templateId)) {
+    return sharedConfig.templateId;
+  }
+  return templates[0].id;
+}
+
 export default function App() {
-  const [data, setData] = useState<SignatureData>(defaultData);
-  const [templateId, setTemplateId] = useState(templates[0].id);
+  const [data, setData] = useState<SignatureData>(loadData);
+  const [templateId, setTemplateId] = useState(loadTemplateId);
   const { theme, toggle } = useTheme();
+
+  function applyConfig(config: SharedConfig) {
+    setData({ ...defaultData, ...config.data });
+    if (config.templateId && templates.some((t) => t.id === config.templateId)) {
+      setTemplateId(config.templateId);
+    }
+  }
+
+  // Strip the #cfg= fragment once it has been consumed by the initializers.
+  useEffect(() => {
+    if (window.location.hash.includes('cfg=')) {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      // Storage may be unavailable (private mode, quota) — non-fatal.
+    }
+  }, [data]);
+
+  function handleReset() {
+    if (window.confirm('Clear all fields and start over?')) {
+      setData(defaultData);
+    }
+  }
 
   const template = templates.find((t) => t.id === templateId) ?? templates[0];
 
@@ -38,6 +102,13 @@ export default function App() {
             <p className="text-sm text-gray-500 dark:text-gray-400">Free &amp; open source — no login required</p>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              Reset
+            </button>
             <button
               type="button"
               onClick={toggle}
@@ -72,6 +143,7 @@ export default function App() {
           <div className="space-y-8 lg:sticky lg:top-24 lg:self-start">
             <SignaturePreview data={data} template={template} />
             <ExportPanel data={data} template={template} />
+            <SharePanel data={data} templateId={templateId} onLoad={applyConfig} />
           </div>
         </div>
       </main>

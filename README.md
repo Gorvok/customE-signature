@@ -4,12 +4,18 @@ A free, open-source web app for creating professional email signatures. No login
 
 ## Features
 
-- **3 signature templates**: Classic Dark, Modern Light, Minimal
+- **7 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card
 - **Live preview** that updates as you type
-- **Full customization**: colors, fonts, logo upload, social links
+- **Rich fields**: name, pronouns, job title, department, company, phone, email, website, office address, booking link, a call-to-action button, and a legal disclaimer
+- **Full customization**: colors, fonts, logo upload, social links (drag to reorder), and four social-icon styles
+- **Inline validation** for email and URL fields, with a bulletproof (Outlook-safe) CTA button
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
-- **Self-contained**: social icons are embedded as inline SVGs, logos are converted to base64 — no external dependencies in the generated signature
+- **Save & share**: copy a self-restoring share link or export/import your setup as JSON
+- **Autosave**: your details are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear)
+- **Installable PWA** with offline support
+- **Light & dark mode** with system-preference detection
+- **Safe output**: all input is HTML-escaped and links are sanitized before being placed in the generated signature
 - **Fully client-side**: zero backend, zero tracking, zero data collection
 
 ## Quick Start
@@ -21,9 +27,48 @@ npm run dev
 
 Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
+## Social Icons
+
+Social icons in the generated signature are **hosted PNGs** (served from the
+deployed site), because Gmail and Outlook strip inline/data-URI SVGs. Four
+styles are available — Brand colors, Dark, Light (for dark backgrounds) and
+Gray. The PNGs are pre-rendered from `src/data/socialIconSvgs.json`:
+
+```bash
+npm run generate:icons   # writes public/icons/png/<style>/<platform>.png
+```
+
+If you fork this project, update `PRODUCTION_ICON_BASE` in
+`src/utils/templateHelpers.ts` to point at your own deployment.
+
+## Known Limitations
+
+- **Uploaded logos** are embedded as base64 data URIs, which Gmail and Outlook
+  may strip. For maximum compatibility, paste a hosted image **URL** in the
+  logo field instead of uploading a file.
+- Email clients are inconsistent by nature; always send yourself a test email
+  before relying on a new signature.
+
+## Testing
+
+```bash
+npm test
+```
+
+Unit tests (Vitest) cover the HTML-escaping/URL-sanitization helpers, the
+share-config encoder, and verify that every template neutralizes malicious
+input. A GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint, tests
+and the build on every pull request.
+
+The social-share image and PWA app icons are generated with:
+
+```bash
+npm run generate:og
+```
+
 ## How to Use
 
-1. Pick a template (Classic Dark, Modern Light, or Minimal)
+1. Pick a template (Classic Dark, Modern Light, Minimal, and more)
 2. Fill in your details — name, title, company, contact info, social links
 3. Customize colors, font, and upload a logo
 4. Choose your email provider (Gmail, Outlook, etc.)
@@ -59,4 +104,4 @@ Contributions are welcome! Some ideas:
 
 ## License
 
-Open source. See repository for license details.
+[MIT](./LICENSE) © Gorvok
