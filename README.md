@@ -6,10 +6,13 @@ A free, open-source web app for creating professional email signatures. No login
 
 - **7 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card
 - **Live preview** that updates as you type
-- **Full customization**: colors, fonts, logo upload, social links
+- **Rich fields**: name, pronouns, job title, department, company, phone, email, website, office address, booking link, a call-to-action button, and a legal disclaimer
+- **Full customization**: colors, fonts, logo upload, social links, and four social-icon styles
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
+- **Save & share**: copy a self-restoring share link or export/import your setup as JSON
 - **Autosave**: your details are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear)
+- **Installable PWA** with offline support
 - **Light & dark mode** with system-preference detection
 - **Safe output**: all input is HTML-escaped and links are sanitized before being placed in the generated signature
 - **Fully client-side**: zero backend, zero tracking, zero data collection
@@ -51,8 +54,16 @@ If you fork this project, update `PRODUCTION_ICON_BASE` in
 npm test
 ```
 
-Unit tests (Vitest) cover the HTML-escaping/URL-sanitization helpers and verify
-that every template neutralizes malicious input.
+Unit tests (Vitest) cover the HTML-escaping/URL-sanitization helpers, the
+share-config encoder, and verify that every template neutralizes malicious
+input. A GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint, tests
+and the build on every pull request.
+
+The social-share image and PWA app icons are generated with:
+
+```bash
+npm run generate:og
+```
 
 ## How to Use
 
