@@ -2,13 +2,20 @@ export type IconStyle = 'brand' | 'dark' | 'light' | 'gray';
 
 export interface SignatureData {
   fullName: string;
+  pronouns: string;
   jobTitle: string;
+  department: string;
   company: string;
   phone: string;
   email: string;
   website: string;
+  address: string;
+  bookingLink: string;
   socials: Record<string, string>;
   logoUrl: string;
+  ctaLabel: string;
+  ctaUrl: string;
+  disclaimer: string;
   primaryColor: string;
   secondaryColor: string;
   fontFamily: string;

@@ -54,7 +54,9 @@ export default function SignatureForm({ data, onChange }: Props) {
         <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Personal Info</h3>
         <div className="space-y-3">
           <InputField label="Full Name" value={data.fullName} onChange={(v) => update({ fullName: v })} placeholder="John Doe" />
+          <InputField label="Pronouns" value={data.pronouns} onChange={(v) => update({ pronouns: v })} placeholder="she/her" />
           <InputField label="Job Title" value={data.jobTitle} onChange={(v) => update({ jobTitle: v })} placeholder="CEO / Designer" />
+          <InputField label="Department" value={data.department} onChange={(v) => update({ department: v })} placeholder="Engineering" />
           <InputField label="Company" value={data.company} onChange={(v) => update({ company: v })} placeholder="Acme Inc." />
         </div>
       </section>
@@ -66,6 +68,8 @@ export default function SignatureForm({ data, onChange }: Props) {
           <InputField label="Phone" value={data.phone} onChange={(v) => update({ phone: v })} placeholder="(555) 123-4567" type="tel" />
           <InputField label="Email" value={data.email} onChange={(v) => update({ email: v })} placeholder="you@example.com" type="email" />
           <InputField label="Website" value={data.website} onChange={(v) => update({ website: v })} placeholder="www.example.com" type="url" />
+          <InputField label="Office Address" value={data.address} onChange={(v) => update({ address: v })} placeholder="123 Main St, City" />
+          <InputField label="Booking Link" value={data.bookingLink} onChange={(v) => update({ bookingLink: v })} placeholder="calendly.com/you" type="url" />
         </div>
       </section>
 
@@ -92,6 +96,28 @@ export default function SignatureForm({ data, onChange }: Props) {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Call to Action</h3>
+        <div className="space-y-3">
+          <InputField label="Button Text" value={data.ctaLabel} onChange={(v) => update({ ctaLabel: v })} placeholder="Book a demo" />
+          <InputField label="Button Link" value={data.ctaUrl} onChange={(v) => update({ ctaUrl: v })} placeholder="https://example.com/demo" type="url" />
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Legal Disclaimer</h3>
+        <textarea
+          value={data.disclaimer}
+          onChange={(e) => update({ disclaimer: e.target.value })}
+          placeholder="This email and any attachments are confidential…"
+          rows={3}
+          aria-label="Legal disclaimer"
+          className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+        />
       </section>
 
       {/* Branding */}

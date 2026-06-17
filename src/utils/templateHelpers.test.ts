@@ -8,6 +8,10 @@ import {
   telDigits,
   buildSocialUrl,
   renderSocialLinks,
+  finalizeHtml,
+  roleLine,
+  renderCtaButton,
+  renderDisclaimer,
   PRODUCTION_ICON_BASE,
 } from './templateHelpers';
 import { templates } from '../templates';
@@ -92,16 +96,70 @@ describe('renderSocialLinks', () => {
   });
 });
 
+describe('finalizeHtml', () => {
+  it('adds a presentation role to tables that lack one', () => {
+    expect(finalizeHtml('<table cellpadding="0">')).toBe('<table role="presentation" cellpadding="0">');
+  });
+
+  it('leaves tables that already have a role untouched', () => {
+    expect(finalizeHtml('<table role="presentation">')).toBe('<table role="presentation">');
+  });
+});
+
+describe('roleLine', () => {
+  it('joins title and department, dropping blanks', () => {
+    expect(roleLine('CTO', 'Engineering')).toBe('CTO, Engineering');
+    expect(roleLine('CTO', '')).toBe('CTO');
+    expect(roleLine('', '')).toBe('');
+  });
+
+  it('escapes its parts', () => {
+    expect(roleLine('<b>', '')).toBe('&lt;b&gt;');
+  });
+});
+
+describe('renderCtaButton', () => {
+  it('renders an escaped button with a safe href', () => {
+    const html = renderCtaButton('Book', 'example.com/x', { bg: '#000', fg: '#fff', font: 'Inter' });
+    expect(html).toContain('href="https://example.com/x"');
+    expect(html).toContain('>Book<');
+  });
+
+  it('returns empty when label or url is missing', () => {
+    expect(renderCtaButton('', 'x', { bg: '#000', fg: '#fff', font: 'Inter' })).toBe('');
+    expect(renderCtaButton('Go', '', { bg: '#000', fg: '#fff', font: 'Inter' })).toBe('');
+  });
+
+  it('neutralizes a javascript: url via normalization', () => {
+    const html = renderCtaButton('Go', 'javascript:alert(1)', { bg: '#000', fg: '#fff', font: 'Inter' });
+    expect(html).not.toContain('href="javascript:');
+  });
+});
+
+describe('renderDisclaimer', () => {
+  it('escapes text and returns empty when blank', () => {
+    expect(renderDisclaimer('<script>', 'Inter')).toContain('&lt;script&gt;');
+    expect(renderDisclaimer('   ', 'Inter')).toBe('');
+  });
+});
+
 describe('templates escape malicious input', () => {
   const malicious: SignatureData = {
     fullName: '<img src=x onerror=alert(1)>',
+    pronouns: '"><b>x</b>',
     jobTitle: '"><script>alert(2)</script>',
+    department: '<i>dept</i>',
     company: 'Acme "Corp"',
     phone: '123',
     email: 'a@b.com',
     website: 'example.com',
+    address: '<script>1</script> 1 Main St',
+    bookingLink: 'javascript:alert(4)',
     socials: { github: 'octocat' },
     logoUrl: 'javascript:alert(3)',
+    ctaLabel: '<u>Click</u>',
+    ctaUrl: 'javascript:alert(5)',
+    disclaimer: 'Confidential <script>alert(6)</script>',
     primaryColor: '#000000',
     secondaryColor: '#FFFFFF',
     fontFamily: 'Inter',

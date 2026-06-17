@@ -79,6 +79,41 @@ export function buildSocialUrl(platformId: string, value: string): string {
   return platform.urlPrefix + value;
 }
 
+/**
+ * Harden generated markup for email clients: give every `<table>` a
+ * presentation role so screen readers and Outlook treat it as layout, not data.
+ */
+export function finalizeHtml(html: string): string {
+  return html.replace(/<table(?![^>]*\brole=)/g, '<table role="presentation"');
+}
+
+/** A combined "Job Title, Department" line (either part may be empty). */
+export function roleLine(jobTitle: string, department: string): string {
+  return [jobTitle, department].filter((p) => p.trim()).map(esc).join(', ');
+}
+
+interface CtaOptions {
+  bg: string;
+  fg: string;
+  font: string;
+}
+
+/**
+ * Render an inline-block call-to-action button, or '' when not configured.
+ * Uses padding/inline-block which renders acceptably across clients.
+ */
+export function renderCtaButton(label: string, url: string, { bg, fg, font }: CtaOptions): string {
+  if (!label.trim() || !url.trim()) return '';
+  const href = sanitizeLinkUrl(normalizeWebsite(url));
+  return `<a href="${href}" target="_blank" rel="noopener" style="display: inline-block; background-color: ${esc(bg)}; color: ${esc(fg)}; font-family: ${esc(font)}, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; padding: 8px 16px; border-radius: 4px;">${esc(label)}</a>`;
+}
+
+/** Render a small legal/confidentiality disclaimer block, or '' when empty. */
+export function renderDisclaimer(text: string, font: string, color = '#999999'): string {
+  if (!text.trim()) return '';
+  return `<div style="margin-top: 10px; max-width: 480px; font-size: 10px; line-height: 1.5; color: ${esc(color)}; font-family: ${esc(font)}, sans-serif;">${esc(text)}</div>`;
+}
+
 interface SocialLinkOptions {
   /** Hosted icon color style. */
   style: IconStyle;
