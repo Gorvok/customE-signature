@@ -94,6 +94,14 @@ describe('renderSocialLinks', () => {
     const html = renderSocialLinks({ bogus: 'x', github: '   ' }, { style: 'dark' });
     expect(html).toBe('');
   });
+
+  it('honors an explicit order and appends the rest', () => {
+    const html = renderSocialLinks(
+      { github: 'a', linkedin: 'b' },
+      { style: 'brand', order: ['linkedin', 'github'] },
+    );
+    expect(html.indexOf('linkedin')).toBeLessThan(html.indexOf('github'));
+  });
 });
 
 describe('finalizeHtml', () => {
@@ -123,6 +131,12 @@ describe('renderCtaButton', () => {
     const html = renderCtaButton('Book', 'example.com/x', { bg: '#000', fg: '#fff', font: 'Inter' });
     expect(html).toContain('href="https://example.com/x"');
     expect(html).toContain('>Book<');
+  });
+
+  it('includes an Outlook VML fallback', () => {
+    const html = renderCtaButton('Book', 'example.com/x', { bg: '#000', fg: '#fff', font: 'Inter' });
+    expect(html).toContain('<!--[if mso]>');
+    expect(html).toContain('v:roundrect');
   });
 
   it('returns empty when label or url is missing', () => {
@@ -156,6 +170,7 @@ describe('templates escape malicious input', () => {
     address: '<script>1</script> 1 Main St',
     bookingLink: 'javascript:alert(4)',
     socials: { github: 'octocat' },
+    socialOrder: ['github'],
     logoUrl: 'javascript:alert(3)',
     ctaLabel: '<u>Click</u>',
     ctaUrl: 'javascript:alert(5)',

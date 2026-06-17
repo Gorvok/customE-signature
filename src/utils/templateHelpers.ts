@@ -99,13 +99,31 @@ interface CtaOptions {
 }
 
 /**
- * Render an inline-block call-to-action button, or '' when not configured.
- * Uses padding/inline-block which renders acceptably across clients.
+ * Render a "bulletproof" call-to-action button, or '' when not configured.
+ * Outlook (Word engine) ignores padding/border-radius on links, so it gets a
+ * VML <v:roundrect> via an MSO conditional comment; every other client gets the
+ * styled inline-block <a>. Browsers render the non-MSO branch in the preview.
  */
 export function renderCtaButton(label: string, url: string, { bg, fg, font }: CtaOptions): string {
   if (!label.trim() || !url.trim()) return '';
   const href = sanitizeLinkUrl(normalizeWebsite(url));
-  return `<a href="${href}" target="_blank" rel="noopener" style="display: inline-block; background-color: ${esc(bg)}; color: ${esc(fg)}; font-family: ${esc(font)}, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; padding: 8px 16px; border-radius: 4px;">${esc(label)}</a>`;
+  const safeLabel = esc(label);
+  const safeBg = esc(bg);
+  const safeFg = esc(fg);
+  const safeFont = esc(font);
+  // Rough width estimate so the VML box fits the (variable-length) label.
+  const width = Math.max(120, Math.round(label.trim().length * 8.5) + 32);
+  return `<div>
+  <!--[if mso]>
+  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${href}" style="height:34px;v-text-anchor:middle;width:${width}px;" arcsize="12%" strokecolor="${safeBg}" fillcolor="${safeBg}">
+    <w:anchorlock/>
+    <center style="color:${safeFg};font-family:${safeFont},sans-serif;font-size:12px;font-weight:bold;">${safeLabel}</center>
+  </v:roundrect>
+  <![endif]-->
+  <!--[if !mso]><!-->
+  <a href="${href}" target="_blank" rel="noopener" style="display: inline-block; background-color: ${safeBg}; color: ${safeFg}; font-family: ${safeFont}, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; padding: 8px 16px; border-radius: 4px;">${safeLabel}</a>
+  <!--<![endif]-->
+</div>`;
 }
 
 /** Render a small legal/confidentiality disclaimer block, or '' when empty. */
@@ -123,6 +141,8 @@ interface SocialLinkOptions {
   cellStyle?: string;
   /** Base URL for the hosted PNGs; defaults to the production URL. */
   baseUrl?: string;
+  /** Preferred platform order; any remaining socials are appended. */
+  order?: string[];
 }
 
 /**
@@ -133,14 +153,16 @@ interface SocialLinkOptions {
  */
 export function renderSocialLinks(
   socials: Record<string, string>,
-  { style, size = 18, cellStyle = 'padding-right: 6px;', baseUrl = PRODUCTION_ICON_BASE }: SocialLinkOptions,
+  { style, size = 18, cellStyle = 'padding-right: 6px;', baseUrl = PRODUCTION_ICON_BASE, order }: SocialLinkOptions,
 ): string {
   const base = baseUrl.replace(/\/$/, '');
-  return Object.entries(socials)
-    .filter(([, val]) => val.trim())
-    .map(([platform, value]) => {
-      if (!socialPlatforms.some((p) => p.id === platform)) return '';
-      const url = sanitizeLinkUrl(buildSocialUrl(platform, value));
+  const ordered = order?.length
+    ? [...order.filter((id) => id in socials), ...Object.keys(socials).filter((id) => !order.includes(id))]
+    : Object.keys(socials);
+  return ordered
+    .filter((platform) => (socials[platform] ?? '').trim() && socialPlatforms.some((p) => p.id === platform))
+    .map((platform) => {
+      const url = sanitizeLinkUrl(buildSocialUrl(platform, socials[platform]));
       const iconUrl = `${base}/${style}/${platform}.png`;
       return `<td style="${cellStyle}"><a href="${url}" target="_blank" rel="noopener" style="text-decoration: none;"><img src="${iconUrl}" width="${size}" height="${size}" alt="${esc(platform)}" style="display: block; width: ${size}px; height: ${size}px;" /></a></td>`;
     })

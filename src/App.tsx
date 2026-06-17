@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { SignatureData } from './types';
 import { templates } from './templates';
+import { socialPlatforms } from './data/socialPlatforms';
 import { useTheme } from './theme';
 import SignatureForm from './components/SignatureForm';
 import SignaturePreview from './components/SignaturePreview';
@@ -21,6 +22,7 @@ const defaultData: SignatureData = {
   address: '',
   bookingLink: '',
   socials: {},
+  socialOrder: socialPlatforms.map((p) => p.id),
   logoUrl: '',
   ctaLabel: '',
   ctaUrl: '',

@@ -7,7 +7,8 @@ A free, open-source web app for creating professional email signatures. No login
 - **7 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card
 - **Live preview** that updates as you type
 - **Rich fields**: name, pronouns, job title, department, company, phone, email, website, office address, booking link, a call-to-action button, and a legal disclaimer
-- **Full customization**: colors, fonts, logo upload, social links, and four social-icon styles
+- **Full customization**: colors, fonts, logo upload, social links (drag to reorder), and four social-icon styles
+- **Inline validation** for email and URL fields, with a bulletproof (Outlook-safe) CTA button
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
 - **Save & share**: copy a self-restoring share link or export/import your setup as JSON

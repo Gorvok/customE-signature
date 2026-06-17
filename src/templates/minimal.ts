@@ -24,6 +24,7 @@ export const minimal: SignatureTemplate = {
       style: data.iconStyle,
       size: 16,
       baseUrl: options.iconBaseUrl,
+      order: data.socialOrder,
     });
 
     const role = [roleLine(data.jobTitle, data.department), data.company ? esc(data.company) : ''].filter(Boolean).join(', ');

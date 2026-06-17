@@ -28,6 +28,7 @@ export const elegant: SignatureTemplate = {
       size: 16,
       cellStyle: 'padding: 0 5px;',
       baseUrl: options.iconBaseUrl,
+      order: data.socialOrder,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

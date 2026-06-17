@@ -26,6 +26,7 @@ export const classicDark: SignatureTemplate = {
       style: data.iconStyle,
       size: 18,
       baseUrl: options.iconBaseUrl,
+      order: data.socialOrder,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

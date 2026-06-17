@@ -12,6 +12,7 @@ export interface SignatureData {
   address: string;
   bookingLink: string;
   socials: Record<string, string>;
+  socialOrder: string[];
   logoUrl: string;
   ctaLabel: string;
   ctaUrl: string;

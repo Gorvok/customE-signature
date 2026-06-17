@@ -28,6 +28,7 @@ export const corporate: SignatureTemplate = {
       size: 16,
       cellStyle: 'padding-right: 8px;',
       baseUrl: options.iconBaseUrl,
+      order: data.socialOrder,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

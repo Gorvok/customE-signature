@@ -26,6 +26,7 @@ export const boldBanner: SignatureTemplate = {
       style: data.iconStyle,
       size: 16,
       baseUrl: options.iconBaseUrl,
+      order: data.socialOrder,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

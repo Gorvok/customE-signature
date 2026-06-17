@@ -28,6 +28,7 @@ export const compactCard: SignatureTemplate = {
       size: 14,
       cellStyle: 'padding-right: 5px;',
       baseUrl: options.iconBaseUrl,
+      order: data.socialOrder,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

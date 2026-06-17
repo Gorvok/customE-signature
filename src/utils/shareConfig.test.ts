@@ -14,6 +14,7 @@ const data: SignatureData = {
   address: '1 Main St',
   bookingLink: 'cal.com/jane',
   socials: { github: 'jane' },
+  socialOrder: ['github', 'linkedin'],
   logoUrl: '',
   ctaLabel: 'Book',
   ctaUrl: 'acme.com/book',
