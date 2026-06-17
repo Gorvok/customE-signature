@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { SignatureData } from '../types';
 import { socialPlatforms } from '../data/socialPlatforms';
 import { getSocialIconSvg } from '../utils/socialIcons';
@@ -14,10 +15,12 @@ const FONTS = ['Inter', 'Arial', 'Georgia', 'Verdana', 'Trebuchet MS', 'Courier 
 function InputField({ label, value, onChange, placeholder, type = 'text' }: {
   label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string;
 }) {
+  const id = useId();
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
       <input
+        id={id}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -66,11 +69,13 @@ export default function SignatureForm({ data, onChange }: Props) {
           {socialPlatforms.map((platform) => (
             <div key={platform.id} className="flex items-center gap-2">
               <span
+                aria-hidden="true"
                 className="w-5 h-5 flex-shrink-0 text-gray-500 dark:text-gray-400"
                 dangerouslySetInnerHTML={{ __html: getSocialIconSvg(platform.id, 'currentColor') }}
               />
-              <label className="text-sm text-gray-600 dark:text-gray-300 min-w-20">{platform.name}</label>
+              <label htmlFor={`social-${platform.id}`} className="text-sm text-gray-600 dark:text-gray-300 min-w-20">{platform.name}</label>
               <input
+                id={`social-${platform.id}`}
                 type="text"
                 value={data.socials[platform.id] || ''}
                 onChange={(e) => updateSocial(platform.id, e.target.value)}
@@ -90,8 +95,9 @@ export default function SignatureForm({ data, onChange }: Props) {
           <ColorPicker label="Primary Color" value={data.primaryColor} onChange={(v) => update({ primaryColor: v })} />
           <ColorPicker label="Secondary Color" value={data.secondaryColor} onChange={(v) => update({ secondaryColor: v })} />
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Font</label>
+            <label htmlFor="font-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Font</label>
             <select
+              id="font-select"
               value={data.fontFamily}
               onChange={(e) => update({ fontFamily: e.target.value })}
               className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"

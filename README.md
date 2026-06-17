@@ -4,12 +4,14 @@ A free, open-source web app for creating professional email signatures. No login
 
 ## Features
 
-- **3 signature templates**: Classic Dark, Modern Light, Minimal
+- **7 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card
 - **Live preview** that updates as you type
 - **Full customization**: colors, fonts, logo upload, social links
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
-- **Self-contained**: social icons are embedded as inline SVGs, logos are converted to base64 — no external dependencies in the generated signature
+- **Autosave**: your details are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear)
+- **Light & dark mode** with system-preference detection
+- **Safe output**: all input is HTML-escaped and links are sanitized before being placed in the generated signature
 - **Fully client-side**: zero backend, zero tracking, zero data collection
 
 ## Quick Start
@@ -21,9 +23,26 @@ npm run dev
 
 Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
+## Known Limitations
+
+Email clients are notoriously inconsistent. The social icons are embedded as
+inline SVG data URIs, which render in most modern webmail clients but are
+**stripped by Gmail and Outlook desktop**. If icons don't appear in those
+clients, the rest of the signature (text, links, logo) still works. Hosted PNG
+icons would be the most universally compatible option — contributions welcome.
+
+## Testing
+
+```bash
+npm test
+```
+
+Unit tests (Vitest) cover the HTML-escaping/URL-sanitization helpers and verify
+that every template neutralizes malicious input.
+
 ## How to Use
 
-1. Pick a template (Classic Dark, Modern Light, or Minimal)
+1. Pick a template (Classic Dark, Modern Light, Minimal, and more)
 2. Fill in your details — name, title, company, contact info, social links
 3. Customize colors, font, and upload a logo
 4. Choose your email provider (Gmail, Outlook, etc.)
@@ -59,4 +78,4 @@ Contributions are welcome! Some ideas:
 
 ## License
 
-Open source. See repository for license details.
+[MIT](./LICENSE) © Gorvok

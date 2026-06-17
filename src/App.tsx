@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { SignatureData } from './types';
 import { templates } from './templates';
-import { useTheme } from './ThemeContext';
+import { useTheme } from './theme';
 import SignatureForm from './components/SignatureForm';
 import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
@@ -21,10 +21,37 @@ const defaultData: SignatureData = {
   fontFamily: 'Inter',
 };
 
+const STORAGE_KEY = 'signature-data';
+
+function loadData(): SignatureData {
+  if (typeof window === 'undefined') return defaultData;
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return { ...defaultData, ...JSON.parse(saved) };
+  } catch {
+    // Ignore malformed/unavailable storage and fall back to defaults.
+  }
+  return defaultData;
+}
+
 export default function App() {
-  const [data, setData] = useState<SignatureData>(defaultData);
+  const [data, setData] = useState<SignatureData>(loadData);
   const [templateId, setTemplateId] = useState(templates[0].id);
   const { theme, toggle } = useTheme();
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      // Storage may be unavailable (private mode, quota) — non-fatal.
+    }
+  }, [data]);
+
+  function handleReset() {
+    if (window.confirm('Clear all fields and start over?')) {
+      setData(defaultData);
+    }
+  }
 
   const template = templates.find((t) => t.id === templateId) ?? templates[0];
 
@@ -38,6 +65,13 @@ export default function App() {
             <p className="text-sm text-gray-500 dark:text-gray-400">Free &amp; open source — no login required</p>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              Reset
+            </button>
             <button
               type="button"
               onClick={toggle}
