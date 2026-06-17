@@ -13,16 +13,17 @@ export const compactCard: SignatureTemplate = {
   id: 'compact-card',
   name: 'Compact Card',
   description: 'Space-efficient card with rounded photo area',
-  render: (data: SignatureData) => {
+  render: (data: SignatureData, options = {}) => {
     const accent = esc(data.primaryColor);
     const font = esc(data.fontFamily);
     const textDark = '#333333';
     const textLight = '#888888';
 
     const socialLinks = renderSocialLinks(data.socials, {
-      color: data.primaryColor,
+      style: data.iconStyle,
       size: 14,
       cellStyle: 'padding-right: 5px;',
+      baseUrl: options.iconBaseUrl,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

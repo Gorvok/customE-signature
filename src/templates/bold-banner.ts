@@ -13,12 +13,16 @@ export const boldBanner: SignatureTemplate = {
   id: 'bold-banner',
   name: 'Bold Banner',
   description: 'Eye-catching colored banner with large name',
-  render: (data: SignatureData) => {
+  render: (data: SignatureData, options = {}) => {
     const bg = esc(data.primaryColor);
     const fg = esc(data.secondaryColor || '#FFFFFF');
     const font = esc(data.fontFamily);
 
-    const socialLinks = renderSocialLinks(data.socials, { color: '#666666', size: 16 });
+    const socialLinks = renderSocialLinks(data.socials, {
+      style: data.iconStyle,
+      size: 16,
+      baseUrl: options.iconBaseUrl,
+    });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);
     const logoHtml = logoSrc

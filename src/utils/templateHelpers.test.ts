@@ -7,6 +7,8 @@ import {
   displayWebsite,
   telDigits,
   buildSocialUrl,
+  renderSocialLinks,
+  PRODUCTION_ICON_BASE,
 } from './templateHelpers';
 import { templates } from '../templates';
 import type { SignatureData } from '../types';
@@ -71,6 +73,25 @@ describe('url helpers', () => {
   });
 });
 
+describe('renderSocialLinks', () => {
+  it('uses hosted PNGs for the selected style and base URL', () => {
+    const html = renderSocialLinks({ github: 'octocat' }, { style: 'brand' });
+    expect(html).toContain(`src="${PRODUCTION_ICON_BASE}/brand/github.png"`);
+    expect(html).toContain('href="https://github.com/octocat"');
+    expect(html).not.toContain('data:image/svg');
+  });
+
+  it('respects a custom base URL and strips a trailing slash', () => {
+    const html = renderSocialLinks({ linkedin: 'jane' }, { style: 'light', baseUrl: '/local/icons/' });
+    expect(html).toContain('src="/local/icons/light/linkedin.png"');
+  });
+
+  it('ignores unknown platforms and empty values', () => {
+    const html = renderSocialLinks({ bogus: 'x', github: '   ' }, { style: 'dark' });
+    expect(html).toBe('');
+  });
+});
+
 describe('templates escape malicious input', () => {
   const malicious: SignatureData = {
     fullName: '<img src=x onerror=alert(1)>',
@@ -84,6 +105,7 @@ describe('templates escape malicious input', () => {
     primaryColor: '#000000',
     secondaryColor: '#FFFFFF',
     fontFamily: 'Inter',
+    iconStyle: 'brand',
   };
 
   for (const template of templates) {

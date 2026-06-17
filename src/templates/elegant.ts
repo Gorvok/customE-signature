@@ -13,16 +13,17 @@ export const elegant: SignatureTemplate = {
   id: 'elegant',
   name: 'Elegant',
   description: 'Refined style with centered layout and dividers',
-  render: (data: SignatureData) => {
+  render: (data: SignatureData, options = {}) => {
     const accent = esc(data.primaryColor);
     const font = esc(data.fontFamily);
     const textColor = '#3a3a3a';
     const mutedColor = '#999999';
 
     const socialLinks = renderSocialLinks(data.socials, {
-      color: data.primaryColor,
+      style: data.iconStyle,
       size: 16,
       cellStyle: 'padding: 0 5px;',
+      baseUrl: options.iconBaseUrl,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

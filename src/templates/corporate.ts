@@ -13,16 +13,17 @@ export const corporate: SignatureTemplate = {
   id: 'corporate',
   name: 'Corporate',
   description: 'Professional enterprise style with left accent',
-  render: (data: SignatureData) => {
+  render: (data: SignatureData, options = {}) => {
     const accent = esc(data.primaryColor);
     const font = esc(data.fontFamily);
     const textDark = '#2d2d2d';
     const textMuted = '#777777';
 
     const socialLinks = renderSocialLinks(data.socials, {
-      color: data.primaryColor,
+      style: data.iconStyle,
       size: 16,
       cellStyle: 'padding-right: 8px;',
+      baseUrl: options.iconBaseUrl,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

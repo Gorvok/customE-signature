@@ -13,14 +13,15 @@ export const classicDark: SignatureTemplate = {
   id: 'classic-dark',
   name: 'Classic Dark',
   description: 'Professional dark theme with two-column layout',
-  render: (data: SignatureData) => {
+  render: (data: SignatureData, options = {}) => {
     const primary = esc(data.primaryColor);
     const secondary = esc(data.secondaryColor || '#FFFFFF');
     const font = esc(data.fontFamily);
 
     const socialLinks = renderSocialLinks(data.socials, {
-      color: data.secondaryColor || '#FFFFFF',
+      style: data.iconStyle,
       size: 18,
+      baseUrl: options.iconBaseUrl,
     });
 
     const logoSrc = sanitizeImageUrl(data.logoUrl);

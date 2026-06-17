@@ -1,5 +1,15 @@
 import { socialPlatforms } from '../data/socialPlatforms';
-import { getSocialIconDataUri } from './socialIcons';
+import type { IconStyle } from '../types';
+
+/**
+ * Absolute URL of the deployed hosted icons. Generated signatures must use
+ * absolute URLs so the icons resolve once pasted into any email client.
+ * Keep in sync with `base` in vite.config.ts.
+ */
+export const PRODUCTION_ICON_BASE = 'https://gorvok.github.io/customE-signature/icons/png';
+
+/** Local URL for the live preview (resolves from /public before deploy). */
+export const LOCAL_ICON_BASE = `${import.meta.env.BASE_URL}icons/png`;
 
 /**
  * Escape a string for safe interpolation into HTML text content OR a
@@ -70,30 +80,34 @@ export function buildSocialUrl(platformId: string, value: string): string {
 }
 
 interface SocialLinkOptions {
-  /** Icon color (hex). */
-  color: string;
+  /** Hosted icon color style. */
+  style: IconStyle;
   /** Icon width/height in px. */
   size?: number;
   /** CSS applied to each `<td>` wrapping an icon. */
   cellStyle?: string;
+  /** Base URL for the hosted PNGs; defaults to the production URL. */
+  baseUrl?: string;
 }
 
 /**
- * Render the `<td>` cells for the populated social links of a signature.
- * Shared by every template so the (security-sensitive) markup lives in one
- * place. Returns an empty string when there are no links.
+ * Render the `<td>` cells for the populated social links of a signature, using
+ * hosted PNG icons (the only format Gmail/Outlook render reliably). Shared by
+ * every template so the security-sensitive markup lives in one place. Returns
+ * an empty string when there are no links.
  */
 export function renderSocialLinks(
   socials: Record<string, string>,
-  { color, size = 18, cellStyle = 'padding-right: 6px;' }: SocialLinkOptions,
+  { style, size = 18, cellStyle = 'padding-right: 6px;', baseUrl = PRODUCTION_ICON_BASE }: SocialLinkOptions,
 ): string {
+  const base = baseUrl.replace(/\/$/, '');
   return Object.entries(socials)
     .filter(([, val]) => val.trim())
     .map(([platform, value]) => {
+      if (!socialPlatforms.some((p) => p.id === platform)) return '';
       const url = sanitizeLinkUrl(buildSocialUrl(platform, value));
-      const iconUri = getSocialIconDataUri(platform, color);
-      if (!iconUri) return '';
-      return `<td style="${cellStyle}"><a href="${url}" target="_blank" rel="noopener" style="text-decoration: none;"><img src="${iconUri}" width="${size}" height="${size}" alt="${esc(platform)}" style="display: block; width: ${size}px; height: ${size}px;" /></a></td>`;
+      const iconUrl = `${base}/${style}/${platform}.png`;
+      return `<td style="${cellStyle}"><a href="${url}" target="_blank" rel="noopener" style="text-decoration: none;"><img src="${iconUrl}" width="${size}" height="${size}" alt="${esc(platform)}" style="display: block; width: ${size}px; height: ${size}px;" /></a></td>`;
     })
     .join('');
 }

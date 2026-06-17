@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { SignatureData, SignatureTemplate } from '../types';
+import { LOCAL_ICON_BASE } from '../utils/templateHelpers';
 
 interface Props {
   data: SignatureData;
@@ -7,7 +8,10 @@ interface Props {
 }
 
 export default function SignaturePreview({ data, template }: Props) {
-  const html = useMemo(() => template.render(data), [data, template]);
+  const html = useMemo(
+    () => template.render(data, { iconBaseUrl: LOCAL_ICON_BASE }),
+    [data, template],
+  );
 
   return (
     <div className="space-y-3">

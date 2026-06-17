@@ -23,13 +23,27 @@ npm run dev
 
 Then open [http://localhost:5173](http://localhost:5173) in your browser.
 
+## Social Icons
+
+Social icons in the generated signature are **hosted PNGs** (served from the
+deployed site), because Gmail and Outlook strip inline/data-URI SVGs. Four
+styles are available — Brand colors, Dark, Light (for dark backgrounds) and
+Gray. The PNGs are pre-rendered from `src/data/socialIconSvgs.json`:
+
+```bash
+npm run generate:icons   # writes public/icons/png/<style>/<platform>.png
+```
+
+If you fork this project, update `PRODUCTION_ICON_BASE` in
+`src/utils/templateHelpers.ts` to point at your own deployment.
+
 ## Known Limitations
 
-Email clients are notoriously inconsistent. The social icons are embedded as
-inline SVG data URIs, which render in most modern webmail clients but are
-**stripped by Gmail and Outlook desktop**. If icons don't appear in those
-clients, the rest of the signature (text, links, logo) still works. Hosted PNG
-icons would be the most universally compatible option — contributions welcome.
+- **Uploaded logos** are embedded as base64 data URIs, which Gmail and Outlook
+  may strip. For maximum compatibility, paste a hosted image **URL** in the
+  logo field instead of uploading a file.
+- Email clients are inconsistent by nature; always send yourself a test email
+  before relying on a new signature.
 
 ## Testing
 

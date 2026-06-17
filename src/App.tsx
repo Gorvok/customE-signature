@@ -19,6 +19,7 @@ const defaultData: SignatureData = {
   primaryColor: '#000000',
   secondaryColor: '#FFFFFF',
   fontFamily: 'Inter',
+  iconStyle: 'brand',
 };
 
 const STORAGE_KEY = 'signature-data';

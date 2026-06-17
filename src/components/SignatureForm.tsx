@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import type { SignatureData } from '../types';
+import type { IconStyle, SignatureData } from '../types';
 import { socialPlatforms } from '../data/socialPlatforms';
 import { getSocialIconSvg } from '../utils/socialIcons';
 import ImageUploader from './ImageUploader';
@@ -11,6 +11,13 @@ interface Props {
 }
 
 const FONTS = ['Inter', 'Arial', 'Georgia', 'Verdana', 'Trebuchet MS', 'Courier New', 'Times New Roman'];
+
+const ICON_STYLES: { value: IconStyle; label: string }[] = [
+  { value: 'brand', label: 'Brand colors' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'light', label: 'Light (for dark backgrounds)' },
+  { value: 'gray', label: 'Gray' },
+];
 
 function InputField({ label, value, onChange, placeholder, type = 'text' }: {
   label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string;
@@ -106,6 +113,20 @@ export default function SignatureForm({ data, onChange }: Props) {
                 <option key={f} value={f}>{f}</option>
               ))}
             </select>
+          </div>
+          <div>
+            <label htmlFor="icon-style-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Social Icon Style</label>
+            <select
+              id="icon-style-select"
+              value={data.iconStyle}
+              onChange={(e) => update({ iconStyle: e.target.value as IconStyle })}
+              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+            >
+              {ICON_STYLES.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">Icons are hosted as images so they display in Gmail &amp; Outlook.</p>
           </div>
         </div>
       </section>

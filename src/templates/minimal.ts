@@ -12,11 +12,15 @@ export const minimal: SignatureTemplate = {
   id: 'minimal',
   name: 'Minimal',
   description: 'Simple, text-focused signature',
-  render: (data: SignatureData) => {
+  render: (data: SignatureData, options = {}) => {
     const textColor = esc(data.primaryColor);
     const font = esc(data.fontFamily);
 
-    const socialLinks = renderSocialLinks(data.socials, { color: data.primaryColor, size: 16 });
+    const socialLinks = renderSocialLinks(data.socials, {
+      style: data.iconStyle,
+      size: 16,
+      baseUrl: options.iconBaseUrl,
+    });
 
     const contactParts: string[] = [];
     if (data.phone) contactParts.push(`<a href="${sanitizeLinkUrl(`tel:${telDigits(data.phone)}`)}" style="color: #666666; text-decoration: none;">${esc(data.phone)}</a>`);
