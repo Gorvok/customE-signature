@@ -13,8 +13,9 @@ A free, open-source web app for creating professional email signatures. No login
 - **Copy to clipboard** (rich HTML) or **download as .html** file
 - **Save & share**: copy a self-restoring share link or export/import your setup as JSON
 - **Autosave**: your details are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear)
+- **Polished UX**: one-click sample data, collapsible form sections with quick-jump nav, a realistic email-window preview (desktop/mobile width, light/dark background, raw-HTML view), color-palette presets, and toast feedback
 - **Installable PWA** with offline support
-- **Light & dark mode** with system-preference detection
+- **Light & dark mode** with system-preference detection, plus reduced-motion and keyboard-focus support
 - **Safe output**: all input is HTML-escaped and links are sanitized before being placed in the generated signature
 - **Fully client-side**: zero backend, zero tracking, zero data collection
 

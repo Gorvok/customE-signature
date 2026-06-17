@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { SignatureData } from '../types';
 import { buildShareUrl, type SharedConfig } from '../utils/shareConfig';
+import { useToast } from '../toast';
 
 interface Props {
   data: SignatureData;
@@ -9,17 +10,19 @@ interface Props {
 }
 
 export default function SharePanel({ data, templateId, onLoad }: Props) {
+  const { addToast } = useToast();
   const [linkStatus, setLinkStatus] = useState<'idle' | 'copied'>('idle');
-  const [importError, setImportError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function handleCopyLink() {
     try {
       await navigator.clipboard.writeText(buildShareUrl({ data, templateId }));
       setLinkStatus('copied');
+      addToast('Share link copied');
       setTimeout(() => setLinkStatus('idle'), 2000);
     } catch {
       setLinkStatus('idle');
+      addToast('Could not copy the link', 'error');
     }
   }
 
@@ -33,19 +36,20 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    addToast('Exported config as JSON');
   }
 
   async function handleImport(file: File) {
-    setImportError('');
     try {
       const parsed = JSON.parse(await file.text());
       if (parsed && typeof parsed === 'object' && parsed.data && typeof parsed.data === 'object') {
         onLoad(parsed as SharedConfig);
+        addToast('Config imported');
       } else {
-        setImportError('That file is not a valid signature config.');
+        addToast('That file is not a valid signature config', 'error');
       }
     } catch {
-      setImportError('Could not read that file.');
+      addToast('Could not read that file', 'error');
     }
   }
 
@@ -86,7 +90,6 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
           }}
         />
       </div>
-      {importError && <p className="text-sm text-red-500">{importError}</p>}
     </div>
   );
 }
