@@ -1,4 +1,5 @@
 import { socialPlatforms } from '../data/socialPlatforms';
+import { isIconStyle } from '../data/options';
 import type { IconStyle } from '../types';
 
 /**
@@ -30,18 +31,39 @@ export function escapeHtml(value: string): string {
 export const esc = escapeHtml;
 
 /**
+ * Control characters (C0 and DEL). Browsers strip tab, newline and leading
+ * or trailing controls from a URL *before* reading its scheme, so
+ * `java\nscript:` is a live `javascript:` link to a browser even though a
+ * naive regex never sees the word. We strip the same set up front.
+ */
+// eslint-disable-next-line no-control-regex -- matching control characters is the point of this regex
+const URL_CONTROL_CHARS =/[\u0000-\u001F\u007F]/g;
+/** A scheme as the URL spec defines it (a leading `alpha`, then `alnum + . -`). */
+const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
+const ALLOWED_LINK_SCHEMES = /^(https?:|mailto:|tel:)/i;
+const ALLOWED_PROTOCOLS = new Set(['http:', 'https:', 'mailto:', 'tel:']);
+
+/**
  * Sanitize a URL destined for an `href`. Only http(s), mailto and tel
  * schemes are allowed through; anything with another scheme (e.g.
  * `javascript:`) is neutralized to `#`. The result is HTML-escaped so it is
  * safe inside a double-quoted attribute.
+ *
+ * Two independent checks: a regex on the cleaned string, then the platform
+ * URL parser's own reading of the scheme (relative URLs resolve against a
+ * throwaway https base, so they pass). Both must agree the link is safe.
  */
 export function sanitizeLinkUrl(url: string): string {
-  const trimmed = url.trim();
-  if (/^(https?:|mailto:|tel:)/i.test(trimmed)) return escapeHtml(trimmed);
-  // Has some other explicit scheme -> reject.
-  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return '#';
-  // Scheme-relative or relative URL -> keep as-is (escaped).
-  return escapeHtml(trimmed);
+  const cleaned = String(url).replace(URL_CONTROL_CHARS, '').trim();
+  if (!cleaned) return '';
+  if (HAS_SCHEME.test(cleaned) && !ALLOWED_LINK_SCHEMES.test(cleaned)) return '#';
+  try {
+    const { protocol } = new URL(cleaned, 'https://relative.invalid/');
+    if (!ALLOWED_PROTOCOLS.has(protocol)) return '#';
+  } catch {
+    return '#';
+  }
+  return escapeHtml(cleaned);
 }
 
 /**
@@ -55,9 +77,24 @@ export function sanitizeImageUrl(url: string): string {
   return '';
 }
 
-/** Ensure a website URL has a protocol so links work when pasted into email. */
+/**
+ * "Looks like it already has a scheme" for user-typed website fields. Unlike
+ * the spec's definition this disallows dots in the scheme, so
+ * `example.com:8080/x` is read as a host with a port (and gets https://
+ * prepended) rather than as the scheme `example.com`.
+ */
+const LOOSE_SCHEME = /^[a-z][a-z0-9+-]*:/i;
+
+/**
+ * Ensure a website URL has a protocol so links work when pasted into email.
+ * Anything that already carries a scheme is left alone for `sanitizeLinkUrl`
+ * to judge; this function only fills in a missing `https://`.
+ */
 export function normalizeWebsite(url: string): string {
-  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (LOOSE_SCHEME.test(trimmed) || trimmed.startsWith('//')) return trimmed;
+  return `https://${trimmed}`;
 }
 
 /** Strip the protocol for display purposes. */
@@ -70,13 +107,25 @@ export function telDigits(phone: string): string {
   return phone.replace(/[^+\d]/g, '');
 }
 
-/** Build the full URL for a social handle (or pass through a full URL). */
+/** `linkedin.com/in/jane`, `www.x.com/jane`: a host followed by a path, typed without a scheme. */
+const HOST_WITH_PATH = /^(?:[a-z0-9-]+\.)+[a-z]{2,}\//i;
+
+/**
+ * Build the full URL for a social handle, or pass a pasted profile URL
+ * through. Handles are prefixed with the platform URL (a leading `@` is
+ * dropped); anything that already looks like a URL is normalized instead of
+ * prefixed. Platforms without a prefix (Website) are always normalized so the
+ * result carries a scheme.
+ */
 export function buildSocialUrl(platformId: string, value: string): string {
-  if (!value) return '';
-  if (/^https?:\/\//i.test(value)) return value;
+  const trimmed = value.trim();
+  if (!trimmed) return '';
   const platform = socialPlatforms.find((p) => p.id === platformId);
-  if (!platform || !platform.urlPrefix) return value;
-  return platform.urlPrefix + value;
+  if (!platform || !platform.urlPrefix) return normalizeWebsite(trimmed);
+  if (LOOSE_SCHEME.test(trimmed) || trimmed.startsWith('//') || HOST_WITH_PATH.test(trimmed)) {
+    return normalizeWebsite(trimmed);
+  }
+  return platform.urlPrefix + trimmed.replace(/^@/, '');
 }
 
 /**
@@ -155,15 +204,20 @@ export function renderSocialLinks(
   socials: Record<string, string>,
   { style, size = 18, cellStyle = 'padding-right: 6px;', baseUrl = PRODUCTION_ICON_BASE, order }: SocialLinkOptions,
 ): string {
+  // Callers pass validated data, but this helper must never throw or emit
+  // unescaped markup on junk either: it is the one place icon URLs are built.
+  if (!socials || typeof socials !== 'object') return '';
+  const safeStyle: IconStyle = isIconStyle(style) ? style : 'brand';
+  const safeOrder = Array.isArray(order) ? order : [];
   const base = baseUrl.replace(/\/$/, '');
-  const ordered = order?.length
-    ? [...order.filter((id) => id in socials), ...Object.keys(socials).filter((id) => !order.includes(id))]
+  const ordered = safeOrder.length
+    ? [...safeOrder.filter((id) => Object.hasOwn(socials, id)), ...Object.keys(socials).filter((id) => !safeOrder.includes(id))]
     : Object.keys(socials);
   return ordered
-    .filter((platform) => (socials[platform] ?? '').trim() && socialPlatforms.some((p) => p.id === platform))
+    .filter((platform) => typeof socials[platform] === 'string' && socials[platform].trim() && socialPlatforms.some((p) => p.id === platform))
     .map((platform) => {
       const url = sanitizeLinkUrl(buildSocialUrl(platform, socials[platform]));
-      const iconUrl = `${base}/${style}/${platform}.png`;
+      const iconUrl = esc(`${base}/${safeStyle}/${platform}.png`);
       return `<td style="${cellStyle}"><a href="${url}" target="_blank" rel="noopener" style="text-decoration: none;"><img src="${iconUrl}" width="${size}" height="${size}" alt="${esc(platform)}" style="display: block; width: ${size}px; height: ${size}px;" /></a></td>`;
     })
     .join('');

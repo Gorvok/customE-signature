@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { SignatureData } from './types';
 import { templates } from './templates';
-import { socialPlatforms } from './data/socialPlatforms';
+import { defaultData } from './data/defaults';
 import { sampleData } from './data/sampleData';
 import { useTheme } from './theme';
 import { useToast } from './toast';
@@ -11,41 +11,22 @@ import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
 import { readConfigFromHash, type SharedConfig } from './utils/shareConfig';
-
-const defaultData: SignatureData = {
-  fullName: '',
-  pronouns: '',
-  jobTitle: '',
-  department: '',
-  company: '',
-  phone: '',
-  email: '',
-  website: '',
-  address: '',
-  bookingLink: '',
-  socials: {},
-  socialOrder: socialPlatforms.map((p) => p.id),
-  logoUrl: '',
-  ctaLabel: '',
-  ctaUrl: '',
-  disclaimer: '',
-  primaryColor: '#000000',
-  secondaryColor: '#FFFFFF',
-  fontFamily: 'Inter',
-  iconStyle: 'brand',
-};
+import { parseSignatureData } from './utils/parseConfig';
 
 const STORAGE_KEY = 'signature-data';
 
 // A shared link (#cfg=...) takes precedence over local storage on first load.
+// readConfigFromHash() has already validated and coerced every field.
 const sharedConfig = typeof window !== 'undefined' ? readConfigFromHash() : null;
 
 function loadData(): SignatureData {
-  if (sharedConfig) return { ...defaultData, ...sharedConfig.data };
+  if (sharedConfig) return sharedConfig.data;
   if (typeof window === 'undefined') return defaultData;
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return { ...defaultData, ...JSON.parse(saved) };
+    // Stored data is treated as untrusted too: another script on the origin,
+    // or an older version of this app, could have written anything.
+    if (saved) return parseSignatureData(JSON.parse(saved));
   } catch {
     // Ignore malformed/unavailable storage and fall back to defaults.
   }
@@ -67,7 +48,7 @@ export default function App() {
   const { addToast } = useToast();
 
   function applyConfig(config: SharedConfig) {
-    setData({ ...defaultData, ...config.data });
+    setData(parseSignatureData(config.data));
     if (config.templateId && templates.some((t) => t.id === config.templateId)) {
       setTemplateId(config.templateId);
     }

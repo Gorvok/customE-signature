@@ -15,6 +15,7 @@ import {
   PRODUCTION_ICON_BASE,
 } from './templateHelpers';
 import { templates } from '../templates';
+import { parseSignatureData } from './parseConfig';
 import type { SignatureData } from '../types';
 
 describe('escapeHtml', () => {
@@ -144,7 +145,7 @@ describe('renderCtaButton', () => {
     expect(renderCtaButton('Go', '', { bg: '#000', fg: '#fff', font: 'Inter' })).toBe('');
   });
 
-  it('neutralizes a javascript: url via normalization', () => {
+  it('neutralizes a javascript: url', () => {
     const html = renderCtaButton('Go', 'javascript:alert(1)', { bg: '#000', fg: '#fff', font: 'Inter' });
     expect(html).not.toContain('href="javascript:');
   });
@@ -192,6 +193,120 @@ describe('templates escape malicious input', () => {
       expect(html).not.toContain('src="javascript:');
       // The escaped form should be present, proving the value was rendered safely.
       expect(html).toContain('&lt;');
+    });
+  }
+});
+
+describe('sanitizeLinkUrl control-character bypasses', () => {
+  const variants = [
+    'java\nscript:alert(1)',
+    'java\tscript:alert(1)',
+    'java\rscript:alert(1)',
+    '\u0001javascript:alert(1)',
+    '\u0000javascript:alert(1)',
+    ' javascript:alert(1)',
+    'JaVaScRiPt:alert(1)',
+  ];
+
+  for (const input of variants) {
+    it(`rejects ${JSON.stringify(input)}`, () => {
+      expect(sanitizeLinkUrl(input)).toBe('#');
+    });
+  }
+
+  it('strips stray control characters from otherwise safe URLs', () => {
+    expect(sanitizeLinkUrl('https://exam\nple.com/a')).toBe('https://example.com/a');
+  });
+
+  it('returns an empty string for empty input', () => {
+    expect(sanitizeLinkUrl('')).toBe('');
+    expect(sanitizeLinkUrl('  \n ')).toBe('');
+  });
+});
+
+describe('normalizeWebsite', () => {
+  it('leaves other schemes alone for the sanitizer to judge', () => {
+    expect(normalizeWebsite('mailto:a@b.com')).toBe('mailto:a@b.com');
+    expect(normalizeWebsite('javascript:alert(1)')).toBe('javascript:alert(1)');
+  });
+
+  it('keeps scheme-relative URLs and trims whitespace', () => {
+    expect(normalizeWebsite('//cdn.example.com/x')).toBe('//cdn.example.com/x');
+    expect(normalizeWebsite('  example.com  ')).toBe('https://example.com');
+  });
+
+  it('treats a host with a port as a host, not a scheme', () => {
+    expect(normalizeWebsite('example.com:8080/x')).toBe('https://example.com:8080/x');
+  });
+
+  it('returns an empty string for empty input', () => {
+    expect(normalizeWebsite('')).toBe('');
+    expect(normalizeWebsite('   ')).toBe('');
+  });
+});
+
+describe('buildSocialUrl', () => {
+  it('gives the Website platform a scheme', () => {
+    expect(buildSocialUrl('website', 'example.com')).toBe('https://example.com');
+    expect(buildSocialUrl('website', 'https://example.com')).toBe('https://example.com');
+  });
+
+  it('strips a leading @ from handles and trims', () => {
+    expect(buildSocialUrl('instagram', '@alex.builds')).toBe('https://www.instagram.com/alex.builds');
+    expect(buildSocialUrl('github', '  octocat ')).toBe('https://github.com/octocat');
+  });
+
+  it('does not double-prefix a pasted profile path', () => {
+    expect(buildSocialUrl('linkedin', 'linkedin.com/in/jane')).toBe('https://linkedin.com/in/jane');
+    expect(buildSocialUrl('linkedin', 'www.linkedin.com/in/jane')).toBe('https://www.linkedin.com/in/jane');
+  });
+
+  it('keeps dotted handles as handles', () => {
+    expect(buildSocialUrl('instagram', 'alex.builds')).toBe('https://www.instagram.com/alex.builds');
+  });
+
+  it('never lets a hidden scheme through the Website platform', () => {
+    expect(sanitizeLinkUrl(buildSocialUrl('website', 'java\nscript:alert(document.domain)'))).toBe('#');
+  });
+});
+
+describe('renderSocialLinks hardening', () => {
+  it('coerces an unknown icon style and escapes the icon URL', () => {
+    const html = renderSocialLinks({ github: 'x' }, { style: 'x" onerror="alert(document.domain)//' as never });
+    expect(html).not.toMatch(/\sonerror=/);
+    expect(html).toContain(`src="${PRODUCTION_ICON_BASE}/brand/github.png"`);
+  });
+
+  it('does not throw on junk shapes', () => {
+    expect(renderSocialLinks(null as never, { style: 'brand' })).toBe('');
+    expect(renderSocialLinks({ github: 'x' }, { style: 'brand', order: 'abc' as never })).toContain('github.png');
+    expect(renderSocialLinks({ github: 'x' }, { style: 'brand', order: ['constructor'] })).toContain('github.png');
+    expect(renderSocialLinks({ github: 7 as never }, { style: 'brand' })).toBe('');
+  });
+});
+
+describe('templates neutralize hostile config values after parsing', () => {
+  // Exactly what a crafted share link or JSON file would deliver.
+  const hostile = {
+    fullName: 'Alex',
+    socials: { github: 'x', website: 'java\tscript:alert(document.domain)' },
+    iconStyle: 'x" onerror="alert(document.domain)//',
+    fontFamily: 'Inter; background: url(https://attacker.example/p.gif)',
+    primaryColor: 'red; background: url(x)',
+    secondaryColor: '#fff"><script>alert(1)</script>',
+    ctaLabel: 'Go',
+    ctaUrl: 'x',
+    disclaimer: 'd',
+  };
+
+  for (const template of templates) {
+    it(`${template.id} emits no handlers, scripts or CSS URLs`, () => {
+      const html = template.render(parseSignatureData(hostile));
+      expect(html).not.toMatch(/\son[a-z]+=/i);
+      expect(html).not.toContain('<script');
+      expect(html).not.toContain('url(');
+      expect(html).not.toMatch(/href="[^"]*javascript:/i);
+      expect(html).toContain('/brand/github.png');
     });
   }
 });

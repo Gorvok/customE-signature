@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { SignatureData } from '../types';
 import { buildShareUrl, type SharedConfig } from '../utils/shareConfig';
+import { parseSharedConfig } from '../utils/parseConfig';
 import { useToast } from '../toast';
 
 interface Props {
@@ -41,9 +42,9 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
 
   async function handleImport(file: File) {
     try {
-      const parsed = JSON.parse(await file.text());
-      if (parsed && typeof parsed === 'object' && parsed.data && typeof parsed.data === 'object') {
-        onLoad(parsed as SharedConfig);
+      const config = parseSharedConfig(JSON.parse(await file.text()));
+      if (config) {
+        onLoad(config);
         addToast('Config imported');
       } else {
         addToast('That file is not a valid signature config', 'error');
