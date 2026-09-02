@@ -1,12 +1,17 @@
 {
   "name": "email-signature-generator",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
     "generate:icons": "node scripts/generate-icons.mjs",
