@@ -1,8 +1,10 @@
 import type { SignatureData } from '../types';
+import { parseSharedConfig } from './parseConfig';
 
 export interface SharedConfig {
   data: SignatureData;
-  templateId: string;
+  /** Omitted when the source named no template or an unknown one. */
+  templateId?: string;
 }
 
 function toBase64Url(input: string): string {
@@ -24,14 +26,13 @@ export function encodeConfig(config: SharedConfig): string {
   return toBase64Url(JSON.stringify(config));
 }
 
-/** Parse a config produced by encodeConfig. Returns null on any malformed input. */
+/**
+ * Parse a config produced by encodeConfig. Returns null on malformed input;
+ * otherwise every field is validated and coerced, never trusted as-is.
+ */
 export function decodeConfig(encoded: string): SharedConfig | null {
   try {
-    const obj = JSON.parse(fromBase64Url(encoded));
-    if (obj && typeof obj === 'object' && obj.data && typeof obj.data === 'object') {
-      return obj as SharedConfig;
-    }
-    return null;
+    return parseSharedConfig(JSON.parse(fromBase64Url(encoded)));
   } catch {
     return null;
   }

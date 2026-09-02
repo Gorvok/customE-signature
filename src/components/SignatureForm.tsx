@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { IconStyle, SignatureData, SocialPlatform } from '../types';
 import { socialPlatforms } from '../data/socialPlatforms';
 import { palettes } from '../data/palettes';
+import { FONTS, ICON_STYLE_OPTIONS, LIMITS } from '../data/options';
 import { getSocialIconSvg } from '../utils/socialIcons';
 import { isValidEmail, isLikelyUrl } from '../utils/validators';
 import ImageUploader from './ImageUploader';
@@ -13,15 +14,6 @@ interface Props {
   data: SignatureData;
   onChange: (data: SignatureData) => void;
 }
-
-const FONTS = ['Inter', 'Arial', 'Georgia', 'Verdana', 'Trebuchet MS', 'Courier New', 'Times New Roman'];
-
-const ICON_STYLES: { value: IconStyle; label: string }[] = [
-  { value: 'brand', label: 'Brand colors' },
-  { value: 'dark', label: 'Dark' },
-  { value: 'light', label: 'Light (for dark backgrounds)' },
-  { value: 'gray', label: 'Gray' },
-];
 
 const icon = (path: ReactNode) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{path}</svg>
@@ -231,11 +223,11 @@ export default function SignatureForm({ data, onChange }: Props) {
           onChange={(e) => update({ disclaimer: e.target.value })}
           placeholder="This email and any attachments are confidential…"
           rows={3}
-          maxLength={600}
+          maxLength={LIMITS.disclaimer}
           aria-label="Legal disclaimer"
           className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
         />
-        <p className="mt-1 text-right text-xs text-gray-400 dark:text-gray-500">{data.disclaimer.length}/600</p>
+        <p className="mt-1 text-right text-xs text-gray-400 dark:text-gray-500">{data.disclaimer.length}/{LIMITS.disclaimer}</p>
       </CollapsibleSection>
 
       {/* Branding */}
@@ -285,7 +277,7 @@ export default function SignatureForm({ data, onChange }: Props) {
               onChange={(e) => update({ iconStyle: e.target.value as IconStyle })}
               className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
             >
-              {ICON_STYLES.map((s) => (
+              {ICON_STYLE_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </select>
