@@ -12,8 +12,7 @@ import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
 import { readConfigFromHash, type SharedConfig } from './utils/shareConfig';
 import { parseSignatureData } from './utils/parseConfig';
-
-const STORAGE_KEY = 'signature-data';
+import { SIGNATURE_STORAGE_KEY as STORAGE_KEY } from './data/storage';
 
 // A shared link (#cfg=...) takes precedence over local storage on first load.
 // readConfigFromHash() has already validated and coerced every field.
