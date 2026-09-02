@@ -13,6 +13,21 @@ export function isFont(value: unknown): value is FontFamily {
   return typeof value === 'string' && (FONTS as readonly string[]).includes(value);
 }
 
+/**
+ * Email-safe font stacks. Recipients rarely have Inter installed, so every
+ * option ends in fonts that ship with Windows and macOS plus a generic family.
+ * Multi-word names are left unquoted (valid CSS) so the stack needs no escaping.
+ */
+export const FONT_STACKS: Record<FontFamily, string> = {
+  Inter: 'Inter, Helvetica, Arial, sans-serif',
+  Arial: 'Arial, Helvetica, sans-serif',
+  Georgia: 'Georgia, Times New Roman, Times, serif',
+  Verdana: 'Verdana, Geneva, sans-serif',
+  'Trebuchet MS': 'Trebuchet MS, Helvetica, Arial, sans-serif',
+  'Courier New': 'Courier New, Courier, monospace',
+  'Times New Roman': 'Times New Roman, Times, serif',
+};
+
 export const ICON_STYLES = ['brand', 'dark', 'light', 'gray'] as const satisfies readonly IconStyle[];
 
 export const ICON_STYLE_OPTIONS: { value: IconStyle; label: string }[] = [

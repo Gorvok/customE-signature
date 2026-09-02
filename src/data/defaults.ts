@@ -21,6 +21,7 @@ export const defaultData: SignatureData = {
   disclaimer: '',
   primaryColor: '#000000',
   secondaryColor: '#FFFFFF',
-  fontFamily: 'Inter',
+  // Arial is what most recipients will actually see; Inter stays as an option.
+  fontFamily: 'Arial',
   iconStyle: 'brand',
 };
