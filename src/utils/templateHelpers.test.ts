@@ -318,6 +318,12 @@ describe('templates neutralize hostile config values after parsing', () => {
   }
 });
 
+describe('icon URL contract', () => {
+  it('keeps the production icon base URL that every generated signature hotlinks (see README)', () => {
+    expect(PRODUCTION_ICON_BASE).toBe('https://gorvok.github.io/customE-signature/icons/png');
+  });
+});
+
 describe('telDigits with extensions', () => {
   it('stops at an extension marker', () => {
     expect(telDigits('555-0123 ext. 4')).toBe('5550123');

@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { SignatureData } from '../types';
-import { buildShareUrl, type SharedConfig } from '../utils/shareConfig';
+import { buildShareUrl, forShareLink, type SharedConfig } from '../utils/shareConfig';
 import { parseSharedConfig } from '../utils/parseConfig';
+import { downloadBlob } from '../utils/exportHelpers';
 import { useToast } from '../toast';
 
 interface Props {
@@ -10,17 +11,27 @@ interface Props {
   onLoad: (config: SharedConfig) => void;
 }
 
+/** Beyond this, chat apps and some browsers start truncating URLs. */
+const LONG_LINK_CHARS = 8000;
+
 export default function SharePanel({ data, templateId, onLoad }: Props) {
   const { addToast } = useToast();
   const [linkStatus, setLinkStatus] = useState<'idle' | 'copied'>('idle');
   const fileRef = useRef<HTMLInputElement>(null);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => () => clearTimeout(resetTimer.current), []);
 
   async function handleCopyLink() {
+    const { config, droppedLogo } = forShareLink({ data, templateId });
+    const url = buildShareUrl(config);
     try {
-      await navigator.clipboard.writeText(buildShareUrl({ data, templateId }));
+      await navigator.clipboard.writeText(url);
       setLinkStatus('copied');
-      addToast('Share link copied');
-      setTimeout(() => setLinkStatus('idle'), 2000);
+      addToast(droppedLogo ? 'Share link copied — uploaded logos are not included in links' : 'Share link copied');
+      if (url.length > LONG_LINK_CHARS) addToast('This link is very long and some chat apps may cut it off', 'info');
+      clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setLinkStatus('idle'), 2000);
     } catch {
       setLinkStatus('idle');
       addToast('Could not copy the link', 'error');
@@ -28,15 +39,7 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
   }
 
   function handleExport() {
-    const blob = new Blob([JSON.stringify({ data, templateId }, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'signature-config.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([JSON.stringify({ data, templateId }, null, 2)], { type: 'application/json' }), 'signature-config.json');
     addToast('Exported config as JSON');
   }
 
@@ -86,7 +89,7 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) handleImport(file);
+            if (file) void handleImport(file);
             e.target.value = '';
           }}
         />

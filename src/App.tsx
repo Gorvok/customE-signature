@@ -1,76 +1,24 @@
-import { useEffect, useState } from 'react';
-import type { SignatureData } from './types';
+import { useState } from 'react';
 import { templates } from './templates';
-import { defaultData } from './data/defaults';
 import { sampleData } from './data/sampleData';
 import { useTheme } from './theme';
 import { useToast } from './toast';
+import { useSignatureState } from './hooks/useSignatureState';
 import SignatureForm from './components/SignatureForm';
 import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
-import { readConfigFromHash, type SharedConfig } from './utils/shareConfig';
-import { parseSignatureData } from './utils/parseConfig';
-import { SIGNATURE_STORAGE_KEY as STORAGE_KEY } from './data/storage';
-
-// A shared link (#cfg=...) takes precedence over local storage on first load.
-// readConfigFromHash() has already validated and coerced every field.
-const sharedConfig = typeof window !== 'undefined' ? readConfigFromHash() : null;
-
-function loadData(): SignatureData {
-  if (sharedConfig) return sharedConfig.data;
-  if (typeof window === 'undefined') return defaultData;
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    // Stored data is treated as untrusted too: another script on the origin,
-    // or an older version of this app, could have written anything.
-    if (saved) return parseSignatureData(JSON.parse(saved));
-  } catch {
-    // Ignore malformed/unavailable storage and fall back to defaults.
-  }
-  return defaultData;
-}
-
-function loadTemplateId(): string {
-  if (sharedConfig?.templateId && templates.some((t) => t.id === sharedConfig.templateId)) {
-    return sharedConfig.templateId;
-  }
-  return templates[0].id;
-}
 
 export default function App() {
-  const [data, setData] = useState<SignatureData>(loadData);
-  const [templateId, setTemplateId] = useState(loadTemplateId);
+  const { data, templateId, setData, setTemplateId, applyConfig, reset } = useSignatureState();
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const { theme, toggle } = useTheme();
   const { addToast } = useToast();
 
-  function applyConfig(config: SharedConfig) {
-    setData(parseSignatureData(config.data));
-    if (config.templateId && templates.some((t) => t.id === config.templateId)) {
-      setTemplateId(config.templateId);
-    }
-  }
-
-  // Strip the #cfg= fragment once it has been consumed by the initializers.
-  useEffect(() => {
-    if (window.location.hash.includes('cfg=')) {
-      history.replaceState(null, '', window.location.pathname + window.location.search);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch {
-      // Storage may be unavailable (private mode, quota) — non-fatal.
-    }
-  }, [data]);
-
   function handleReset() {
     if (window.confirm('Clear all fields and start over?')) {
-      setData(defaultData);
+      reset();
       addToast('Cleared all fields', 'info');
     }
   }
@@ -178,7 +126,7 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-gray-800 px-6 py-4 mt-12">
         <div className="max-w-7xl mx-auto text-center text-sm text-gray-500 dark:text-gray-500">
-          Open source email signature generator. No data is stored — everything runs in your browser.
+          Open source email signature generator. Your details are saved in this browser only — nothing is sent to a server.
         </div>
       </footer>
     </div>

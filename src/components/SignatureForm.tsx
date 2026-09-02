@@ -215,6 +215,9 @@ export default function SignatureForm({ data, onChange }: Props) {
         <div className="space-y-3">
           <InputField label="Button Text" value={data.ctaLabel} onChange={(v) => update({ ctaLabel: v })} placeholder="Book a demo" />
           <InputField label="Button Link" value={data.ctaUrl} onChange={(v) => update({ ctaUrl: v })} placeholder="https://example.com/demo" type="url" maxLength={LIMITS.url} error={data.ctaUrl && !isLikelyUrl(data.ctaUrl) ? 'Enter a valid URL.' : undefined} />
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Shows as a button in most clients. Outlook for Windows keeps the button shape only when you install the downloaded HTML file; when pasted, it shows a styled link.
+          </p>
         </div>
       </CollapsibleSection>
 
