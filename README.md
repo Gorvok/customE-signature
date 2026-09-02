@@ -1,6 +1,6 @@
 # Email Signature Generator
 
-A free, open-source web app for creating professional email signatures. No login required — everything runs in your browser. No data is stored or sent to any server.
+A free, open-source web app for creating professional email signatures. No login required — everything runs in your browser. Your details are saved in this browser only (so a refresh keeps your work) and are never sent to a server.
 
 ## Features
 
@@ -12,7 +12,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
 - **Save & share**: copy a self-restoring share link or export/import your setup as JSON
-- **Autosave**: your details are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear)
+- **Autosave**: your details and chosen template are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear). Opening a share link over saved work asks before replacing it.
 - **Polished UX**: one-click sample data, collapsible form sections with quick-jump nav, a realistic email-window preview (desktop/mobile width, light/dark background, raw-HTML view), color-palette presets, and toast feedback
 - **Installable PWA** with offline support
 - **Light & dark mode** with system-preference detection, plus reduced-motion and keyboard-focus support
@@ -42,11 +42,25 @@ npm run generate:icons   # writes public/icons/png/<style>/<platform>.png
 If you fork this project, update `PRODUCTION_ICON_BASE` in
 `src/utils/templateHelpers.ts` to point at your own deployment.
 
+### Icon URL contract
+
+Every signature ever generated hotlinks its social icons from
+`https://gorvok.github.io/customE-signature/icons/png/<style>/<platform>.png`.
+Those signatures live in other people's mail clients and cannot be updated, so
+that path is a public contract: do not rename the repository, move the
+deployment, or change the look of the existing PNGs. A test pins
+`PRODUCTION_ICON_BASE` to this URL. If the icons are ever redesigned, add them
+under a new path and leave the current files in place.
+
 ## Known Limitations
 
 - **Uploaded logos** are embedded as base64 data URIs, which Gmail and Outlook
   may strip. For maximum compatibility, paste a hosted image **URL** in the
-  logo field instead of uploading a file.
+  logo field instead of uploading a file. Uploaded logos are also left out of
+  share links, which would otherwise be too long for most chat apps.
+- **The call-to-action button in Outlook for Windows** keeps its shape only
+  when the downloaded HTML file is installed. Pasting into a signature editor
+  drops the Outlook-specific fallback, and Outlook then shows a styled link.
 - Email clients are inconsistent by nature; always send yourself a test email
   before relying on a new signature.
 

@@ -38,6 +38,17 @@ export function decodeConfig(encoded: string): SharedConfig | null {
   }
 }
 
+/**
+ * The config to embed in a share link. Uploaded logos are base64 data URLs
+ * that make links tens of kilobytes long, which chat apps and some browsers
+ * truncate, so they are left out; hosted logo URLs are kept.
+ */
+export function forShareLink(config: SharedConfig): { config: SharedConfig; droppedLogo: boolean } {
+  const droppedLogo = config.data.logoUrl.startsWith('data:');
+  if (!droppedLogo) return { config, droppedLogo };
+  return { config: { ...config, data: { ...config.data, logoUrl: '' } }, droppedLogo };
+}
+
 /** Build a full shareable URL embedding the config in the hash fragment. */
 export function buildShareUrl(config: SharedConfig): string {
   const { origin, pathname } = window.location;

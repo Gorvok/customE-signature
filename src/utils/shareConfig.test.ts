@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { encodeConfig, decodeConfig, type SharedConfig } from './shareConfig';
+import { encodeConfig, decodeConfig, forShareLink, type SharedConfig } from './shareConfig';
 import type { SignatureData } from '../types';
 
 const data: SignatureData = {
@@ -40,5 +40,24 @@ describe('shareConfig', () => {
   it('returns null for malformed input', () => {
     expect(decodeConfig('not-valid-base64!!')).toBeNull();
     expect(decodeConfig('')).toBeNull();
+  });
+});
+
+describe('forShareLink', () => {
+  it('drops an uploaded (data URL) logo and says so', () => {
+    const config: SharedConfig = { data: { ...data, logoUrl: 'data:image/png;base64,AAAA' }, templateId: 'minimal' };
+    const result = forShareLink(config);
+    expect(result.droppedLogo).toBe(true);
+    expect(result.config.data.logoUrl).toBe('');
+    expect(result.config.templateId).toBe('minimal');
+    // The caller's object is not mutated.
+    expect(config.data.logoUrl).toBe('data:image/png;base64,AAAA');
+  });
+
+  it('keeps a hosted logo URL', () => {
+    const config: SharedConfig = { data: { ...data, logoUrl: 'https://x.com/logo.png' }, templateId: 'minimal' };
+    const result = forShareLink(config);
+    expect(result.droppedLogo).toBe(false);
+    expect(result.config).toBe(config);
   });
 });
