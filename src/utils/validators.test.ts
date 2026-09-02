@@ -13,6 +13,12 @@ describe('isValidEmail', () => {
     expect(isValidEmail('jane @acme.com')).toBe(false);
     expect(isValidEmail('')).toBe(false);
   });
+
+  it('rejects trailing, leading or doubled dots in the domain', () => {
+    expect(isValidEmail('jane@acme.com.')).toBe(false);
+    expect(isValidEmail('jane@acme..com')).toBe(false);
+    expect(isValidEmail('jane@.acme.com')).toBe(false);
+  });
 });
 
 describe('isLikelyUrl', () => {
@@ -22,9 +28,21 @@ describe('isLikelyUrl', () => {
     expect(isLikelyUrl('calendly.com/you')).toBe(true);
   });
 
+  it('accepts an uppercase scheme and a port', () => {
+    expect(isLikelyUrl('HTTPS://EXAMPLE.COM')).toBe(true);
+    expect(isLikelyUrl('example.com:8080/x')).toBe(true);
+  });
+
   it('rejects values without a dot or with spaces', () => {
     expect(isLikelyUrl('example')).toBe(false);
     expect(isLikelyUrl('not a url')).toBe(false);
     expect(isLikelyUrl('')).toBe(false);
+  });
+
+  it('rejects other schemes and quotes, which would become dead or unsafe links', () => {
+    expect(isLikelyUrl('mailto:jane@acme.com')).toBe(false);
+    expect(isLikelyUrl('javascript:alert(1)')).toBe(false);
+    expect(isLikelyUrl('ftp://example.com')).toBe(false);
+    expect(isLikelyUrl('a"b.com')).toBe(false);
   });
 });

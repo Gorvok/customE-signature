@@ -12,10 +12,17 @@ import {
   roleLine,
   renderCtaButton,
   renderDisclaimer,
+  fontStack,
+  nameWithPronouns,
+  roleAndCompany,
+  renderLogo,
+  contactLinks,
+  spacerCell,
   PRODUCTION_ICON_BASE,
 } from './templateHelpers';
 import { templates } from '../templates';
 import { parseSignatureData } from './parseConfig';
+import { sampleData } from '../data/sampleData';
 import type { SignatureData } from '../types';
 
 describe('escapeHtml', () => {
@@ -309,4 +316,127 @@ describe('templates neutralize hostile config values after parsing', () => {
       expect(html).toContain('/brand/github.png');
     });
   }
+});
+
+describe('telDigits with extensions', () => {
+  it('stops at an extension marker', () => {
+    expect(telDigits('555-0123 ext. 4')).toBe('5550123');
+    expect(telDigits('+1 (415) 555-0123 x12')).toBe('+14155550123');
+    expect(telDigits('555 0123 extension 9')).toBe('5550123');
+  });
+
+  it('returns an empty string when there is nothing to dial', () => {
+    expect(telDigits('call me')).toBe('');
+  });
+});
+
+describe('fontStack', () => {
+  it('expands a known font to its email-safe stack', () => {
+    expect(fontStack('Inter')).toBe('Inter, Helvetica, Arial, sans-serif');
+    expect(fontStack('Georgia')).toMatch(/serif$/);
+    expect(fontStack('Courier New')).toMatch(/monospace$/);
+  });
+
+  it('gives an unknown font a generic fallback and escapes it', () => {
+    expect(fontStack('Weird"Font')).toBe('Weird&quot;Font, Arial, sans-serif');
+  });
+});
+
+describe('nameWithPronouns and roleAndCompany', () => {
+  it('falls back to a placeholder name and omits the span without pronouns', () => {
+    expect(nameWithPronouns({ ...sampleData, fullName: '  ', pronouns: '' }, 'x')).toBe('Your Name');
+  });
+
+  it('escapes and styles the pronouns span', () => {
+    const html = nameWithPronouns({ ...sampleData, fullName: 'A <b>', pronouns: 'she/her' }, 'font-size: 12px;');
+    expect(html).toBe('A &lt;b&gt; <span style="font-size: 12px;">(she/her)</span>');
+  });
+
+  it('joins role and company with the given separator, dropping blanks', () => {
+    expect(roleAndCompany(sampleData, ' | ')).toBe('Head of Product, Product | Northwind Labs');
+    expect(roleAndCompany({ ...sampleData, jobTitle: '', department: '', company: ' Acme ' }, ' | ')).toBe('Acme');
+  });
+});
+
+describe('renderLogo', () => {
+  it('emits width, optional height and a border attribute', () => {
+    expect(renderLogo('https://x.com/a.png', { width: 70 })).toBe(
+      '<img src="https://x.com/a.png" width="70" border="0" alt="Logo" style="display: block; width: 70px;" />',
+    );
+    expect(renderLogo('https://x.com/a.png', { width: 52, height: 52, style: 'border-radius: 50%;' })).toContain(
+      'width="52" height="52" border="0" alt="Logo" style="display: block; width: 52px; height: 52px; border-radius: 50%;"',
+    );
+  });
+
+  it('returns an empty string for empty or unsafe URLs', () => {
+    expect(renderLogo('', { width: 50 })).toBe('');
+    expect(renderLogo('javascript:alert(1)', { width: 50 })).toBe('');
+    expect(renderLogo('data:text/html,<script>', { width: 50 })).toBe('');
+  });
+});
+
+describe('contactLinks', () => {
+  it('returns one sanitized link per populated field, in order', () => {
+    const parts = contactLinks(sampleData, { color: '#666666' });
+    expect(parts).toHaveLength(4);
+    expect(parts[0]).toContain('href="tel:+14155550123"');
+    expect(parts[1]).toContain('href="mailto:alex@northwind.io"');
+    expect(parts[2]).toContain('href="https://northwind.io"');
+    expect(parts[2]).toContain('>northwind.io<');
+    expect(parts[3]).toContain('href="https://cal.com/alex"');
+    expect(parts[3]).toContain('>Book a meeting<');
+  });
+
+  it('skips empty fields', () => {
+    const parts = contactLinks({ ...sampleData, phone: '', email: ' ', website: '', bookingLink: '' }, { color: '#000' });
+    expect(parts).toEqual([]);
+  });
+
+  it('renders a digit-less phone as text rather than an empty tel link', () => {
+    const [phone] = contactLinks({ ...sampleData, phone: 'call me', email: '', website: '', bookingLink: '' }, { color: '#000' });
+    expect(phone).not.toContain('href');
+    expect(phone).toContain('call me');
+  });
+
+  it('applies colors, styles and the phone label', () => {
+    const parts = contactLinks(sampleData, {
+      color: '#111111',
+      accent: '#ff0000',
+      websiteColor: '#00ff00',
+      style: 'font-size: 12px;',
+      bookingStyle: 'font-weight: bold;',
+      phoneLabel: 'Tel: ',
+    });
+    expect(parts[0]).toContain('color: #111111; text-decoration: none; font-size: 12px;');
+    expect(parts[0]).toContain('>Tel: +1 (415) 555-0123<');
+    expect(parts[2]).toContain('color: #00ff00;');
+    expect(parts[3]).toContain('color: #ff0000; text-decoration: none; font-size: 12px; font-weight: bold;');
+  });
+
+  it('escapes user text and neutralizes hidden schemes', () => {
+    const parts = contactLinks(
+      { ...sampleData, email: 'a"@b.com', website: 'java\tscript:alert(1)', phone: '', bookingLink: '' },
+      { color: '#000' },
+    );
+    expect(parts[0]).not.toContain('"@');
+    expect(parts[1]).not.toMatch(/href="javascript:/i);
+    expect(parts[1]).not.toMatch(/href="java\tscript:/i);
+  });
+});
+
+describe('spacerCell', () => {
+  it('carries width, height and bgcolor attributes plus a non-breaking space', () => {
+    expect(spacerCell({ width: 40, height: 1, background: '#0f172a' })).toBe(
+      '<td width="40" height="1" bgcolor="#0f172a" style="width: 40px; height: 1px; line-height: 1px; font-size: 0; background-color: #0f172a;">&nbsp;</td>',
+    );
+  });
+
+  it('uses zero line height and no background when neither is given', () => {
+    expect(spacerCell({ width: 8 })).toBe('<td width="8" style="width: 8px; line-height: 0; font-size: 0;">&nbsp;</td>');
+  });
+
+  it('appends extra style and escapes the color', () => {
+    expect(spacerCell({ width: 6, height: 6, background: '#abc', style: 'border-radius: 50%;' })).toContain('background-color: #abc; border-radius: 50%;');
+    expect(spacerCell({ width: 4, background: '"><b>' })).not.toContain('"><b>');
+  });
 });

@@ -2,16 +2,19 @@ import type { SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
   finalizeHtml,
-  roleLine,
+  fontStack,
+  nameWithPronouns,
+  roleAndCompany,
+  renderLogo,
+  contactLinks,
+  spacerCell,
   renderCtaButton,
   renderDisclaimer,
-  sanitizeImageUrl,
-  sanitizeLinkUrl,
-  normalizeWebsite,
-  displayWebsite,
-  telDigits,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+
+/** The name is always set in a serif regardless of the chosen body font. */
+const SERIF = 'Georgia, Times New Roman, Times, serif';
 
 export const elegant: SignatureTemplate = {
   id: 'elegant',
@@ -19,7 +22,7 @@ export const elegant: SignatureTemplate = {
   description: 'Refined style with centered layout and dividers',
   render: (data: SignatureData, options = {}) => {
     const accent = esc(data.primaryColor);
-    const font = esc(data.fontFamily);
+    const font = fontStack(data.fontFamily);
     const textColor = '#3a3a3a';
     const mutedColor = '#999999';
 
@@ -31,45 +34,35 @@ export const elegant: SignatureTemplate = {
       order: data.socialOrder,
     });
 
-    const logoSrc = sanitizeImageUrl(data.logoUrl);
-    const logoHtml = logoSrc
-      ? `<tr><td align="center" style="padding-bottom: 10px;"><img src="${logoSrc}" width="60" style="width: 60px; display: block;" alt="Logo" /></td></tr>`
-      : '';
+    const logo = renderLogo(data.logoUrl, { width: 60 });
+    const role = roleAndCompany(data, '  &mdash;  ');
 
-    const role = [roleLine(data.jobTitle, data.department), data.company ? esc(data.company) : ''].filter(Boolean).join('  &mdash;  ');
-
-    const contactParts: string[] = [];
-    if (data.phone) contactParts.push(`<a href="${sanitizeLinkUrl(`tel:${telDigits(data.phone)}`)}" style="color: ${mutedColor}; text-decoration: none;">${esc(data.phone)}</a>`);
-    if (data.email) contactParts.push(`<a href="${sanitizeLinkUrl(`mailto:${data.email}`)}" style="color: ${mutedColor}; text-decoration: none;">${esc(data.email)}</a>`);
-    if (data.website) contactParts.push(`<a href="${sanitizeLinkUrl(normalizeWebsite(data.website))}" style="color: ${mutedColor}; text-decoration: none;">${esc(displayWebsite(data.website))}</a>`);
-    if (data.bookingLink) contactParts.push(`<a href="${sanitizeLinkUrl(normalizeWebsite(data.bookingLink))}" style="color: ${accent}; text-decoration: none;">Book a meeting</a>`);
-    if (data.address) contactParts.push(`<span style="color: ${mutedColor};">${esc(data.address)}</span>`);
+    const contact = contactLinks(data, { color: mutedColor, accent: data.primaryColor });
+    if (data.address.trim()) contact.push(`<span style="color: ${mutedColor};">${esc(data.address.trim())}</span>`);
 
     const cta = renderCtaButton(data.ctaLabel, data.ctaUrl, { bg: data.primaryColor, fg: '#FFFFFF', font: data.fontFamily });
 
-    return finalizeHtml(`<table cellpadding="0" cellspacing="0" border="0" style="font-family: Georgia, 'Times New Roman', ${font}, serif; text-align: center;">
+    // A 1px line, a dot, and another line. The lines sit in nested tables so
+    // they stay 1px tall next to the 6px dot (a cell's background fills the
+    // whole row height).
+    const line = `<td width="40" style="width: 40px; vertical-align: middle;"><table cellpadding="0" cellspacing="0" border="0" width="40"><tr>${spacerCell({ width: 40, height: 1, background: data.primaryColor })}</tr></table></td>`;
+    const gap = spacerCell({ width: 8 });
+    const dot = spacerCell({ width: 6, height: 6, background: data.primaryColor, style: 'border-radius: 50%;' });
+    const divider = `<table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;"><tr>${line}${gap}${dot}${gap}${line}</tr></table>`;
+
+    return finalizeHtml(`<table cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color: #ffffff; font-family: ${font}; text-align: center;">
   <tr>
     <td align="center">
       <table cellpadding="0" cellspacing="0" border="0">
-        ${logoHtml}
+        ${logo ? `<tr><td align="center" style="padding-bottom: 10px;">${logo}</td></tr>` : ''}
         <tr>
-          <td align="center" style="font-size: 20px; color: ${textColor}; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 2px;">${esc(data.fullName) || 'Your Name'}${data.pronouns ? ` <span style="font-size: 12px; letter-spacing: 0; color: ${mutedColor};">(${esc(data.pronouns)})</span>` : ''}</td>
+          <td align="center" style="font-size: 20px; color: ${textColor}; font-family: ${SERIF}; letter-spacing: 2px;">${nameWithPronouns(data, `font-size: 12px; letter-spacing: 0; color: ${mutedColor};`)}</td>
         </tr>
-        ${role ? `<tr><td align="center" style="font-size: 11px; color: ${accent}; font-family: ${font}, sans-serif; padding-top: 4px; text-transform: uppercase; letter-spacing: 3px;">${role}</td></tr>` : ''}
+        ${role ? `<tr><td align="center" style="font-size: 11px; color: ${accent}; font-family: ${font}; padding-top: 4px; text-transform: uppercase; letter-spacing: 3px;">${role}</td></tr>` : ''}
         <tr>
-          <td align="center" style="padding-top: 10px;">
-            <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
-              <tr>
-                <td style="width: 40px; height: 1px; background-color: ${accent};"></td>
-                <td style="width: 8px;"></td>
-                <td style="width: 6px; height: 6px; border-radius: 50%; background-color: ${accent};"></td>
-                <td style="width: 8px;"></td>
-                <td style="width: 40px; height: 1px; background-color: ${accent};"></td>
-              </tr>
-            </table>
-          </td>
+          <td align="center" style="padding-top: 10px;">${divider}</td>
         </tr>
-        ${contactParts.length ? `<tr><td align="center" style="padding-top: 10px; font-size: 12px; color: ${mutedColor}; line-height: 1.8; font-family: ${font}, sans-serif;">${contactParts.join('<br />')}</td></tr>` : ''}
+        ${contact.length ? `<tr><td align="center" style="padding-top: 10px; font-size: 12px; color: ${mutedColor}; line-height: 1.8; font-family: ${font};">${contact.join('<br />')}</td></tr>` : ''}
         ${cta ? `<tr><td align="center" style="padding-top: 12px;">${cta}</td></tr>` : ''}
         ${socialLinks ? `<tr><td align="center" style="padding-top: 10px;"><table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;"><tr>${socialLinks}</tr></table></td></tr>` : ''}
       </table>
