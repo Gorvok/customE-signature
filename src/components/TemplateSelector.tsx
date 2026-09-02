@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import type { SignatureData, SignatureTemplate } from '../types';
 import { templates } from '../templates';
 import { LOCAL_ICON_BASE } from '../utils/templateHelpers';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import SignatureFrame from './SignatureFrame';
 
 interface Props {
   selected: string;
@@ -19,12 +21,16 @@ function MiniPreview({ template, data }: { template: SignatureTemplate; data: Si
       className="bg-white rounded p-2 overflow-hidden pointer-events-none"
       style={{ transform: 'scale(0.45)', transformOrigin: 'top left', width: '222%', height: 90 }}
     >
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <SignatureFrame html={html} title={`${template.name} thumbnail`} decorative />
     </div>
   );
 }
 
 export default function TemplateSelector({ selected, onSelect, previewData }: Props) {
+  // Seven sandboxed frames re-parse their documents on every change, so wait
+  // for typing to pause rather than rendering on each keystroke.
+  const data = useDebouncedValue(previewData, 150);
+
   return (
     <div className="space-y-3">
       <h3 className="text-base font-semibold text-gray-900 dark:text-white">Template</h3>
@@ -41,7 +47,7 @@ export default function TemplateSelector({ selected, onSelect, previewData }: Pr
             }`}
           >
             <div className="h-20 overflow-hidden rounded-lg mb-2 border border-gray-100 dark:border-gray-700">
-              <MiniPreview template={t} data={previewData} />
+              <MiniPreview template={t} data={data} />
             </div>
             <p className="text-sm font-medium text-gray-900 dark:text-white">{t.name}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">{t.description}</p>

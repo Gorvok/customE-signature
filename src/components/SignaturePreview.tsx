@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { SignatureData, SignatureTemplate } from '../types';
 import { LOCAL_ICON_BASE } from '../utils/templateHelpers';
 import { useToast } from '../toast';
+import SignatureFrame from './SignatureFrame';
 
 interface Props {
   data: SignatureData;
@@ -96,7 +97,7 @@ export default function SignaturePreview({ data, template, onLoadSample }: Props
             className="transition-all duration-300 mx-auto"
             style={{ maxWidth: width === 'mobile' ? 360 : '100%' }}
           >
-            <div dangerouslySetInnerHTML={{ __html: html }} />
+            <SignatureFrame html={html} title="Signature preview" />
           </div>
         </div>
       </div>

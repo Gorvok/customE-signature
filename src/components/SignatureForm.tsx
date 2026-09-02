@@ -37,8 +37,8 @@ const SECTIONS = [
   { id: 'branding', label: 'Branding' },
 ];
 
-function InputField({ label, value, onChange, placeholder, type = 'text', error }: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; error?: string;
+function InputField({ label, value, onChange, placeholder, type = 'text', error, maxLength = LIMITS.text }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; error?: string; maxLength?: number;
 }) {
   const id = useId();
   const errorId = `${id}-error`;
@@ -51,6 +51,7 @@ function InputField({ label, value, onChange, placeholder, type = 'text', error 
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        maxLength={maxLength}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         className={`w-full bg-white dark:bg-gray-800 border rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:outline-none transition-colors ${
@@ -152,9 +153,9 @@ export default function SignatureForm({ data, onChange }: Props) {
         <div className="space-y-3">
           <InputField label="Phone" value={data.phone} onChange={(v) => update({ phone: v })} placeholder="(555) 123-4567" type="tel" />
           <InputField label="Email" value={data.email} onChange={(v) => update({ email: v })} placeholder="you@example.com" type="email" error={data.email && !isValidEmail(data.email) ? 'Enter a valid email address.' : undefined} />
-          <InputField label="Website" value={data.website} onChange={(v) => update({ website: v })} placeholder="www.example.com" type="url" error={data.website && !isLikelyUrl(data.website) ? 'Enter a valid URL.' : undefined} />
-          <InputField label="Office Address" value={data.address} onChange={(v) => update({ address: v })} placeholder="123 Main St, City" />
-          <InputField label="Booking Link" value={data.bookingLink} onChange={(v) => update({ bookingLink: v })} placeholder="calendly.com/you" type="url" error={data.bookingLink && !isLikelyUrl(data.bookingLink) ? 'Enter a valid URL.' : undefined} />
+          <InputField label="Website" value={data.website} onChange={(v) => update({ website: v })} placeholder="www.example.com" type="url" maxLength={LIMITS.url} error={data.website && !isLikelyUrl(data.website) ? 'Enter a valid URL.' : undefined} />
+          <InputField label="Office Address" value={data.address} onChange={(v) => update({ address: v })} placeholder="123 Main St, City" maxLength={LIMITS.address} />
+          <InputField label="Booking Link" value={data.bookingLink} onChange={(v) => update({ bookingLink: v })} placeholder="calendly.com/you" type="url" maxLength={LIMITS.url} error={data.bookingLink && !isLikelyUrl(data.bookingLink) ? 'Enter a valid URL.' : undefined} />
         </div>
       </CollapsibleSection>
 
@@ -193,6 +194,7 @@ export default function SignatureForm({ data, onChange }: Props) {
                 value={data.socials[platform.id] || ''}
                 onChange={(e) => updateSocial(platform.id, e.target.value)}
                 placeholder={platform.placeholder}
+                maxLength={LIMITS.url}
                 className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
               />
               <div className="flex flex-col">
@@ -212,7 +214,7 @@ export default function SignatureForm({ data, onChange }: Props) {
       <CollapsibleSection id="sec-cta" title="Call to Action" subtitle="An optional button" icon={SECTION_ICONS.cta} filled={filled.cta} open={open.cta} onToggle={() => toggle('cta')}>
         <div className="space-y-3">
           <InputField label="Button Text" value={data.ctaLabel} onChange={(v) => update({ ctaLabel: v })} placeholder="Book a demo" />
-          <InputField label="Button Link" value={data.ctaUrl} onChange={(v) => update({ ctaUrl: v })} placeholder="https://example.com/demo" type="url" error={data.ctaUrl && !isLikelyUrl(data.ctaUrl) ? 'Enter a valid URL.' : undefined} />
+          <InputField label="Button Link" value={data.ctaUrl} onChange={(v) => update({ ctaUrl: v })} placeholder="https://example.com/demo" type="url" maxLength={LIMITS.url} error={data.ctaUrl && !isLikelyUrl(data.ctaUrl) ? 'Enter a valid URL.' : undefined} />
         </div>
       </CollapsibleSection>
 
