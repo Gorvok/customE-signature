@@ -62,8 +62,8 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-base font-semibold text-gray-900 dark:text-white">Save &amp; Share</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400">
+      <h2 className="text-base font-semibold text-gray-900 dark:text-white">Save &amp; Share</h2>
+      <p className="text-sm text-muted">
         Save your setup as a file or copy a link that restores it — no account needed.
       </p>
       <div className="flex flex-wrap gap-3">
@@ -86,6 +86,7 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
           ref={fileRef}
           type="file"
           accept="application/json,.json"
+          aria-label="Signature config file"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];

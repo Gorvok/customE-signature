@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { SignatureData, SignatureTemplate } from '../types';
 import { LOCAL_ICON_BASE } from '../utils/templateHelpers';
@@ -28,7 +28,7 @@ function Segmented<T extends string>({ value, onChange, options, label }: {
           className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
             value === o.value
               ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
-              : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              : 'text-muted hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           {o.icon}
@@ -41,6 +41,7 @@ function Segmented<T extends string>({ value, onChange, options, label }: {
 
 export default function SignaturePreview({ data, template, onLoadSample }: Props) {
   const { addToast } = useToast();
+  const headingId = useId();
   const [width, setWidth] = useState<Width>('desktop');
   const [bg, setBg] = useState<Bg>('light');
   const [showHtml, setShowHtml] = useState(false);
@@ -59,9 +60,9 @@ export default function SignaturePreview({ data, template, onLoadSample }: Props
   }
 
   return (
-    <div className="space-y-3">
+    <section aria-labelledby={headingId} className="space-y-3">
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h3 className="text-base font-semibold text-gray-900 dark:text-white">Preview</h3>
+        <h2 id={headingId} className="text-base font-semibold text-gray-900 dark:text-white">Preview</h2>
         <div className="flex items-center gap-2">
           <Segmented<Width>
             label="Preview width"
@@ -90,7 +91,7 @@ export default function SignaturePreview({ data, template, onLoadSample }: Props
           <span className="w-3 h-3 rounded-full bg-red-400" />
           <span className="w-3 h-3 rounded-full bg-yellow-400" />
           <span className="w-3 h-3 rounded-full bg-green-400" />
-          <span className="ml-3 text-xs text-gray-400 dark:text-gray-500">New Message</span>
+          <span className="ml-3 text-xs text-hint">New Message</span>
         </div>
         <div className={`p-6 overflow-auto transition-colors ${bg === 'light' ? 'bg-white' : 'bg-[#1a1a1a]'}`}>
           <div
@@ -120,7 +121,7 @@ export default function SignaturePreview({ data, template, onLoadSample }: Props
           type="button"
           onClick={() => setShowHtml((s) => !s)}
           aria-expanded={showHtml}
-          className="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          className="text-xs font-medium text-muted hover:text-gray-900 dark:hover:text-white transition-colors"
         >
           {showHtml ? '▾ Hide HTML' : '▸ View HTML'}
         </button>
@@ -137,6 +138,6 @@ export default function SignaturePreview({ data, template, onLoadSample }: Props
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }

@@ -2,6 +2,31 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Secondary text colors that clear WCAG AA in both themes, exposed as the
+ * utilities text-muted, text-hint and text-danger. Contrast ratios:
+ *   muted   gray-500 on white 4.8:1   | gray-400 on gray-900 7.0:1
+ *   hint    gray-600 on white 7.6:1   | gray-400 on gray-900 7.0:1 (12px text, tinted panels)
+ *   danger  red-600  on white 4.5:1   | red-400  on gray-900 6.4:1
+ * Defined as plain custom properties so the dark theme can swap them, and
+ * exposed to Tailwind with @theme inline so utilities read the live value.
+ */
+:root {
+  --text-muted: #6b7280;
+  --text-hint: #4b5563;
+  --text-danger: #dc2626;
+}
+.dark {
+  --text-muted: #9ca3af;
+  --text-hint: #9ca3af;
+  --text-danger: #f87171;
+}
+@theme inline {
+  --color-muted: var(--text-muted);
+  --color-hint: var(--text-hint);
+  --color-danger: var(--text-danger);
+}
+
 /* Toast entrance */
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(8px) scale(0.98); }
@@ -9,11 +34,18 @@
 }
 .toast-in { animation: toast-in 0.2s ease-out; }
 
-/* Clear keyboard focus ring for interactive elements */
-:where(a, button, [tabindex]):focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-  border-radius: 6px;
+/*
+ * Clear keyboard focus ring for interactive elements. Lives in the base layer
+ * on purpose: unlayered CSS beats every Tailwind utility regardless of
+ * specificity, which would make focus:outline-none a no-op wherever a
+ * component draws its own focus indicator (the template cards).
+ */
+@layer base {
+  :where(a, button, [tabindex]):focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
 }
 
 /* Respect users who prefer reduced motion */

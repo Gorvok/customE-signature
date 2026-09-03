@@ -42,7 +42,7 @@ export default function App() {
             </span>
             <div className="min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate">Email Signature Generator</h1>
-              <p className="hidden sm:block text-sm text-gray-500 dark:text-gray-400">Free &amp; open source — no login required</p>
+              <p className="hidden sm:block text-sm text-muted">Free &amp; open source — no login required</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -56,7 +56,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleReset}
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="text-sm text-muted hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               Reset
             </button>
@@ -77,7 +77,7 @@ export default function App() {
               target="_blank"
               rel="noopener"
               aria-label="View source on GitHub"
-              className="hidden sm:inline text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="hidden sm:inline text-sm text-muted hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               GitHub
             </a>
@@ -101,7 +101,7 @@ export default function App() {
                 className={`flex-1 px-3 py-1.5 text-sm font-medium rounded-md capitalize transition-colors ${
                   mobileTab === tab
                     ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400'
+                    : 'text-muted'
                 }`}
               >
                 {tab}
@@ -125,7 +125,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-gray-800 px-6 py-4 mt-12">
-        <div className="max-w-7xl mx-auto text-center text-sm text-gray-500 dark:text-gray-500">
+        <div className="max-w-7xl mx-auto text-center text-sm text-muted">
           Open source email signature generator. Your details are saved in this browser only — nothing is sent to a server.
         </div>
       </footer>

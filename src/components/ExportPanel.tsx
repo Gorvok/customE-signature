@@ -89,7 +89,7 @@ export default function ExportPanel({ data, template }: Props) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-base font-semibold text-gray-900 dark:text-white">Export</h3>
+      <h2 className="text-base font-semibold text-gray-900 dark:text-white">Export</h2>
 
       {/* Provider grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -98,6 +98,7 @@ export default function ExportPanel({ data, template }: Props) {
             key={p.id}
             type="button"
             onClick={() => setSelectedProvider(p.id)}
+            aria-pressed={selectedProvider === p.id}
             className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
               selectedProvider === p.id
                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
@@ -111,7 +112,7 @@ export default function ExportPanel({ data, template }: Props) {
 
       {provider ? (
         <div className="bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-4">
-          <h4 className="font-medium text-gray-900 dark:text-white">Setup Instructions for {provider.name}</h4>
+          <h3 className="font-medium text-gray-900 dark:text-white">Setup Instructions for {provider.name}</h3>
           <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
             {provider.instructions.map((step, i) => (
               <li key={i}>{step}</li>

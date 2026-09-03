@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { fileToBase64 } from '../utils/imageUtils';
 import { LIMITS } from '../data/options';
 import { useToast } from '../toast';
@@ -15,6 +15,8 @@ export default function ImageUploader({ value, onChange }: Props) {
   // cannot overwrite a later one.
   const requestRef = useRef(0);
   const [dragOver, setDragOver] = useState(false);
+  const urlId = useId();
+  const dropHintId = useId();
 
   async function handleFile(file: File) {
     const request = ++requestRef.current;
@@ -30,14 +32,14 @@ export default function ImageUploader({ value, onChange }: Props) {
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Logo</label>
+      <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Logo</span>
+      {/* The drop target is passive; the real control is the button inside it. */}
       <div
-        className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+        className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
           dragOver
             ? 'border-blue-400 bg-blue-50 dark:bg-blue-400/10'
             : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-400'
         }`}
-        onClick={() => inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={(e) => {
@@ -47,26 +49,30 @@ export default function ImageUploader({ value, onChange }: Props) {
           if (file) void handleFile(file);
         }}
       >
-        {value ? (
-          <div className="flex items-center justify-center gap-3">
-            <img src={value} alt="Logo preview" className="max-h-12" />
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onChange(''); }}
-              className="text-xs text-red-500 hover:text-red-400"
-            >
-              Remove
+        {value && (
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <img src={value} alt="Current logo" className="max-h-12" />
+            <button type="button" onClick={() => onChange('')} className="text-xs font-medium text-danger hover:underline">
+              Remove logo
             </button>
           </div>
-        ) : (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Drop an image here or click to upload
-          </p>
         )}
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          aria-describedby={dropHintId}
+          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          {value ? 'Choose a different logo' : 'Upload a logo'}
+        </button>
+        <p id={dropHintId} className="mt-1 text-xs text-hint">
+          PNG, JPG or SVG up to 5 MB. You can also drop an image here.
+        </p>
         <input
           ref={inputRef}
           type="file"
           accept="image/*"
+          aria-label="Logo image file"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -76,8 +82,11 @@ export default function ImageUploader({ value, onChange }: Props) {
           }}
         />
       </div>
-      <div className="text-xs text-gray-500 dark:text-gray-500">Or paste a URL:</div>
+      <label htmlFor={urlId} className="block text-xs text-hint">
+        Or paste an image URL
+      </label>
       <input
+        id={urlId}
         type="url"
         placeholder="https://example.com/logo.png"
         maxLength={LIMITS.url}
