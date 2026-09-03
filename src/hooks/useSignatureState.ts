@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SignatureData } from '../types';
-import { templates } from '../templates';
+import { DEFAULT_TEMPLATE, isTemplateId } from '../templates';
 import { defaultData } from '../data/defaults';
 import { LEGACY_SIGNATURE_STORAGE_KEY, SIGNATURE_STORAGE_KEY } from '../data/storage';
 import { parseSharedConfig, parseSignatureData } from '../utils/parseConfig';
@@ -13,16 +13,12 @@ interface Stored {
 
 type Confirm = (message: string) => boolean;
 
-const DEFAULT_TEMPLATE_ID = templates[0].id;
+const DEFAULT_TEMPLATE_ID = DEFAULT_TEMPLATE.id;
 const HAS_SHARE_FRAGMENT = /(?:^#|&)cfg=/;
 
 export const REPLACE_PROMPT = 'This link contains a signature. Replace the one saved in this browser with it?';
 
 const defaultConfirm: Confirm = (message) => window.confirm(message);
-
-function isTemplateId(id: unknown): id is string {
-  return typeof id === 'string' && templates.some((t) => t.id === id);
-}
 
 /** Saved state from this browser, migrating the pre-1.1 data-only key. Never throws. */
 function readStored(): Stored {

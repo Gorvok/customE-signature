@@ -10,8 +10,13 @@ import type { SignatureData } from '../types';
 
 const fragment = (data: SignatureData, templateId?: string) => `#cfg=${encodeConfig({ data, templateId })}`;
 
-function stored() {
-  return JSON.parse(localStorage.getItem(SIGNATURE_STORAGE_KEY) ?? 'null');
+interface StoredShape {
+  data?: { fullName?: string };
+  templateId?: string;
+}
+
+function stored(): StoredShape {
+  return JSON.parse(localStorage.getItem(SIGNATURE_STORAGE_KEY) ?? '{}') as StoredShape;
 }
 
 beforeEach(() => {
@@ -51,7 +56,7 @@ describe('useSignatureState', () => {
     });
 
     expect(result.current.templateId).toBe('minimal');
-    expect(stored().data.fullName).toBe('Jane');
+    expect(stored().data?.fullName).toBe('Jane');
     expect(stored().templateId).toBe('minimal');
   });
 
@@ -67,7 +72,7 @@ describe('useSignatureState', () => {
     const { result } = renderHook(() => useSignatureState());
     expect(result.current.data.fullName).toBe('Old');
     expect(localStorage.getItem(LEGACY_SIGNATURE_STORAGE_KEY)).toBeNull();
-    expect(stored().data.fullName).toBe('Old');
+    expect(stored().data?.fullName).toBe('Old');
   });
 
   it('ignores an unknown template id', () => {
@@ -93,7 +98,7 @@ describe('useSignatureState', () => {
     expect(result.current.templateId).toBe('corporate');
     expect(confirm).not.toHaveBeenCalled();
     expect(window.location.hash).toBe('');
-    expect(stored().data.fullName).toBe('Alex Rivera');
+    expect(stored().data?.fullName).toBe('Alex Rivera');
   });
 
   it('asks before replacing saved work and keeps it on decline', () => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { templates } from './templates';
+import { getTemplate } from './templates';
 import { sampleData } from './data/sampleData';
 import { useTheme } from './theme';
 import { useToast } from './toast';
@@ -9,6 +9,7 @@ import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
+import UpdatePrompt from './components/UpdatePrompt';
 
 export default function App() {
   const { data, templateId, setData, setTemplateId, applyConfig, reset } = useSignatureState();
@@ -29,7 +30,7 @@ export default function App() {
     addToast('Loaded sample data');
   }
 
-  const template = templates.find((t) => t.id === templateId) ?? templates[0];
+  const template = getTemplate(templateId);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white transition-colors">
@@ -129,6 +130,7 @@ export default function App() {
           Open source email signature generator. Your details are saved in this browser only — nothing is sent to a server.
         </div>
       </footer>
+      <UpdatePrompt />
     </div>
   );
 }

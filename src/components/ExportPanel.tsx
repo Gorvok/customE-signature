@@ -122,12 +122,12 @@ export default function ExportPanel({ data, template }: Props) {
             showCopy={provider.exportMethod === 'clipboard' || provider.exportMethod === 'both'}
             showDownload={provider.exportMethod === 'download' || provider.exportMethod === 'both'}
             copyStatus={copyStatus}
-            onCopy={handleCopy}
+            onCopy={() => void handleCopy()}
             onDownload={handleDownload}
           />
         </div>
       ) : (
-        <ExportActions showCopy showDownload copyStatus={copyStatus} onCopy={handleCopy} onDownload={handleDownload} />
+        <ExportActions showCopy showDownload copyStatus={copyStatus} onCopy={() => void handleCopy()} onDownload={handleDownload} />
       )}
     </div>
   );

@@ -47,8 +47,8 @@ describe('copyHtmlToClipboard', () => {
   }
 
   it('reports rich when the HTML write succeeds', async () => {
-    const write = vi.fn(async () => {});
-    const writeText = vi.fn(async () => {});
+    const write = vi.fn(() => Promise.resolve());
+    const writeText = vi.fn(() => Promise.resolve());
     stubClipboard(write, writeText);
     await expect(copyHtmlToClipboard('<b>x</b>')).resolves.toBe('rich');
     expect(write).toHaveBeenCalledTimes(1);
@@ -56,12 +56,12 @@ describe('copyHtmlToClipboard', () => {
   });
 
   it('reports text when only the plain-text write works', async () => {
-    stubClipboard(vi.fn(async () => { throw new Error('denied'); }), vi.fn(async () => {}));
+    stubClipboard(vi.fn(() => Promise.reject(new Error('denied'))), vi.fn(() => Promise.resolve()));
     await expect(copyHtmlToClipboard('<b>x</b>')).resolves.toBe('text');
   });
 
   it('reports failed when nothing works', async () => {
-    stubClipboard(vi.fn(async () => { throw new Error('denied'); }), vi.fn(async () => { throw new Error('denied'); }));
+    stubClipboard(vi.fn(() => Promise.reject(new Error('denied'))), vi.fn(() => Promise.reject(new Error('denied'))));
     await expect(copyHtmlToClipboard('<b>x</b>')).resolves.toBe('failed');
   });
 });

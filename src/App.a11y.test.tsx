@@ -66,7 +66,7 @@ describe('App accessibility', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     const levels = screen.getAllByRole('heading').map((h) => Number(h.tagName.slice(1)));
     for (let i = 1; i < levels.length; i++) {
-      expect(levels[i] - levels[i - 1], `heading jump at index ${i}`).toBeLessThanOrEqual(1);
+      expect((levels[i] ?? 0) - (levels[i - 1] ?? 0), `heading jump at index ${i}`).toBeLessThanOrEqual(1);
     }
   });
 

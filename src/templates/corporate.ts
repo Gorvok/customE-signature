@@ -1,4 +1,4 @@
-import type { SignatureData, SignatureTemplate } from '../types';
+import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
   finalizeHtml,
@@ -13,11 +13,11 @@ import {
   renderSocialLinks,
 } from '../utils/templateHelpers';
 
-export const corporate: SignatureTemplate = {
+export const corporate = {
   id: 'corporate',
   name: 'Corporate',
   description: 'Professional enterprise style with left accent',
-  render: (data: SignatureData, options = {}) => {
+  render: (data: SignatureData, options: RenderOptions = {}) => {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
     const textDark = '#2d2d2d';
@@ -67,4 +67,4 @@ export const corporate: SignatureTemplate = {
 </table>
 ${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
   },
-};
+} satisfies SignatureTemplate;

@@ -1,4 +1,4 @@
-import type { SignatureData, SignatureTemplate } from '../types';
+import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
   finalizeHtml,
@@ -12,11 +12,11 @@ import {
   renderSocialLinks,
 } from '../utils/templateHelpers';
 
-export const boldBanner: SignatureTemplate = {
+export const boldBanner = {
   id: 'bold-banner',
   name: 'Bold Banner',
   description: 'Eye-catching colored banner with large name',
-  render: (data: SignatureData, options = {}) => {
+  render: (data: SignatureData, options: RenderOptions = {}) => {
     const fgRaw = data.secondaryColor || '#FFFFFF';
     const bg = esc(data.primaryColor);
     const fg = esc(fgRaw);
@@ -72,4 +72,4 @@ export const boldBanner: SignatureTemplate = {
 </table>
 ${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
   },
-};
+} satisfies SignatureTemplate;

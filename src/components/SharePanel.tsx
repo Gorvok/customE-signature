@@ -69,7 +69,7 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
-          onClick={handleCopyLink}
+          onClick={() => void handleCopyLink()}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             linkStatus === 'copied' ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'
           }`}

@@ -198,8 +198,10 @@ describe('templates escape malicious input', () => {
       // javascript: must never survive in an href/src attribute.
       expect(html).not.toContain('href="javascript:');
       expect(html).not.toContain('src="javascript:');
-      // The escaped form should be present, proving the value was rendered safely.
-      expect(html).toContain('&lt;');
+      // The escaped forms must be present, proving the values were rendered rather than dropped.
+      expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
+      expect(html).toContain('&lt;script&gt;alert(2)&lt;/script&gt;');
+      expect(html).toContain('Confidential &lt;script&gt;alert(6)&lt;/script&gt;');
     });
   }
 });

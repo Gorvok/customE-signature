@@ -1,4 +1,4 @@
-import type { SignatureData, SignatureTemplate } from '../types';
+import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
   finalizeHtml,
@@ -12,11 +12,11 @@ import {
   renderSocialLinks,
 } from '../utils/templateHelpers';
 
-export const minimal: SignatureTemplate = {
+export const minimal = {
   id: 'minimal',
   name: 'Minimal',
   description: 'Simple, text-focused signature',
-  render: (data: SignatureData, options = {}) => {
+  render: (data: SignatureData, options: RenderOptions = {}) => {
     const textColor = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
 
@@ -47,4 +47,4 @@ export const minimal: SignatureTemplate = {
 </table>
 ${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
   },
-};
+} satisfies SignatureTemplate;

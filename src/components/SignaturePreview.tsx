@@ -129,7 +129,7 @@ export default function SignaturePreview({ data, template, onLoadSample }: Props
           <div className="mt-2 relative">
             <button
               type="button"
-              onClick={copyHtml}
+              onClick={() => void copyHtml()}
               className="absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 text-white"
             >
               Copy

@@ -51,7 +51,8 @@ describe('SignatureForm keyboard reordering', () => {
     const user = userEvent.setup();
     render(<Host initial={sampleData} />);
     await user.click(screen.getByRole('button', { name: /Social Links/, expanded: false }));
-    const handle = screen.getAllByTitle('Drag to reorder')[0];
+    const [handle] = screen.getAllByTitle('Drag to reorder');
+    if (!handle) throw new Error('no drag handle rendered');
     const setData = vi.fn();
     fireEvent.dragStart(handle, { dataTransfer: { setData, effectAllowed: '' } });
     expect(setData).toHaveBeenCalledWith('text/plain', '0');

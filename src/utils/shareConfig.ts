@@ -57,6 +57,6 @@ export function buildShareUrl(config: SharedConfig): string {
 
 /** Read a config from the current URL hash (e.g. #cfg=...), or null. */
 export function readConfigFromHash(): SharedConfig | null {
-  const match = window.location.hash.match(/(?:^#|&)cfg=([^&]+)/);
-  return match ? decodeConfig(match[1]) : null;
+  const encoded = window.location.hash.match(/(?:^#|&)cfg=([^&]+)/)?.[1];
+  return encoded ? decodeConfig(encoded) : null;
 }
