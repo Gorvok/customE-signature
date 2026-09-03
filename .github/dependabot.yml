@@ -9,8 +9,19 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # Type definitions follow the Node version in .nvmrc, not the newest Node.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    groups:
+      # The Pages actions are paired generations and only the deploy workflow
+      # exercises them, so every action bump arrives as one PR to merge and
+      # watch together rather than five to reconcile.
+      actions:
+        patterns:
+          - "*"
