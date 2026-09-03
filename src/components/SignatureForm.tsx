@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { IconStyle, SignatureData, SocialPlatform } from '../types';
 import { socialPlatforms } from '../data/socialPlatforms';
@@ -60,13 +60,26 @@ function InputField({ label, value, onChange, placeholder, type = 'text', error,
             : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500'
         }`}
       />
-      {error && <p id={errorId} className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p id={errorId} className="mt-1 text-xs text-danger">{error}</p>}
     </div>
   );
 }
 
 export default function SignatureForm({ data, onChange }: Props) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  // After a keyboard move, focus follows the moved row: the same arrow button
+  // if it is still enabled, otherwise its sibling (at the top or bottom the
+  // pressed button becomes disabled and would drop focus to <body>).
+  const focusAfterMove = useRef<{ id: string; dir: 'up' | 'down' } | null>(null);
+  useEffect(() => {
+    const pending = focusAfterMove.current;
+    if (!pending) return;
+    focusAfterMove.current = null;
+    const same = document.getElementById(`move-${pending.dir}-${pending.id}`);
+    const other = document.getElementById(`move-${pending.dir === 'up' ? 'down' : 'up'}-${pending.id}`);
+    const target = same instanceof HTMLButtonElement && !same.disabled ? same : other;
+    target?.focus();
+  }, [data.socialOrder]);
   const [open, setOpen] = useState<Record<string, boolean>>({
     personal: true,
     contact: true,
@@ -104,11 +117,12 @@ export default function SignatureForm({ data, onChange }: Props) {
     .map((id) => socialPlatforms.find((p) => p.id === id))
     .filter((p): p is SocialPlatform => Boolean(p));
 
-  function moveSocial(from: number, to: number) {
+  function moveSocial(from: number, to: number, dir?: 'up' | 'down') {
     if (to < 0 || to >= orderedPlatforms.length || from === to) return;
     const ids = orderedPlatforms.map((p) => p.id);
     const [moved] = ids.splice(from, 1);
     ids.splice(to, 0, moved);
+    if (dir) focusAfterMove.current = { id: moved, dir };
     update({ socialOrder: ids });
   }
 
@@ -174,17 +188,22 @@ export default function SignatureForm({ data, onChange }: Props) {
             >
               <span
                 draggable
-                onDragStart={() => setDragIndex(index)}
+                onDragStart={(e) => {
+                  // Firefox refuses to start a drag with no data attached.
+                  e.dataTransfer.setData('text/plain', String(index));
+                  e.dataTransfer.effectAllowed = 'move';
+                  setDragIndex(index);
+                }}
                 onDragEnd={() => setDragIndex(null)}
                 aria-hidden="true"
                 title="Drag to reorder"
-                className="cursor-grab active:cursor-grabbing text-gray-400 dark:text-gray-500 select-none"
+                className="cursor-grab active:cursor-grabbing text-muted select-none"
               >
                 <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="8" r="1.5"/><circle cx="9" cy="8" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="9" cy="13" r="1.5"/></svg>
               </span>
               <span
                 aria-hidden="true"
-                className="w-5 h-5 flex-shrink-0 text-gray-500 dark:text-gray-400"
+                className="w-5 h-5 flex-shrink-0 text-muted"
                 dangerouslySetInnerHTML={{ __html: getSocialIconSvg(platform.id, 'currentColor') }}
               />
               <label htmlFor={`social-${platform.id}`} className="text-sm text-gray-600 dark:text-gray-300 min-w-16 sm:min-w-20">{platform.name}</label>
@@ -198,10 +217,10 @@ export default function SignatureForm({ data, onChange }: Props) {
                 className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
               />
               <div className="flex flex-col">
-                <button type="button" onClick={() => moveSocial(index, index - 1)} disabled={index === 0} aria-label={`Move ${platform.name} up`} className="text-gray-400 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-gray-400 leading-none">
+                <button type="button" id={`move-up-${platform.id}`} onClick={() => moveSocial(index, index - 1, 'up')} disabled={index === 0} aria-label={`Move ${platform.name} up`} className="text-muted hover:text-blue-600 disabled:opacity-30 disabled:hover:text-muted leading-none">
                   <svg width="14" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15" /></svg>
                 </button>
-                <button type="button" onClick={() => moveSocial(index, index + 1)} disabled={index === orderedPlatforms.length - 1} aria-label={`Move ${platform.name} down`} className="text-gray-400 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-gray-400 leading-none">
+                <button type="button" id={`move-down-${platform.id}`} onClick={() => moveSocial(index, index + 1, 'down')} disabled={index === orderedPlatforms.length - 1} aria-label={`Move ${platform.name} down`} className="text-muted hover:text-blue-600 disabled:opacity-30 disabled:hover:text-muted leading-none">
                   <svg width="14" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
                 </button>
               </div>
@@ -215,7 +234,7 @@ export default function SignatureForm({ data, onChange }: Props) {
         <div className="space-y-3">
           <InputField label="Button Text" value={data.ctaLabel} onChange={(v) => update({ ctaLabel: v })} placeholder="Book a demo" />
           <InputField label="Button Link" value={data.ctaUrl} onChange={(v) => update({ ctaUrl: v })} placeholder="https://example.com/demo" type="url" maxLength={LIMITS.url} error={data.ctaUrl && !isLikelyUrl(data.ctaUrl) ? 'Enter a valid URL.' : undefined} />
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-hint">
             Shows as a button in most clients. Outlook for Windows keeps the button shape only when you install the downloaded HTML file; when pasted, it shows a styled link.
           </p>
         </div>
@@ -232,7 +251,7 @@ export default function SignatureForm({ data, onChange }: Props) {
           aria-label="Legal disclaimer"
           className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
         />
-        <p className="mt-1 text-right text-xs text-gray-400 dark:text-gray-500">{data.disclaimer.length}/{LIMITS.disclaimer}</p>
+        <p className="mt-1 text-right text-xs text-hint">{data.disclaimer.length}/{LIMITS.disclaimer}</p>
       </CollapsibleSection>
 
       {/* Branding */}
@@ -286,7 +305,7 @@ export default function SignatureForm({ data, onChange }: Props) {
                 <option key={s.value} value={s.value}>{s.label}</option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">Icons are hosted as images so they display in Gmail &amp; Outlook.</p>
+            <p className="mt-1 text-xs text-hint">Icons are hosted as images so they display in Gmail &amp; Outlook.</p>
           </div>
         </div>
       </CollapsibleSection>
