@@ -1,4 +1,4 @@
-import type { SignatureData, SignatureTemplate } from '../types';
+import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
   finalizeHtml,
@@ -12,11 +12,11 @@ import {
   renderSocialLinks,
 } from '../utils/templateHelpers';
 
-export const compactCard: SignatureTemplate = {
+export const compactCard = {
   id: 'compact-card',
   name: 'Compact Card',
   description: 'Space-efficient card with rounded photo area',
-  render: (data: SignatureData, options = {}) => {
+  render: (data: SignatureData, options: RenderOptions = {}) => {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
     const textDark = '#333333';
@@ -71,4 +71,4 @@ export const compactCard: SignatureTemplate = {
 </table>
 ${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
   },
-};
+} satisfies SignatureTemplate;

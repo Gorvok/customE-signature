@@ -1,4 +1,4 @@
-import type { SignatureData, SignatureTemplate } from '../types';
+import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
   finalizeHtml,
@@ -12,11 +12,11 @@ import {
   renderSocialLinks,
 } from '../utils/templateHelpers';
 
-export const modernLight: SignatureTemplate = {
+export const modernLight = {
   id: 'modern-light',
   name: 'Modern Light',
   description: 'Clean light theme with accent color bar',
-  render: (data: SignatureData, options = {}) => {
+  render: (data: SignatureData, options: RenderOptions = {}) => {
     const accentColor = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
     const textColor = '#333333';
@@ -66,4 +66,4 @@ export const modernLight: SignatureTemplate = {
 </table>
 ${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
   },
-};
+} satisfies SignatureTemplate;

@@ -44,7 +44,7 @@ for (const template of templates) {
     it('sets a font on every cell that holds text or a text link', () => {
       // Outlook does not reliably inherit font-family from a parent table.
       for (const m of html.matchAll(/<td([^>]*)>([^<]*)/g)) {
-        const text = m[2].replace(/&nbsp;/g, '').trim();
+        const text = (m[2] ?? '').replace(/&nbsp;/g, '').trim();
         if (text) expect(m[1], `cell holding "${text.slice(0, 40)}"`).toContain('font-family');
       }
       for (const m of html.matchAll(/<td([^>]*)>\s*<a[^>]*>(?!<img)/g)) {

@@ -334,7 +334,7 @@ export function renderSocialLinks(
   return ordered
     .filter((platform) => typeof socials[platform] === 'string' && socials[platform].trim() && socialPlatforms.some((p) => p.id === platform))
     .map((platform) => {
-      const url = sanitizeLinkUrl(buildSocialUrl(platform, socials[platform]));
+      const url = sanitizeLinkUrl(buildSocialUrl(platform, socials[platform] ?? ''));
       const iconUrl = esc(`${base}/${safeStyle}/${platform}.png`);
       const name = socialPlatforms.find((p) => p.id === platform)?.name ?? platform;
       // border="0": legacy Outlook draws a blue border around linked images without it.

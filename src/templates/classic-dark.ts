@@ -1,4 +1,4 @@
-import type { SignatureData, SignatureTemplate } from '../types';
+import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
   finalizeHtml,
@@ -12,11 +12,11 @@ import {
   renderSocialLinks,
 } from '../utils/templateHelpers';
 
-export const classicDark: SignatureTemplate = {
+export const classicDark = {
   id: 'classic-dark',
   name: 'Classic Dark',
   description: 'Professional dark theme with two-column layout',
-  render: (data: SignatureData, options = {}) => {
+  render: (data: SignatureData, options: RenderOptions = {}) => {
     const secondaryRaw = data.secondaryColor || '#FFFFFF';
     const primary = esc(data.primaryColor);
     const secondary = esc(secondaryRaw);
@@ -78,4 +78,4 @@ export const classicDark: SignatureTemplate = {
   </tr>
 </table>`);
   },
-};
+} satisfies SignatureTemplate;

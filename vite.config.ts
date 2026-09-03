@@ -18,7 +18,7 @@ function cspMeta(): Plugin {
     transformIndexHtml: {
       order: 'post',
       handler(html) {
-        const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1])
+        const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1] ?? '')
         const hashes = inlineScripts.map((source) => `'sha256-${createHash('sha256').update(source).digest('base64')}'`)
         const policy = [
           "default-src 'self'",
@@ -50,8 +50,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['og.png'],
+      // A new deploy is offered through an in-app "Reload" prompt instead of
+      // silently serving the previous release for one more visit.
+      registerType: 'prompt',
+      // The preview renders the hosted social icons, so they must be cached
+      // for the app to work offline. The Open Graph image is only for crawlers.
+      includeAssets: ['icons/png/**/*.png', 'icons/app-192.png'],
       manifest: {
         name: 'Email Signature Generator',
         short_name: 'Signature',
@@ -64,7 +68,7 @@ export default defineConfig({
         icons: [
           { src: 'icons/app-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icons/app-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icons/app-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icons/app-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
     }),

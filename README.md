@@ -14,7 +14,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Save & share**: copy a self-restoring share link or export/import your setup as JSON
 - **Autosave**: your details and chosen template are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear). Opening a share link over saved work asks before replacing it.
 - **Polished UX**: one-click sample data, collapsible form sections with quick-jump nav, a realistic email-window preview (desktop/mobile width, light/dark background, raw-HTML view), color-palette presets, and toast feedback
-- **Installable PWA** with offline support
+- **Installable PWA** with offline support and an in-app prompt when a new version has been deployed
 - **Light & dark mode** with system-preference detection, plus reduced-motion and keyboard-focus support
 - **Safe output**: all input is HTML-escaped and links are sanitized before being placed in the generated signature
 - **Fully client-side**: zero backend, zero tracking, zero data collection
@@ -26,7 +26,7 @@ npm install
 npm run dev
 ```
 
-Then open [http://localhost:5173](http://localhost:5173) in your browser.
+Then open [http://localhost:5173/customE-signature/](http://localhost:5173/customE-signature/) in your browser. The app is served under the same base path as on GitHub Pages.
 
 ## Social Icons
 
@@ -67,18 +67,30 @@ under a new path and leave the current files in place.
 ## Testing
 
 ```bash
-npm test
+npm test           # Vitest
+npm run lint       # ESLint, type-aware, with jsx-a11y
+npm run typecheck  # tsc
 ```
 
-Unit tests (Vitest) cover the HTML-escaping/URL-sanitization helpers, the
-share-config encoder, and verify that every template neutralizes malicious
-input. A GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint, tests
-and the build on every pull request.
+Tests cover the config validator, the HTML-escaping and URL-sanitization
+helpers, the share-link encoder, the plain-text converter and the clipboard
+modes. Every template is checked structurally and against a committed
+snapshot, and must neutralize malicious input. Component tests (Testing
+Library and user-event) cover the error boundary, the sandboxed preview
+frame, keyboard reordering and the uploader, and an axe-core run over the
+whole app asserts no accessibility violations. `.github/workflows/ci.yml`
+runs lint, typecheck, tests and the build on every pull request and push to
+`master`.
 
-The social-share image and PWA app icons are generated with:
+## Generated assets
+
+The social-share image and the PWA app icons are rendered from SVG with a
+bundled font (`scripts/fonts/Inter-Bold.ttf`, SIL Open Font License), so the
+output is identical on every machine:
 
 ```bash
-npm run generate:og
+npm run generate:og      # public/og.png and public/icons/app-*.png
+npm run generate:icons   # public/icons/png/<style>/<platform>.png (see Social Icons)
 ```
 
 ## How to Use
@@ -94,20 +106,25 @@ npm run generate:og
 - [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vite.dev/) (build tool)
 - [Tailwind CSS](https://tailwindcss.com/) (app styling)
+- [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (installable, offline, update prompt)
+- [Vitest](https://vitest.dev/), [Testing Library](https://testing-library.com/) and [axe-core](https://github.com/dequelabs/axe-core) (tests)
 
 ## Deployment
 
-This is a static site with no backend. Build and deploy anywhere:
+The site is deployed to GitHub Pages at
+<https://gorvok.github.io/customE-signature/> by `.github/workflows/deploy.yml`
+on every push to `master`, and on demand from the Actions tab. The workflow
+runs lint, typecheck and tests before building, so nothing reaches production
+unverified.
 
-```bash
-npm run build
-```
+Three values are pinned to that address. Change all of them if you host the
+app somewhere else:
 
-The `dist/` folder can be deployed to:
-- **GitHub Pages**
-- **Netlify** (connect repo, auto-deploys)
-- **Vercel** (connect repo, auto-deploys)
-- **Any static web server** (Nginx, Apache, S3, etc.)
+- `base` in `vite.config.ts` (the path the app is served from)
+- `PRODUCTION_ICON_BASE` in `src/utils/templateHelpers.ts` (see the icon URL contract above)
+- the `og:url`, `og:image` and `twitter:image` URLs in `index.html`
+
+Then `npm run build` and serve the `dist/` folder from any static host.
 
 ## Contributing
 

@@ -1,4 +1,4 @@
-import type { SignatureData, SignatureTemplate } from '../types';
+import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
   finalizeHtml,
@@ -16,11 +16,11 @@ import {
 /** The name is always set in a serif regardless of the chosen body font. */
 const SERIF = 'Georgia, Times New Roman, Times, serif';
 
-export const elegant: SignatureTemplate = {
+export const elegant = {
   id: 'elegant',
   name: 'Elegant',
   description: 'Refined style with centered layout and dividers',
-  render: (data: SignatureData, options = {}) => {
+  render: (data: SignatureData, options: RenderOptions = {}) => {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
     const textColor = '#3a3a3a';
@@ -71,4 +71,4 @@ export const elegant: SignatureTemplate = {
 </table>
 ${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
   },
-};
+} satisfies SignatureTemplate;
