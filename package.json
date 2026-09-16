@@ -23,7 +23,7 @@
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^10.0.1",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.2.1",
     "@testing-library/dom": "^10.4.2",
@@ -34,10 +34,10 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "axe-core": "^4.13.0",
-    "eslint": "^9.39.1",
+    "eslint": "^10.10.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.5.6",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.12.0",
     "jsdom": "^30.0.1",
     "tailwindcss": "^4.2.1",
@@ -46,5 +46,13 @@
     "vite": "^8.3.0",
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.1.11"
+  },
+  "comments": {
+    "overrides": "eslint-plugin-jsx-a11y 6.10.2 (its latest) still caps its eslint peer at ^9. Its rules run fine on ESLint 10, so we broaden the peer to match our eslint. Remove this override once jsx-a11y ships native ESLint 10 support."
+  },
+  "overrides": {
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    }
   }
 }
