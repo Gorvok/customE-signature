@@ -7,8 +7,17 @@ import iconSvgs from '../data/socialIconSvgs.json';
 
 const icons = iconSvgs as Record<string, string>;
 
+/**
+ * The color is substituted into an SVG `stroke` attribute and the result is
+ * injected with dangerouslySetInnerHTML, so only simple color tokens are
+ * allowed: a hex color or a bare keyword such as `currentColor`. Anything
+ * carrying a quote, bracket or space could close the attribute and add markup.
+ */
+const SAFE_COLOR = /^(?:#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|[a-z]+)$/i;
+
 export function getSocialIconSvg(platformId: string, color: string): string {
   const svg = icons[platformId];
   if (!svg) return '';
-  return svg.replace(/__COLOR__/g, color);
+  const safeColor = SAFE_COLOR.test(color) ? color : 'currentColor';
+  return svg.replace(/__COLOR__/g, safeColor);
 }
