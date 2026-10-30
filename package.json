@@ -48,11 +48,11 @@
     "vitest": "^5.0.5"
   },
   "comments": {
-    "overrides": "eslint-plugin-jsx-a11y 6.10.2 (its latest) still caps its eslint peer at ^9. Its rules run fine on ESLint 10, so we broaden the peer to match our eslint. Remove this override once jsx-a11y ships native ESLint 10 support."
+    "overrides": "eslint-plugin-jsx-a11y 6.10.2 (its latest) still caps its eslint peer at ^9. Its rules run fine on ESLint 10, so we broaden the peer to match. An explicit range is used rather than the `$eslint` self-reference, which crashes `npm install` on npm 10 (edgesOut null). Remove this override once jsx-a11y ships native ESLint 10 support."
   },
   "overrides": {
     "eslint-plugin-jsx-a11y": {
-      "eslint": "$eslint"
+      "eslint": "^10.0.0"
     }
   }
 }
