@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto'
-import { defineConfig, type Plugin } from 'vite'
+import type { Plugin } from 'vite'
+// vitest's re-export adds the `test` block below to vite's own config type.
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -75,4 +77,9 @@ export default defineConfig({
     // Last, so it sees the HTML after every other plugin has injected its tags.
     cspMeta(),
   ],
+  test: {
+    // Unit tests only. The e2e suite under e2e/ is a Playwright suite and must
+    // not be collected here — see playwright.config.ts.
+    include: ['src/**/*.test.{ts,tsx}'],
+  },
 })
