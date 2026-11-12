@@ -15,6 +15,24 @@ import {
 const PROMPT_TEXT = 'A new version is available.'
 const PROJECT_ROOT = fileURLToPath(new URL('..', import.meta.url))
 
+/**
+ * Console output that is expected rather than the app misbehaving.
+ *
+ * The signature preview renders inside an iframe sandboxed *without*
+ * `allow-scripts`, deliberately — see SignatureFrame. Playwright's trace
+ * recorder injects a snapshot script into every frame, Chromium refuses it
+ * there, and says so once per frame per navigation. It is the sandbox doing its
+ * job: the generated srcdoc contains no script of its own. The message shows up
+ * only while tracing is enabled, which is to say only on CI.
+ */
+const EXPECTED_CONSOLE_ERRORS = [
+  /Blocked script execution in 'about:srcdoc'/,
+  /favicon/i,
+  /404 \(Not Found\)/i,
+]
+
+const isUnexpected = (text: string) => !EXPECTED_CONSOLE_ERRORS.some((pattern) => pattern.test(text))
+
 let site: StaticSite
 let releases: Releases
 let workDir: string
@@ -187,6 +205,6 @@ test.describe('service worker update prompt', () => {
     })
 
     expect(pageErrors).toEqual([])
-    expect(consoleErrors.filter((text) => !/favicon|404 \(Not Found\)/i.test(text))).toEqual([])
+    expect(consoleErrors.filter(isUnexpected)).toEqual([])
   })
 })
