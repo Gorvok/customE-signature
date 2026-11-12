@@ -29,6 +29,14 @@ export default defineConfig([
     },
   },
   {
+    // The e2e suite is Node code that happens to evaluate snippets in a browser,
+    // so it needs Node globals on top of the browser ones above.
+    files: ['e2e/**/*.ts', 'playwright.config.ts'],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
+    },
+  },
+  {
     // Build tooling: plain Node ESM, not part of any tsconfig.
     files: ['scripts/**/*.mjs', 'eslint.config.js'],
     extends: [js.configs.recommended],
