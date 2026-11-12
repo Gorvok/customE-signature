@@ -48,11 +48,16 @@
     "vitest": "^5.0.5"
   },
   "comments": {
-    "overrides": "eslint-plugin-jsx-a11y 6.10.2 (its latest) still caps its eslint peer at ^9. Its rules run fine on ESLint 10, so we broaden the peer to match. An explicit range is used rather than the `$eslint` self-reference, which crashes `npm install` on npm 10 (edgesOut null). Remove this override once jsx-a11y ships native ESLint 10 support."
+    "overrides": {
+      "eslint-plugin-jsx-a11y": "6.10.2 (its latest) still caps its eslint peer at ^9. Its rules run fine on ESLint 10, so we broaden the peer to match. An explicit range is used rather than the `$eslint` self-reference, which crashes `npm install` on npm 10 (edgesOut null). Remove once jsx-a11y ships native ESLint 10 support.",
+      "minimatch / glob": "Advisories GHSA minimatch (DoS via globparts amplification, fixed in 11.0.1) and glob (AbortSignal cancellation bypass, fixed above 14.0.1) are unpatched in the versions eslint, typescript-eslint and workbox-build still depend on. Both are build/lint-time only. The overrides are scoped by version range so the older minimatch 3.x/5.x copies, which the advisory does not cover, are left alone. Remove each once the parents ship the patched ranges themselves."
+    }
   },
   "overrides": {
     "eslint-plugin-jsx-a11y": {
       "eslint": "^10.0.0"
-    }
+    },
+    "minimatch@^10.0.0": "^11.0.1",
+    "glob@^11.0.0": "^14.0.6"
   }
 }
