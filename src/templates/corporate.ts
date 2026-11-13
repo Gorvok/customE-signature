@@ -6,6 +6,7 @@ import {
   roleLine,
   nameWithPronouns,
   renderLogo,
+  logoAlt,
   contactLinks,
   spacerCell,
   renderCtaButton,
@@ -31,7 +32,7 @@ export const corporate = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 90 });
+    const logo = renderLogo(data.logoUrl, { width: 90, alt: logoAlt(data) });
     const role = roleLine(data.jobTitle, data.department);
 
     const muted = (inner: string) =>

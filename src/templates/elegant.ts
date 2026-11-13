@@ -6,6 +6,7 @@ import {
   nameWithPronouns,
   roleAndCompany,
   renderLogo,
+  logoAlt,
   contactLinks,
   spacerCell,
   renderCtaButton,
@@ -34,7 +35,7 @@ export const elegant = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 60 });
+    const logo = renderLogo(data.logoUrl, { width: 60, alt: logoAlt(data) });
     const role = roleAndCompany(data, '  &mdash;  ');
 
     const contact = contactLinks(data, { color: mutedColor, accent: data.primaryColor });
