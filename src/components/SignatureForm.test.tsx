@@ -72,7 +72,7 @@ describe('SignatureForm logo uploader', () => {
     await user.keyboard('{Enter}');
     expect(click).toHaveBeenCalledTimes(1);
 
-    expect(screen.getByLabelText('Or paste an image URL')).toBeTruthy();
+    expect(screen.getByLabelText('Logo URL — works in every mail client')).toBeTruthy();
     click.mockRestore();
   });
 });

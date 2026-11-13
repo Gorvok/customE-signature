@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from 'react';
 import { fileToBase64 } from '../utils/imageUtils';
+import { isEmbeddedImage } from '../utils/compatibility';
 import { LIMITS } from '../data/options';
 import { useToast } from '../toast';
 
@@ -66,7 +67,8 @@ export default function ImageUploader({ value, onChange }: Props) {
           {value ? 'Choose a different logo' : 'Upload a logo'}
         </button>
         <p id={dropHintId} className="mt-1 text-xs text-hint">
-          PNG, JPG or SVG up to 5 MB. You can also drop an image here.
+          PNG, JPG or SVG up to 5 MB. You can also drop an image here. An upload is embedded in the
+          signature, which only Apple Mail and Thunderbird display.
         </p>
         <input
           ref={inputRef}
@@ -82,8 +84,19 @@ export default function ImageUploader({ value, onChange }: Props) {
           }}
         />
       </div>
-      <label htmlFor={urlId} className="block text-xs text-hint">
-        Or paste an image URL
+      {isEmbeddedImage(value) && (
+        <p
+          role="status"
+          className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300"
+        >
+          This logo is embedded in the signature. Gmail, Outlook and Yahoo Mail remove embedded
+          images, so it will show here but not in their inboxes — host it somewhere public and paste
+          the link below instead.
+        </p>
+      )}
+
+      <label htmlFor={urlId} className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+        Logo URL — works in every mail client
       </label>
       <input
         id={urlId}
