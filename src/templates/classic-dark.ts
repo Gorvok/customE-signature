@@ -6,6 +6,7 @@ import {
   roleLine,
   nameWithPronouns,
   renderLogo,
+  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
@@ -29,7 +30,7 @@ export const classicDark = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 100 });
+    const logo = renderLogo(data.logoUrl, { width: 100, alt: logoAlt(data) });
     const role = roleLine(data.jobTitle, data.department);
 
     const rows = contactLinks(data, { color: secondaryRaw, style: 'font-size: 12px;' }).map(

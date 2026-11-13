@@ -6,7 +6,7 @@ exports[`template bold-banner > matches its snapshot 1`] = `
     <td bgcolor="#0f172a" style="background-color: #0f172a; padding: 16px 20px; border-radius: 6px 6px 0 0;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="padding-right: 14px; vertical-align: middle;"><img src="https://example.com/logo.png" width="50" border="0" alt="Logo" style="display: block; width: 50px; border-radius: 50%;" /></td>
+          <td style="padding-right: 14px; vertical-align: middle;"><img src="https://example.com/logo.png" width="50" border="0" alt="Northwind Labs logo" style="display: block; width: 50px; border-radius: 50%;" /></td>
           <td style="vertical-align: middle; font-family: Inter, Helvetica, Arial, sans-serif;">
             <span style="font-size: 22px; font-weight: bold; color: #f8fafc; font-family: Inter, Helvetica, Arial, sans-serif; letter-spacing: 0.5px;">Alex Rivera <span style="font-size: 13px; font-weight: normal; letter-spacing: 0; opacity: 0.85;">(they/them)</span></span>
             <br /><span style="font-size: 13px; color: #f8fafc; opacity: 0.85; font-family: Inter, Helvetica, Arial, sans-serif;">Head of Product, Product at Northwind Labs</span>
@@ -51,7 +51,7 @@ exports[`template classic-dark > matches its snapshot 1`] = `
                 <td style="font-weight: bold; font-size: 20px; color: #f8fafc; font-family: Inter, Helvetica, Arial, sans-serif;">Alex Rivera <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">(they/them)</span></td>
               </tr>
               <tr><td style="font-size: 12px; color: #f8fafc; font-family: Inter, Helvetica, Arial, sans-serif; padding-top: 2px;">Head of Product, Product</td></tr>
-              <tr><td style="padding-top: 10px;"><img src="https://example.com/logo.png" width="100" border="0" alt="Logo" style="display: block; width: 100px;" /></td></tr>
+              <tr><td style="padding-top: 10px;"><img src="https://example.com/logo.png" width="100" border="0" alt="Northwind Labs logo" style="display: block; width: 100px;" /></td></tr>
             </table>
           </td>
           <td style="border-left: 1px solid #f8fafc; padding-left: 15px; vertical-align: top;">
@@ -86,7 +86,7 @@ exports[`template compact-card > matches its snapshot 1`] = `
     <td style="padding: 14px;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="vertical-align: middle; padding-right: 12px;"><img src="https://example.com/logo.png" width="52" border="0" alt="Logo" style="display: block; width: 52px; border-radius: 50%; border: 2px solid #0f172a;" /></td>
+          <td style="vertical-align: middle; padding-right: 12px;"><img src="https://example.com/logo.png" width="52" border="0" alt="Northwind Labs logo" style="display: block; width: 52px; border-radius: 50%; border: 2px solid #0f172a;" /></td>
           <td style="vertical-align: middle;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr>
@@ -123,7 +123,7 @@ exports[`template corporate > matches its snapshot 1`] = `
     <td width="4" bgcolor="#0f172a" style="width: 4px; line-height: 0; font-size: 0; background-color: #0f172a; border-radius: 2px;">&nbsp;</td>
     <td style="padding-left: 16px; vertical-align: top;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="padding-bottom: 10px;"><img src="https://example.com/logo.png" width="90" border="0" alt="Logo" style="display: block; width: 90px;" /></td></tr>
+        <tr><td style="padding-bottom: 10px;"><img src="https://example.com/logo.png" width="90" border="0" alt="Northwind Labs logo" style="display: block; width: 90px;" /></td></tr>
         <tr>
           <td style="font-size: 18px; font-weight: bold; color: #2d2d2d; font-family: Inter, Helvetica, Arial, sans-serif; text-transform: uppercase; letter-spacing: 1px;">Alex Rivera <span style="font-size: 12px; font-weight: normal; text-transform: none; letter-spacing: 0; color: #777777;">(they/them)</span></td>
         </tr>
@@ -154,7 +154,7 @@ exports[`template elegant > matches its snapshot 1`] = `
   <tr>
     <td align="center">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-        <tr><td align="center" style="padding-bottom: 10px;"><img src="https://example.com/logo.png" width="60" border="0" alt="Logo" style="display: block; width: 60px;" /></td></tr>
+        <tr><td align="center" style="padding-bottom: 10px;"><img src="https://example.com/logo.png" width="60" border="0" alt="Northwind Labs logo" style="display: block; width: 60px;" /></td></tr>
         <tr>
           <td align="center" style="font-size: 20px; color: #3a3a3a; font-family: Georgia, Times New Roman, Times, serif; letter-spacing: 2px;">Alex Rivera <span style="font-size: 12px; letter-spacing: 0; color: #999999;">(they/them)</span></td>
         </tr>
@@ -184,7 +184,7 @@ exports[`template elegant > matches its snapshot 1`] = `
 
 exports[`template minimal > matches its snapshot 1`] = `
 "<table role="presentation" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color: #ffffff; font-family: Inter, Helvetica, Arial, sans-serif; font-size: 13px;">
-  <tr><td style="padding-bottom: 8px;"><img src="https://example.com/logo.png" width="80" border="0" alt="Logo" style="display: block; width: 80px;" /></td></tr>
+  <tr><td style="padding-bottom: 8px;"><img src="https://example.com/logo.png" width="80" border="0" alt="Northwind Labs logo" style="display: block; width: 80px;" /></td></tr>
   <tr>
     <td style="font-family: Inter, Helvetica, Arial, sans-serif; font-size: 13px;">
       <strong style="color: #0f172a; font-size: 14px;">Alex Rivera <span style="color: #888888; font-size: 12px; font-weight: normal;">(they/them)</span></strong>
@@ -215,7 +215,7 @@ exports[`template modern-light > matches its snapshot 1`] = `
     <td style="padding-top: 12px;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="padding-right: 15px; vertical-align: middle;"><img src="https://example.com/logo.png" width="70" border="0" alt="Logo" style="display: block; width: 70px; border-radius: 4px;" /></td>
+          <td style="padding-right: 15px; vertical-align: middle;"><img src="https://example.com/logo.png" width="70" border="0" alt="Northwind Labs logo" style="display: block; width: 70px; border-radius: 4px;" /></td>
           <td style="vertical-align: top;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr>

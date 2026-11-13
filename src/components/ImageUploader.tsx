@@ -1,5 +1,8 @@
 import { useId, useRef, useState } from 'react';
 import { fileToBase64 } from '../utils/imageUtils';
+import { isEmbeddedImage } from '../utils/compatibility';
+import { adviseLogoUrl } from '../utils/logoUrl';
+import { useImageLoads } from '../hooks/useImageLoads';
 import { LIMITS } from '../data/options';
 import { useToast } from '../toast';
 
@@ -17,6 +20,12 @@ export default function ImageUploader({ value, onChange }: Props) {
   const [dragOver, setDragOver] = useState(false);
   const urlId = useId();
   const dropHintId = useId();
+
+  // Advice on the pasted link, and whether that link really resolves to an
+  // image. Uploads are judged elsewhere, so they are not probed.
+  const hostedUrl = isEmbeddedImage(value) ? '' : value;
+  const advice = adviseLogoUrl(hostedUrl);
+  const loadState = useImageLoads(advice.level === 'problem' ? '' : hostedUrl);
 
   async function handleFile(file: File) {
     const request = ++requestRef.current;
@@ -66,7 +75,8 @@ export default function ImageUploader({ value, onChange }: Props) {
           {value ? 'Choose a different logo' : 'Upload a logo'}
         </button>
         <p id={dropHintId} className="mt-1 text-xs text-hint">
-          PNG, JPG or SVG up to 5 MB. You can also drop an image here.
+          PNG, JPG or SVG up to 5 MB. You can also drop an image here. An upload is embedded in the
+          signature, which only Apple Mail and Thunderbird display.
         </p>
         <input
           ref={inputRef}
@@ -82,8 +92,19 @@ export default function ImageUploader({ value, onChange }: Props) {
           }}
         />
       </div>
-      <label htmlFor={urlId} className="block text-xs text-hint">
-        Or paste an image URL
+      {isEmbeddedImage(value) && (
+        <p
+          role="status"
+          className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300"
+        >
+          This logo is embedded in the signature. Gmail, Outlook and Yahoo Mail remove embedded
+          images, so it will show here but not in their inboxes — host it somewhere public and paste
+          the link below instead.
+        </p>
+      )}
+
+      <label htmlFor={urlId} className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+        Logo URL — works in every mail client
       </label>
       <input
         id={urlId}
@@ -94,6 +115,35 @@ export default function ImageUploader({ value, onChange }: Props) {
         onChange={(e) => onChange(e.target.value)}
         className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
       />
+
+      <div role="status">
+        {advice.problem ? (
+          <div
+            className={`rounded-lg border px-3 py-2 text-xs ${
+              advice.level === 'problem'
+                ? 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300'
+                : 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300'
+            }`}
+          >
+            <p>{advice.problem}</p>
+            {advice.suggestion && (
+              <button
+                type="button"
+                onClick={() => { onChange(advice.suggestion ?? ''); }}
+                className="mt-1 font-medium underline hover:no-underline"
+              >
+                Use the direct link instead
+              </button>
+            )}
+          </div>
+        ) : loadState === 'failed' ? (
+          <p className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+            That image did not load. Check the link is public and points straight at the file.
+          </p>
+        ) : loadState === 'loaded' ? (
+          <p className="text-xs text-green-700 dark:text-green-400">This image loads correctly.</p>
+        ) : null}
+      </div>
     </div>
   );
 }

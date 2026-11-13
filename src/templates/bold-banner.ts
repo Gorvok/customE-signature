@@ -6,6 +6,7 @@ import {
   roleLine,
   nameWithPronouns,
   renderLogo,
+  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
@@ -29,7 +30,7 @@ export const boldBanner = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 50, style: 'border-radius: 50%;' });
+    const logo = renderLogo(data.logoUrl, { width: 50, alt: logoAlt(data), style: 'border-radius: 50%;' });
     const logoCell = logo ? `<td style="padding-right: 14px; vertical-align: middle;">${logo}</td>` : '';
 
     const role = roleLine(data.jobTitle, data.department);

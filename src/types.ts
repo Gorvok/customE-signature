@@ -44,6 +44,12 @@ export interface EmailProvider {
   name: string;
   exportMethod: 'clipboard' | 'download' | 'both';
   instructions: string[];
+  /**
+   * Whether this client displays an image embedded as a `data:` URI. Most
+   * webmail strips them, which silently drops an uploaded logo — so the
+   * export panel warns when one is in use. See compatibility.ts.
+   */
+  rendersEmbeddedImages: boolean;
 }
 
 export type SocialPlatform = {
