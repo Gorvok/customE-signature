@@ -166,6 +166,15 @@ interface LogoOptions {
 }
 
 /** A logo <img>, or '' when the URL is empty or not an image URL. */
+/**
+ * Alt text for the logo. Many clients block images by default, so this is
+ * what the recipient actually reads; the company name says more than "Logo".
+ */
+export function logoAlt(data: Pick<SignatureData, 'company'>): string {
+  const company = data.company.trim();
+  return company ? `${company} logo` : 'Logo';
+}
+
 export function renderLogo(src: string, { width, height, style = '', alt = 'Logo' }: LogoOptions): string {
   const safeSrc = sanitizeImageUrl(src);
   if (!safeSrc) return '';

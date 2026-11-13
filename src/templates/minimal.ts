@@ -6,6 +6,7 @@ import {
   nameWithPronouns,
   roleAndCompany,
   renderLogo,
+  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
@@ -27,7 +28,7 @@ export const minimal = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 80 });
+    const logo = renderLogo(data.logoUrl, { width: 80, alt: logoAlt(data) });
     const role = roleAndCompany(data, ', ');
     const contact = contactLinks(data, { color: '#666666', accent: data.primaryColor });
     const cta = renderCtaButton(data.ctaLabel, data.ctaUrl, { bg: data.primaryColor, fg: '#FFFFFF', font: data.fontFamily });

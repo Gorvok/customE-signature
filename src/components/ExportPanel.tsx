@@ -2,6 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { SignatureData, SignatureTemplate } from '../types';
 import { providers } from '../data/providers';
 import { copyHtmlToClipboard, downloadHtmlFile, type CopyResult } from '../utils/exportHelpers';
+import {
+  compatibilityWarnings,
+  formatBytes,
+  signatureBytes,
+  type CompatibilityWarning,
+} from '../utils/compatibility';
 import { useToast, type ToastType } from '../toast';
 
 interface Props {
@@ -63,6 +69,32 @@ function ExportActions({
   );
 }
 
+/**
+ * What the preview cannot show: the preview is a browser, and the person's
+ * mail client is not. Sizes and stripped images only matter once it leaves.
+ */
+function CompatibilityNotes({ html, warnings }: { html: string; warnings: CompatibilityWarning[] }) {
+  return (
+    <div role="status" className="space-y-2">
+      <p className="text-xs text-hint">
+        Signature size: {formatBytes(signatureBytes(html))} · {html.length.toLocaleString()} characters
+      </p>
+      {warnings.map((warning) => (
+        <p
+          key={warning.id}
+          className={`rounded-lg border px-3 py-2 text-xs ${
+            warning.level === 'warning'
+              ? 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300'
+              : 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300'
+          }`}
+        >
+          {warning.message}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 export default function ExportPanel({ data, template }: Props) {
   const { addToast } = useToast();
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
@@ -71,6 +103,7 @@ export default function ExportPanel({ data, template }: Props) {
 
   const html = useMemo(() => template.render(data), [data, template]);
   const provider = providers.find((p) => p.id === selectedProvider);
+  const warnings = useMemo(() => compatibilityWarnings({ html, data, provider }), [html, data, provider]);
 
   useEffect(() => () => clearTimeout(resetTimer.current), []);
 
@@ -118,6 +151,7 @@ export default function ExportPanel({ data, template }: Props) {
               <li key={i}>{step}</li>
             ))}
           </ol>
+          <CompatibilityNotes html={html} warnings={warnings} />
           <ExportActions
             showCopy={provider.exportMethod === 'clipboard' || provider.exportMethod === 'both'}
             showDownload={provider.exportMethod === 'download' || provider.exportMethod === 'both'}
@@ -127,7 +161,10 @@ export default function ExportPanel({ data, template }: Props) {
           />
         </div>
       ) : (
-        <ExportActions showCopy showDownload copyStatus={copyStatus} onCopy={() => void handleCopy()} onDownload={handleDownload} />
+        <div className="space-y-4">
+          <CompatibilityNotes html={html} warnings={warnings} />
+          <ExportActions showCopy showDownload copyStatus={copyStatus} onCopy={() => void handleCopy()} onDownload={handleDownload} />
+        </div>
       )}
     </div>
   );

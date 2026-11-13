@@ -6,6 +6,7 @@ import {
   nameWithPronouns,
   roleAndCompany,
   renderLogo,
+  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
@@ -32,7 +33,7 @@ export const compactCard = {
 
     // Width only, so a non-square logo keeps its aspect ratio; clients that
     // support border-radius round it, the rest show it square.
-    const logo = renderLogo(data.logoUrl, { width: 52, style: `border-radius: 50%; border: 2px solid ${accent};` });
+    const logo = renderLogo(data.logoUrl, { width: 52, alt: logoAlt(data), style: `border-radius: 50%; border: 2px solid ${accent};` });
     const logoCell = logo ? `<td style="vertical-align: middle; padding-right: 12px;">${logo}</td>` : '';
 
     const role = roleAndCompany(data, ' &bull; ');

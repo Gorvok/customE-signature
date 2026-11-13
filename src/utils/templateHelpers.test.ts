@@ -19,6 +19,7 @@ import {
   contactLinks,
   spacerCell,
   PRODUCTION_ICON_BASE,
+  logoAlt,
 } from './templateHelpers';
 import { templates } from '../templates';
 import { parseSignatureData } from './parseConfig';
@@ -446,5 +447,16 @@ describe('spacerCell', () => {
   it('appends extra style and escapes the color', () => {
     expect(spacerCell({ width: 6, height: 6, background: '#abc', style: 'border-radius: 50%;' })).toContain('background-color: #abc; border-radius: 50%;');
     expect(spacerCell({ width: 4, background: '"><b>' })).not.toContain('"><b>');
+  });
+});
+
+describe('logoAlt', () => {
+  it('names the company, which is what a recipient with images off reads', () => {
+    expect(logoAlt({ company: 'Northwind Labs' })).toBe('Northwind Labs logo');
+  });
+
+  it('falls back when there is no company', () => {
+    expect(logoAlt({ company: '' })).toBe('Logo');
+    expect(logoAlt({ company: '   ' })).toBe('Logo');
   });
 });

@@ -6,6 +6,7 @@ import {
   nameWithPronouns,
   roleAndCompany,
   renderLogo,
+  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
@@ -28,7 +29,7 @@ export const modernLight = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 70, style: 'border-radius: 4px;' });
+    const logo = renderLogo(data.logoUrl, { width: 70, alt: logoAlt(data), style: 'border-radius: 4px;' });
     const logoCell = logo ? `<td style="padding-right: 15px; vertical-align: middle;">${logo}</td>` : '';
 
     const role = roleAndCompany(data, ' | ');
