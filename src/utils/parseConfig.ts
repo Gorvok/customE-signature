@@ -1,9 +1,9 @@
-import type { IconStyle, SignatureData } from '../types';
+import type { IconStyle, SavedSignature, SignatureData } from '../types';
 import type { SharedConfig } from './shareConfig';
 import { defaultData } from '../data/defaults';
 import { socialPlatforms } from '../data/socialPlatforms';
-import { templates } from '../templates';
-import { LIMITS, isFont, isIconStyle } from '../data/options';
+import { DEFAULT_TEMPLATE, templates } from '../templates';
+import { LIMITS, MAX_SIGNATURES, isFont, isIconStyle } from '../data/options';
 
 /**
  * The single entry point for untrusted signature data: share links, imported
@@ -111,4 +111,46 @@ export function parseSharedConfig(input: unknown): SharedConfig | null {
     return { data, templateId };
   }
   return { data };
+}
+
+export interface SignatureLibrary {
+  activeId: string;
+  items: SavedSignature[];
+}
+
+/** Ids this app generates; anything else in storage is rejected rather than trusted. */
+const SIGNATURE_ID = /^[A-Za-z0-9_-]{6,64}$/;
+
+/**
+ * Validate the stored signature library. Entries without a usable id or data
+ * object are dropped rather than repaired, duplicates of an id are ignored,
+ * and the list is capped. Returns null when nothing usable survives, so the
+ * caller can fall back to a migration or the defaults.
+ */
+export function parseLibrary(input: unknown): SignatureLibrary | null {
+  if (!isRecord(input) || !Array.isArray(input.items)) return null;
+
+  const items: SavedSignature[] = [];
+  const seen = new Set<string>();
+  for (const raw of input.items) {
+    if (items.length >= MAX_SIGNATURES) break;
+    if (!isRecord(raw)) continue;
+    const id = raw.id;
+    if (typeof id !== 'string' || !SIGNATURE_ID.test(id) || seen.has(id)) continue;
+    const config = parseSharedConfig({ data: raw.data, templateId: raw.templateId });
+    if (!config) continue;
+    seen.add(id);
+    items.push({
+      id,
+      name: text(raw.name, LIMITS.signatureName, 'Untitled signature'),
+      data: config.data,
+      templateId: config.templateId ?? DEFAULT_TEMPLATE.id,
+    });
+  }
+  if (!items.length) return null;
+
+  const activeId = typeof input.activeId === 'string' && items.some((i) => i.id === input.activeId)
+    ? input.activeId
+    : items[0]!.id;
+  return { activeId, items };
 }

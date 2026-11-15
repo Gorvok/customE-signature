@@ -23,6 +23,14 @@ export interface SignatureData {
   iconStyle: IconStyle;
 }
 
+/** One signature in the library, as stored in this browser. */
+export interface SavedSignature {
+  id: string;
+  name: string;
+  data: SignatureData;
+  templateId: string;
+}
+
 export interface RenderOptions {
   /**
    * Base URL for hosted social-icon PNGs (no trailing slash). Defaults to the
