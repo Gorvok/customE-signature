@@ -240,6 +240,32 @@ export default function SignatureForm({ data, onChange }: Props) {
           <p className="text-xs text-hint">
             Shows as a button in most clients. Outlook for Windows keeps the button shape only when you install the downloaded HTML file; when pasted, it shows a styled link.
           </p>
+
+          <div className="pt-2 border-t border-gray-200 dark:border-gray-800 space-y-3">
+            <label className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                checked={data.utmEnabled}
+                onChange={(e) => update({ utmEnabled: e.target.checked })}
+                className="mt-0.5"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                Tag links for analytics
+                <span className="block text-xs text-hint">
+                  Adds campaign parameters to your website, booking and button links so clicks from
+                  the signature can be told apart. Social profiles are left untouched.
+                </span>
+              </span>
+            </label>
+
+            {data.utmEnabled && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <InputField label="utm_source" value={data.utmSource} onChange={(v) => update({ utmSource: v })} placeholder="email" />
+                <InputField label="utm_medium" value={data.utmMedium} onChange={(v) => update({ utmMedium: v })} placeholder="signature" />
+                <InputField label="utm_campaign" value={data.utmCampaign} onChange={(v) => update({ utmCampaign: v })} placeholder="spring-launch" />
+              </div>
+            )}
+          </div>
         </div>
       </CollapsibleSection>
 

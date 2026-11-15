@@ -95,6 +95,10 @@ export function parseSignatureData(input: unknown, defaults: SignatureData = def
     secondaryColor: color(src.secondaryColor, defaults.secondaryColor),
     fontFamily: font(src.fontFamily, defaults.fontFamily),
     iconStyle: iconStyle(src.iconStyle, defaults.iconStyle),
+    utmEnabled: typeof src.utmEnabled === 'boolean' ? src.utmEnabled : defaults.utmEnabled,
+    utmSource: text(src.utmSource, LIMITS.text, defaults.utmSource),
+    utmMedium: text(src.utmMedium, LIMITS.text, defaults.utmMedium),
+    utmCampaign: text(src.utmCampaign, LIMITS.text, defaults.utmCampaign),
   };
 }
 

@@ -188,6 +188,10 @@ describe('templates escape malicious input', () => {
     secondaryColor: '#FFFFFF',
     fontFamily: 'Inter',
     iconStyle: 'brand',
+    utmEnabled: false,
+    utmSource: 'email',
+    utmMedium: 'signature',
+    utmCampaign: '',
   };
 
   for (const template of templates) {

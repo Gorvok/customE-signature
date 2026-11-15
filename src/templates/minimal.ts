@@ -12,6 +12,7 @@ import {
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { withUtm } from '../utils/utm';
 
 export const minimal = {
   id: 'minimal',
@@ -31,7 +32,7 @@ export const minimal = {
     const logo = renderLogo(data.logoUrl, { width: 80, alt: logoAlt(data) });
     const role = roleAndCompany(data, ', ');
     const contact = contactLinks(data, { color: '#666666', accent: data.primaryColor });
-    const cta = renderCtaButton(data.ctaLabel, data.ctaUrl, { bg: data.primaryColor, fg: '#FFFFFF', font: data.fontFamily });
+    const cta = renderCtaButton(data.ctaLabel, withUtm(data.ctaUrl, data), { bg: data.primaryColor, fg: '#FFFFFF', font: data.fontFamily });
 
     return finalizeHtml(`<table cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color: #ffffff; font-family: ${font}; font-size: 13px;">
   ${logo ? `<tr><td style="padding-bottom: 8px;">${logo}</td></tr>` : ''}
