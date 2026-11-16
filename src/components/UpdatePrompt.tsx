@@ -29,7 +29,7 @@ export default function UpdatePrompt() {
       <button
         type="button"
         onClick={() => void updateServiceWorker(true)}
-        className="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+        className="px-3 py-1.5 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-accent-fg transition-colors"
       >
         Reload
       </button>

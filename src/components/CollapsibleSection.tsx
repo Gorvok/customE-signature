@@ -30,7 +30,7 @@ export default function CollapsibleSection({ id, title, subtitle, icon, filled, 
           className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
         >
           {icon && (
-            <span className="flex-shrink-0 grid place-items-center w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+            <span className="flex-shrink-0 grid place-items-center w-9 h-9 rounded-lg bg-accent-surface text-accent-text">
               {icon}
             </span>
           )}

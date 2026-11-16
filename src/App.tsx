@@ -10,6 +10,7 @@ import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
 import SignatureLibrary from './components/SignatureLibrary';
+import BrandMark from './components/BrandMark';
 import MobileActionBar from './components/MobileActionBar';
 import LazySection from './components/LazySection';
 
@@ -51,19 +52,24 @@ export default function App() {
       <header className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-4 sm:px-6 py-4 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="grid place-items-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
-            </span>
+            {/* The ink tile is nearly the colour of the dark header, so on dark
+                the seal stands free rather than sitting on an edge you can
+                only just make out. */}
+            <BrandMark
+              size={40}
+              variant={theme === 'dark' ? 'bare' : 'dark'}
+              className="w-9 h-9 sm:w-11 sm:h-11 flex-shrink-0 rounded-xl"
+            />
             <div className="min-w-0">
-              <h1 className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white truncate">Email Signature Generator</h1>
-              <p className="hidden sm:block text-sm text-muted">Free &amp; open source — no login required</p>
+              <h1 className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white truncate leading-tight">Envoi</h1>
+              <p className="text-[11px] sm:text-sm text-muted truncate">Email signature generator — free, no login</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <button
               type="button"
               onClick={handleLoadSample}
-              className="inline-flex flex-shrink-0 text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+              className="inline-flex flex-shrink-0 text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 rounded-lg bg-accent hover:bg-accent-hover text-accent-fg transition-colors"
             >
               Load sample
             </button>
@@ -107,9 +113,9 @@ export default function App() {
           <div
             role="alertdialog"
             aria-labelledby="share-prompt"
-            className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-blue-200 dark:border-blue-500/40 bg-blue-50 dark:bg-blue-500/10 px-4 py-3"
+            className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-accent-border bg-accent-surface px-4 py-3"
           >
-            <p id="share-prompt" className="flex-1 min-w-64 text-sm text-blue-900 dark:text-blue-200">
+            <p id="share-prompt" className="flex-1 min-w-64 text-sm text-accent-text">
               {REPLACE_PROMPT}
               {pendingShare.data.fullName.trim() && (
                 <span className="block text-xs opacity-80">
@@ -124,14 +130,14 @@ export default function App() {
                   acceptPending();
                   addToast('Loaded the signature from the link');
                 }}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-accent-fg transition-colors"
               >
                 Replace mine
               </button>
               <button
                 type="button"
                 onClick={dismissPending}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium text-blue-800 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium text-accent-text hover:bg-accent-surface transition-colors"
               >
                 Keep mine
               </button>

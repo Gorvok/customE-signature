@@ -75,14 +75,14 @@ export default function TeamPanel({ data, template, templateId }: Props) {
               <button
                 type="button"
                 onClick={() => setCsv(EXAMPLE_CSV)}
-                className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-xs font-medium text-accent-text hover:underline"
               >
                 Load example
               </button>
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-xs font-medium text-accent-text hover:underline"
               >
                 Choose a file
               </button>
@@ -106,7 +106,7 @@ export default function TeamPanel({ data, template, templateId }: Props) {
             rows={6}
             spellCheck={false}
             placeholder={'name,email,title\nJane Doe,jane@example.com,Designer'}
-            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
           />
           <p className="mt-1 text-xs text-hint">
             First row names the columns. Understood: {TEAM_COLUMNS.join(', ')} — plus any social
@@ -150,7 +150,7 @@ export default function TeamPanel({ data, template, templateId }: Props) {
             type="button"
             onClick={handleDownload}
             disabled={!roster?.people.length}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:hover:bg-blue-600 text-white transition-colors"
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover disabled:opacity-40 disabled:hover:bg-accent text-accent-fg transition-colors"
           >
             Download ZIP
           </button>

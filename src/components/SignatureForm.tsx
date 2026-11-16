@@ -71,7 +71,7 @@ function InputField({ label, value, onChange, placeholder, type = 'text', error,
         className={`w-full bg-white dark:bg-gray-800 border rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-1 focus:outline-none transition-colors ${
           error
             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-            : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500'
+            : 'border-gray-300 dark:border-gray-600 focus:border-accent-ring focus:ring-accent-ring'
         }`}
       />
       {error && <p id={errorId} className="mt-1 text-xs text-danger">{error}</p>}
@@ -172,7 +172,7 @@ export default function SignatureForm({ data, onChange }: Props) {
             key={s.id}
             type="button"
             onClick={() => openAndScroll(s.id)}
-            className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:border-accent-ring hover:text-accent-text transition-colors"
           >
             {s.label}
           </button>
@@ -242,13 +242,13 @@ export default function SignatureForm({ data, onChange }: Props) {
                 onChange={(e) => updateSocial(platform.id, e.target.value)}
                 placeholder={platform.placeholder}
                 maxLength={LIMITS.url}
-                className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+                className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
               />
               <div className="flex flex-col">
-                <button type="button" id={`move-up-${platform.id}`} onClick={() => moveSocial(index, index - 1, 'up')} disabled={index === 0} aria-label={`Move ${platform.name} up`} className="text-muted hover:text-blue-600 disabled:opacity-30 disabled:hover:text-muted leading-none">
+                <button type="button" id={`move-up-${platform.id}`} onClick={() => moveSocial(index, index - 1, 'up')} disabled={index === 0} aria-label={`Move ${platform.name} up`} className="text-muted hover:text-accent-text disabled:opacity-30 disabled:hover:text-muted leading-none">
                   <svg width="14" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15" /></svg>
                 </button>
-                <button type="button" id={`move-down-${platform.id}`} onClick={() => moveSocial(index, index + 1, 'down')} disabled={index === orderedPlatforms.length - 1} aria-label={`Move ${platform.name} down`} className="text-muted hover:text-blue-600 disabled:opacity-30 disabled:hover:text-muted leading-none">
+                <button type="button" id={`move-down-${platform.id}`} onClick={() => moveSocial(index, index + 1, 'down')} disabled={index === orderedPlatforms.length - 1} aria-label={`Move ${platform.name} down`} className="text-muted hover:text-accent-text disabled:opacity-30 disabled:hover:text-muted leading-none">
                   <svg width="14" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
                 </button>
               </div>
@@ -303,7 +303,7 @@ export default function SignatureForm({ data, onChange }: Props) {
           rows={3}
           maxLength={LIMITS.disclaimer}
           aria-label="Legal disclaimer"
-          className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+          className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
         />
         <p className="mt-1 text-right text-xs text-hint">{data.disclaimer.length}/{LIMITS.disclaimer}</p>
       </CollapsibleSection>
@@ -378,7 +378,7 @@ export default function SignatureForm({ data, onChange }: Props) {
                     aria-label={`Apply ${p.name} palette`}
                     aria-pressed={active}
                     onClick={() => update({ primaryColor: p.primary, secondaryColor: p.secondary })}
-                    className={`w-8 h-8 rounded-full border-2 overflow-hidden transition-transform hover:scale-110 ${active ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-white dark:border-gray-700 shadow'}`}
+                    className={`w-8 h-8 rounded-full border-2 overflow-hidden transition-transform hover:scale-110 ${active ? 'border-accent-ring ring-2 ring-accent-ring/30' : 'border-white dark:border-gray-700 shadow'}`}
                     style={{ background: `linear-gradient(135deg, ${p.primary} 0 50%, ${p.secondary} 50% 100%)` }}
                   />
                 );
@@ -394,7 +394,7 @@ export default function SignatureForm({ data, onChange }: Props) {
               id="font-select"
               value={data.fontFamily}
               onChange={(e) => update({ fontFamily: e.target.value })}
-              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
             >
               {FONTS.map((f) => (
                 <option key={f} value={f}>{f}</option>
@@ -407,7 +407,7 @@ export default function SignatureForm({ data, onChange }: Props) {
               id="icon-style-select"
               value={data.iconStyle}
               onChange={(e) => update({ iconStyle: e.target.value as IconStyle })}
-              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
             >
               {ICON_STYLE_OPTIONS.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -422,7 +422,7 @@ export default function SignatureForm({ data, onChange }: Props) {
                 id="density-select"
                 value={data.density}
                 onChange={(e) => update({ density: e.target.value === 'compact' ? 'compact' : 'comfortable' })}
-                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
               >
                 {DENSITY_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>{option.label}</option>
@@ -436,7 +436,7 @@ export default function SignatureForm({ data, onChange }: Props) {
                 id="mark-side-select"
                 value={data.brandMarkSide}
                 onChange={(e) => update({ brandMarkSide: e.target.value === 'end' ? 'end' : 'start' })}
-                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
               >
                 {BRAND_MARK_SIDE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>{option.label}</option>
@@ -452,7 +452,7 @@ export default function SignatureForm({ data, onChange }: Props) {
               id="direction-select"
               value={data.textDirection}
               onChange={(e) => update({ textDirection: e.target.value === 'rtl' ? 'rtl' : 'ltr' })}
-              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
             >
               {TEXT_DIRECTION_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>

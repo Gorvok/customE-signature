@@ -1,4 +1,8 @@
-# Email Signature Generator
+# Envoi
+
+*envoi* (n.) — the closing stanza of a ballade, addressed to whoever the poem
+is being sent to. Literally "the sending": the words at the end that see a
+message on its way.
 
 A free, open-source web app for creating professional email signatures. No login required — everything runs in your browser. Your details are saved in this browser only (so a refresh keeps your work) and are never sent to a server.
 
@@ -237,12 +241,14 @@ here.
 
 ## Generated assets
 
-The social-share image and the PWA app icons are rendered from SVG with a
-bundled font (`scripts/fonts/Inter-Bold.ttf`, SIL Open Font License), so the
-output is identical on every machine:
+The favicon, the PWA app icons and the social-share image are rendered from
+one source — `src/data/brandMark.json`, the same geometry the app's header
+draws — with a bundled font (`scripts/fonts/Inter-Bold.ttf`, SIL Open Font
+License), so the output is identical on every machine and the browser tab can
+never show a different mark from the page:
 
 ```bash
-npm run generate:og      # public/og.png and public/icons/app-*.png
+npm run generate:brand   # favicon, PWA icons and og.png, from src/data/brandMark.json
 npm run generate:icons   # public/icons/png/<style>/<platform>.png (see Social Icons)
 ```
 

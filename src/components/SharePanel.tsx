@@ -71,7 +71,7 @@ export default function SharePanel({ data, templateId, onLoad }: Props) {
           type="button"
           onClick={() => void handleCopyLink()}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            linkStatus === 'copied' ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'
+            linkStatus === 'copied' ? 'bg-green-600 text-white' : 'bg-accent hover:bg-accent-hover text-accent-fg'
           }`}
         >
           {linkStatus === 'copied' ? 'Link copied!' : 'Copy share link'}

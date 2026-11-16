@@ -1,0 +1,12 @@
+{
+  "comment": "Envoi's mark: the signature block as a letter, stamped into a seal. The E's three arms are the three lines of a signature block — name, title, contact — which is why they differ in length. Geometry lives here rather than in either consumer so the app (components/BrandMark.tsx) and the asset generator (scripts/generate-brand.mjs) cannot drift apart, the same arrangement socialIconSvgs.json already uses.",
+  "viewBox": "0 0 512 512",
+  "cornerRadius": 112,
+  "seal": { "cx": 256, "cy": 256, "r": 196 },
+  "letter": [
+    { "role": "spine", "x": 156, "y": 148, "width": 44, "height": 216, "rx": 22 },
+    { "role": "name", "x": 156, "y": 148, "width": 196, "height": 44, "rx": 22 },
+    { "role": "title", "x": 156, "y": 234, "width": 124, "height": 44, "rx": 22 },
+    { "role": "contact", "x": 156, "y": 320, "width": 162, "height": 44, "rx": 22 }
+  ]
+}

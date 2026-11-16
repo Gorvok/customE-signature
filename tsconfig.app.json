@@ -5,7 +5,11 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["vite/client", "vite-plugin-pwa/react"],
+    // "node" is here for the 41 test files that share this project: a test may
+    // read a fixture off disk (brand.test.ts reads index.css, because Vite hands
+    // a `?raw` import of a stylesheet an empty string). App code is browser-only
+    // and should not reach for node APIs.
+    "types": ["vite/client", "vite-plugin-pwa/react", "node"],
     "skipLibCheck": true,
 
     /* Bundler mode */

@@ -46,7 +46,7 @@ export default function ImageUploader({ value, onChange }: Props) {
       <div
         className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
           dragOver
-            ? 'border-blue-400 bg-blue-50 dark:bg-blue-400/10'
+            ? 'border-accent-ring bg-accent-surface'
             : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-400'
         }`}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -70,7 +70,7 @@ export default function ImageUploader({ value, onChange }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           aria-describedby={dropHintId}
-          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+          className="text-sm font-medium text-accent-text hover:underline"
         >
           {value ? 'Choose a different logo' : 'Upload a logo'}
         </button>
@@ -113,7 +113,7 @@ export default function ImageUploader({ value, onChange }: Props) {
         maxLength={LIMITS.url}
         value={value.startsWith('data:') ? '' : value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+        className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
       />
 
       <div role="status">

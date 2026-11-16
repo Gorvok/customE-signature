@@ -56,7 +56,7 @@ export default function SignatureCheck() {
             rows={6}
             spellCheck={false}
             placeholder={'<table role="presentation">…</table>'}
-            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
           />
           <p className="mt-1 text-xs text-hint">
             In Gmail: open the signature editor, select it all, copy — then paste here. Or use the
