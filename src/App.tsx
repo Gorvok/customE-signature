@@ -10,6 +10,7 @@ import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
 import SignatureLibrary from './components/SignatureLibrary';
+import TeamPanel from './components/TeamPanel';
 import UpdatePrompt from './components/UpdatePrompt';
 
 export default function App() {
@@ -132,6 +133,9 @@ export default function App() {
             <SharePanel data={data} templateId={templateId} onLoad={applyConfig} />
           </div>
         </div>
+
+        {/* Everything above is one person's signature; this makes everyone's. */}
+        <TeamPanel data={data} template={template} templateId={templateId} />
       </main>
 
       {/* Footer */}

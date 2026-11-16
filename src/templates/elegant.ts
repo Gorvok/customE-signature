@@ -1,18 +1,19 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  MUTED_TEXT,
+  LIGHT_SURFACE,
   finalizeHtml,
   fontStack,
   nameWithPronouns,
   roleAndCompany,
-  renderLogo,
-  logoAlt,
   contactLinks,
   spacerCell,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 /** The name is always set in a serif regardless of the chosen body font. */
@@ -26,7 +27,7 @@ export const elegant = {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
     const textColor = '#3a3a3a';
-    const mutedColor = '#999999';
+    const mutedColor = MUTED_TEXT;
 
     const socialLinks = renderSocialLinks(data.socials, {
       style: data.iconStyle,
@@ -36,7 +37,7 @@ export const elegant = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 60, alt: logoAlt(data) });
+    const logo = renderBrandMark(data, { width: 60, background: data.primaryColor });
     const role = roleAndCompany(data, '  &mdash;  ');
 
     const contact = contactLinks(data, { color: mutedColor, accent: data.primaryColor });
@@ -71,6 +72,6 @@ export const elegant = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
   },
 } satisfies SignatureTemplate;

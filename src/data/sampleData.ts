@@ -21,6 +21,8 @@ export const sampleData: SignatureData = {
   },
   socialOrder: socialPlatforms.map((p) => p.id),
   logoUrl: '',
+  brandMark: 'logo',
+  monogramText: '',
   ctaLabel: 'Book a demo',
   ctaUrl: 'northwind.io/demo',
   disclaimer:
@@ -29,6 +31,7 @@ export const sampleData: SignatureData = {
   secondaryColor: '#f8fafc',
   fontFamily: 'Inter',
   iconStyle: 'light',
+  textDirection: 'ltr',
   utmEnabled: false,
   utmSource: 'email',
   utmMedium: 'signature',

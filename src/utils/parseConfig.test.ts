@@ -180,3 +180,29 @@ describe('parseLibrary', () => {
     expect(result?.items[0]?.templateId).toBe(DEFAULT_TEMPLATE.id);
   });
 });
+
+describe('parseSignatureData: the later fields', () => {
+  it('keeps the valid values', () => {
+    const data = parseSignatureData({ brandMark: 'monogram', monogramText: 'NW', textDirection: 'rtl' });
+    expect(data.brandMark).toBe('monogram');
+    expect(data.monogramText).toBe('NW');
+    expect(data.textDirection).toBe('rtl');
+  });
+
+  it('falls back when the value is not one of the choices', () => {
+    const data = parseSignatureData({ brandMark: 'photo', textDirection: 'sideways' });
+    expect(data.brandMark).toBe('logo');
+    expect(data.textDirection).toBe('ltr');
+  });
+
+  it('caps the monogram letters like any other text field', () => {
+    expect(parseSignatureData({ monogramText: 'ABCDEFGH' }).monogramText).toHaveLength(LIMITS.monogramText);
+  });
+
+  it('gives a config written before these fields existed the defaults', () => {
+    const data = parseSignatureData({ fullName: 'Jane Doe' });
+    expect(data.brandMark).toBe('logo');
+    expect(data.monogramText).toBe('');
+    expect(data.textDirection).toBe('ltr');
+  });
+});

@@ -11,6 +11,7 @@ import { providers } from '../data/providers';
 import { sampleData } from '../data/sampleData';
 
 const gmail = providers.find((p) => p.id === 'gmail')!;
+const outlook = providers.find((p) => p.id === 'outlook')!;
 const appleMail = providers.find((p) => p.id === 'apple-mail')!;
 const thunderbird = providers.find((p) => p.id === 'thunderbird')!;
 
@@ -92,6 +93,35 @@ describe('compatibilityWarnings', () => {
   it('leaves a signature at the limits alone', () => {
     const html = 'x'.repeat(GMAIL_SIGNATURE_CHARS);
     expect(ids(compatibilityWarnings({ html, data: hosted, provider: gmail }))).toEqual([]);
+  });
+
+  it('warns when the chosen colors leave text unreadable', () => {
+    const html = '<td bgcolor="#ffffff" style="color: #eeeeee; font-size: 12px;">Faint</td>';
+    const warning = compatibilityWarnings({ html, data: hosted, provider: gmail }).find((w) =>
+      w.id.startsWith('low-contrast'),
+    );
+    expect(warning?.level).toBe('warning');
+    expect(warning?.message).toContain('#eeeeee');
+  });
+
+  it('does not repeat the template-level dark-mode rule in the UI', () => {
+    // Text with no painted background is a template bug a test catches; no
+    // choice in the UI causes it, so showing it here would only confuse.
+    const html = '<div style="color: #6b7280; font-size: 10px;">Small print</div>';
+    expect(ids(compatibilityWarnings({ html, data: hosted, provider: gmail }))).toEqual([]);
+  });
+
+  it('cautions about a dark surface only for a client that recolors in dark mode', () => {
+    const html = '<table bgcolor="#0f172a"><tr><td style="color: #ffffff;">Name</td></tr></table>';
+    expect(ids(compatibilityWarnings({ html, data: hosted, provider: outlook }))).toContain('dark-surface-recolored');
+    expect(ids(compatibilityWarnings({ html, data: hosted, provider: gmail }))).not.toContain('dark-surface-recolored');
+    // With no client chosen there is nothing specific to say.
+    expect(ids(compatibilityWarnings({ html, data: hosted }))).not.toContain('dark-surface-recolored');
+  });
+
+  it('says nothing about a light surface, whatever the client', () => {
+    const html = '<table bgcolor="#ffffff"><tr><td style="color: #111111;">Name</td></tr></table>';
+    expect(ids(compatibilityWarnings({ html, data: hosted, provider: outlook }))).toEqual([]);
   });
 
   it('reports both the logo and the size when a big embedded logo is used', () => {

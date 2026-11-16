@@ -1,17 +1,18 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  MUTED_TEXT,
+  LIGHT_SURFACE,
   finalizeHtml,
   fontStack,
   roleLine,
   nameWithPronouns,
-  renderLogo,
-  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const boldBanner = {
@@ -31,7 +32,7 @@ export const boldBanner = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 50, alt: logoAlt(data), style: 'border-radius: 50%;' });
+    const logo = renderBrandMark(data, { width: 50, logoStyle: 'border-radius: 50%;', background: fgRaw, color: data.primaryColor });
     const logoCell = logo ? `<td style="padding-right: 14px; vertical-align: middle;">${logo}</td>` : '';
 
     const role = roleLine(data.jobTitle, data.department);
@@ -64,7 +65,7 @@ export const boldBanner = {
   <tr>
     <td bgcolor="#f8f8f8" style="background-color: #f8f8f8; padding: 12px 20px; border-radius: 0 0 6px 6px; border: 1px solid #e8e8e8; border-top: none;">
       <table cellpadding="0" cellspacing="0" border="0">
-        ${data.address.trim() ? `<tr><td style="font-size: 12px; color: #777777; font-family: ${font}; padding-bottom: 4px;">${esc(data.address.trim())}</td></tr>` : ''}
+        ${data.address.trim() ? `<tr><td style="font-size: 12px; color: ${MUTED_TEXT}; font-family: ${font}; padding-bottom: 4px;">${esc(data.address.trim())}</td></tr>` : ''}
         ${contact.length ? `<tr><td style="font-size: 12px; line-height: 1.8; font-family: ${font};">${contact.join(' &nbsp;&middot;&nbsp; ')}</td></tr>` : ''}
         ${cta ? `<tr><td style="padding-top: 8px;">${cta}</td></tr>` : ''}
         ${socialLinks ? `<tr><td style="padding-top: 6px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${socialLinks}</tr></table></td></tr>` : ''}
@@ -72,6 +73,6 @@ export const boldBanner = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
   },
 } satisfies SignatureTemplate;

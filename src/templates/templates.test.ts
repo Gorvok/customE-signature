@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { templates } from './index';
 import { sampleData } from '../data/sampleData';
+import { findDarkModeIssues, formatDarkModeIssues } from '../utils/darkMode';
+import { defaultData } from '../data/defaults';
 
 /** Templates on a transparent background that must paint their own white for non-inverting dark-mode clients. */
 const LIGHT_TEMPLATES = ['modern-light', 'minimal', 'corporate', 'elegant', 'compact-card'];
@@ -67,6 +69,45 @@ for (const template of templates) {
     it('uses a full font stack ending in a generic family', () => {
       expect(html).toMatch(/font-family: [^;"]*(sans-serif|serif|monospace)/);
       expect(html).not.toMatch(/font-family: Inter;/);
+    });
+
+    it('survives a client in dark mode', () => {
+      // Every run of text must sit on a background the markup itself paints,
+      // and be readable on it. Nothing may rely on the client's canvas: in
+      // dark mode that canvas is near-black. See utils/darkMode.ts.
+      const issues = findDarkModeIssues(html);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
+    });
+
+    it('renders the monogram in place of the logo when that is the chosen mark', () => {
+      const html = template.render({ ...data, brandMark: 'monogram' });
+      expect(html).not.toContain('logo.png');
+      expect(html).toContain('>AR<');
+      const issues = findDarkModeIssues(html);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
+    });
+
+    it('mirrors cleanly for right-to-left text', () => {
+      const ltr = template.render(data);
+      const rtl = template.render({ ...data, textDirection: 'rtl' });
+      const count = (html: string, needle: RegExp) => html.match(needle)?.length ?? 0;
+      expect(rtl).toContain('dir="rtl"');
+      // Each sided declaration moved to the other side: the counts trade places.
+      expect(count(rtl, /padding-left/g)).toBe(count(ltr, /padding-right/g));
+      expect(count(rtl, /padding-right/g)).toBe(count(ltr, /padding-left/g));
+      expect(count(rtl, /border-left/g)).toBe(count(ltr, /border-right/g));
+      expect(rtl).not.toMatch(/text-align: left/);
+      // And mirroring must not break the other guarantees.
+      const issues = findDarkModeIssues(rtl);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
+    });
+
+    it('survives dark mode with the default colors too', () => {
+      // The sample data picks a deliberate palette; the defaults are black on
+      // white, which is what a first-time visitor's signature uses.
+      const bare = template.render({ ...defaultData, fullName: 'Jane Doe', disclaimer: 'Confidential.' });
+      const issues = findDarkModeIssues(bare);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
     });
   });
 }

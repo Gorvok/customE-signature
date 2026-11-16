@@ -16,6 +16,10 @@ export const defaultData: SignatureData = {
   socials: {},
   socialOrder: socialPlatforms.map((p) => p.id),
   logoUrl: '',
+  // A logo by default, so nothing changes for a signature made before the
+  // monogram existed; the form offers the swap.
+  brandMark: 'logo',
+  monogramText: '',
   ctaLabel: '',
   ctaUrl: '',
   disclaimer: '',
@@ -24,6 +28,7 @@ export const defaultData: SignatureData = {
   // Arial is what most recipients will actually see; Inter stays as an option.
   fontFamily: 'Arial',
   iconStyle: 'brand',
+  textDirection: 'ltr',
   // Off until asked for: a signature should not rewrite links by surprise.
   utmEnabled: false,
   utmSource: 'email',

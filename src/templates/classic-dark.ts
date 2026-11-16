@@ -5,13 +5,12 @@ import {
   fontStack,
   roleLine,
   nameWithPronouns,
-  renderLogo,
-  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const classicDark = {
@@ -31,7 +30,7 @@ export const classicDark = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 100, alt: logoAlt(data) });
+    const logo = renderBrandMark(data, { width: 100, monogramSize: 64, background: secondaryRaw, color: data.primaryColor });
     const role = roleLine(data.jobTitle, data.department);
 
     const rows = contactLinks(data, { color: secondaryRaw, style: 'font-size: 12px;' }).map(
@@ -49,7 +48,7 @@ export const classicDark = {
 
     // The disclaimer lives inside the dark box: in the secondary (light)
     // color it would be invisible on the email's own white background.
-    const disclaimer = renderDisclaimer(data.disclaimer, data.fontFamily, secondaryRaw);
+    const disclaimer = renderDisclaimer(data.disclaimer, { font: data.fontFamily, color: secondaryRaw });
 
     return finalizeHtml(`<table cellpadding="0" cellspacing="0" border="0" bgcolor="${primary}" style="background-color: ${primary}; border: 1px solid ${secondary}; border-radius: 5px; font-family: ${font};">
   <tr>
@@ -78,6 +77,6 @@ export const classicDark = {
       ${disclaimer}
     </td>
   </tr>
-</table>`);
+</table>`, data.textDirection);
   },
 } satisfies SignatureTemplate;

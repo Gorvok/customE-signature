@@ -1,5 +1,18 @@
 export type IconStyle = 'brand' | 'dark' | 'light' | 'gray';
 
+/**
+ * Which brand mark the signature shows. 'monogram' draws the person's
+ * initials with markup, which needs no hosting — unlike an uploaded logo,
+ * which most clients strip. See utils/monogram.ts.
+ */
+export type BrandMark = 'logo' | 'monogram';
+
+/**
+ * Which way the signature's text runs. 'rtl' mirrors the layout for Arabic,
+ * Hebrew, Persian and Urdu. See finalizeHtml in utils/templateHelpers.ts.
+ */
+export type TextDirection = 'ltr' | 'rtl';
+
 export interface SignatureData {
   fullName: string;
   pronouns: string;
@@ -14,6 +27,9 @@ export interface SignatureData {
   socials: Record<string, string>;
   socialOrder: string[];
   logoUrl: string;
+  brandMark: BrandMark;
+  /** Letters for the monogram; derived from the name or company when blank. */
+  monogramText: string;
   ctaLabel: string;
   ctaUrl: string;
   disclaimer: string;
@@ -21,6 +37,7 @@ export interface SignatureData {
   secondaryColor: string;
   fontFamily: string;
   iconStyle: IconStyle;
+  textDirection: TextDirection;
   /**
    * Campaign tagging for the website, booking and call-to-action links.
    * Off by default; social profiles are never tagged. See utils/utm.ts.
@@ -66,6 +83,12 @@ export interface EmailProvider {
    * export panel warns when one is in use. See compatibility.ts.
    */
   rendersEmbeddedImages: boolean;
+  /**
+   * Whether this client rewrites the colors of message content in dark mode.
+   * Outlook.com and Yahoo Mail recolor light text even when the markup paints
+   * its own background, so a dark signature is a risk there. See darkMode.ts.
+   */
+  recolorsInDarkMode: boolean;
 }
 
 export type SocialPlatform = {

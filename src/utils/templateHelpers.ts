@@ -1,6 +1,6 @@
 import { socialPlatforms } from '../data/socialPlatforms';
 import { FONT_STACKS, isIconStyle } from '../data/options';
-import type { IconStyle, SignatureData } from '../types';
+import type { IconStyle, SignatureData, TextDirection } from '../types';
 import { withUtm } from './utm';
 
 /**
@@ -134,6 +134,17 @@ export function buildSocialUrl(platformId: string, value: string): string {
   return platform.urlPrefix + trimmed.replace(/^@/, '');
 }
 
+/**
+ * Muted text on a light surface. The grays this project reached for by habit
+ * (#999999, #888888, #777777) measure 2.85:1, 3.54:1 and 4.47:1 on white, all
+ * under WCAG's 4.5:1 for small text. This one clears it on white (4.83:1) and
+ * on the #f8f8f8 panel bold-banner paints (4.60:1).
+ */
+export const MUTED_TEXT = '#6b7280';
+
+/** The white surface the light templates paint, so dark mode cannot take it away. */
+export const LIGHT_SURFACE = '#ffffff';
+
 /** The chosen font plus email-safe fallbacks, escaped for a style attribute. */
 export function fontStack(font: string): string {
   const stack = (FONT_STACKS as Record<string, string>)[font] ?? `${font}, Arial, sans-serif`;
@@ -257,11 +268,43 @@ export function spacerCell({ width, height, background, style = '' }: SpacerOpti
 }
 
 /**
- * Harden generated markup for email clients: give every `<table>` a
- * presentation role so screen readers and Outlook treat it as layout, not data.
+ * Properties whose left/right halves have to swap when the layout mirrors.
+ * `border-radius` is left alone: the templates only use symmetric corners,
+ * and its shorthand orders corners rather than sides.
  */
-export function finalizeHtml(html: string): string {
-  return html.replace(/<table(?![^>]*\brole=)/g, '<table role="presentation"');
+const SIDED_PROPERTY = /\b(padding|margin|border)-(left|right)\b/g;
+const TEXT_ALIGN = /\btext-align\s*:\s*(left|right)\b/g;
+const ALIGN_ATTRIBUTE = /\balign\s*=\s*"(left|right)"/g;
+
+const flip = (side: string) => (side === 'left' ? 'right' : 'left');
+
+/**
+ * Mirror a layout for right-to-left text.
+ *
+ * Direction does most of the work itself: `dir="rtl"` on a table reverses the
+ * visual order of its cells, which is the column mirror. What it does not do
+ * is move the spacing, so a `padding-right` that separated two columns ends up
+ * on the wrong side — hence the swap here. Doing it centrally means all seven
+ * templates mirror without each one carrying a second set of styles.
+ */
+function mirrorSides(html: string): string {
+  return html
+    .replace(SIDED_PROPERTY, (_, property: string, side: string) => `${property}-${flip(side)}`)
+    .replace(TEXT_ALIGN, (_, side: string) => `text-align: ${flip(side)}`)
+    .replace(ALIGN_ATTRIBUTE, (_, side: string) => `align="${flip(side)}"`);
+}
+
+/**
+ * Harden generated markup for email clients: give every `<table>` a
+ * presentation role so screen readers and Outlook treat it as layout, not
+ * data, and mirror the layout when the text runs right to left.
+ */
+export function finalizeHtml(html: string, direction: TextDirection = 'ltr'): string {
+  const roled = html.replace(/<table(?![^>]*\brole=)/g, '<table role="presentation"');
+  if (direction !== 'rtl') return roled;
+  // Every table, not just the outermost: each one lays out its own row of
+  // cells, and they all have to reverse.
+  return mirrorSides(roled).replace(/<table(?![^>]*\bdir=)/g, '<table dir="rtl"');
 }
 
 /** A combined "Job Title, Department" line (either part may be empty). */
@@ -303,10 +346,32 @@ export function renderCtaButton(label: string, url: string, { bg, fg, font }: Ct
 </div>`;
 }
 
-/** Render a small legal/confidentiality disclaimer block, or '' when empty. */
-export function renderDisclaimer(text: string, font: string, color = '#999999'): string {
+interface DisclaimerOptions {
+  font: string;
+  /** Text color; defaults to the muted gray, which is readable on a light surface. */
+  color?: string;
+  /**
+   * Background painted behind the text. Required unless the disclaimer sits
+   * inside a container that paints one already, because small print on the
+   * client's own canvas is the first thing to disappear in dark mode —
+   * see darkMode.ts.
+   */
+  background?: string;
+}
+
+/**
+ * Render a small legal/confidentiality disclaimer block, or '' when empty.
+ *
+ * With a background it is a painted one-cell table rather than a bare div: it
+ * is usually placed after the signature's main table, where nothing else
+ * declares a background for it to inherit.
+ */
+export function renderDisclaimer(text: string, { font, color = MUTED_TEXT, background }: DisclaimerOptions): string {
   if (!text.trim()) return '';
-  return `<div style="margin-top: 10px; max-width: 480px; font-size: 10px; line-height: 1.5; color: ${esc(color)}; font-family: ${fontStack(font)};">${esc(text)}</div>`;
+  const cell = `<td style="padding-top: 10px; max-width: 480px; font-size: 10px; line-height: 1.5; color: ${esc(color)}; font-family: ${fontStack(font)};">${esc(text)}</td>`;
+  if (!background) return `<table cellpadding="0" cellspacing="0" border="0"><tr>${cell}</tr></table>`;
+  const bg = esc(background);
+  return `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bg}" style="background-color: ${bg};"><tr>${cell}</tr></table>`;
 }
 
 interface SocialLinkOptions {

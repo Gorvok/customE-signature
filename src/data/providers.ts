@@ -6,6 +6,7 @@ export const providers: EmailProvider[] = [
     name: 'Gmail',
     exportMethod: 'clipboard',
     rendersEmbeddedImages: false,
+    recolorsInDarkMode: false,
     instructions: [
       'Click "Copy to Clipboard" below.',
       'Open Gmail and click the gear icon → "See all settings".',
@@ -20,6 +21,7 @@ export const providers: EmailProvider[] = [
     name: 'Outlook',
     exportMethod: 'both',
     rendersEmbeddedImages: false,
+    recolorsInDarkMode: true,
     instructions: [
       'Click "Copy to Clipboard" or "Download HTML" below.',
       'Open Outlook and go to Settings → Mail → Compose and reply.',
@@ -34,6 +36,7 @@ export const providers: EmailProvider[] = [
     name: 'Apple Mail',
     exportMethod: 'clipboard',
     rendersEmbeddedImages: true,
+    recolorsInDarkMode: false,
     instructions: [
       'Click "Copy to Clipboard" below.',
       'Open Mail → Settings (Preferences on older macOS) → Signatures.',
@@ -48,6 +51,7 @@ export const providers: EmailProvider[] = [
     name: 'Yahoo Mail',
     exportMethod: 'clipboard',
     rendersEmbeddedImages: false,
+    recolorsInDarkMode: true,
     instructions: [
       'Click "Copy to Clipboard" below.',
       'Open Yahoo Mail and click the gear icon → "More Settings".',
@@ -62,6 +66,7 @@ export const providers: EmailProvider[] = [
     name: 'Thunderbird',
     exportMethod: 'download',
     rendersEmbeddedImages: true,
+    recolorsInDarkMode: false,
     instructions: [
       'Click "Download HTML" below.',
       'Open Thunderbird → Account Settings.',

@@ -1,17 +1,18 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  MUTED_TEXT,
+  LIGHT_SURFACE,
   finalizeHtml,
   fontStack,
   nameWithPronouns,
   roleAndCompany,
-  renderLogo,
-  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const compactCard = {
@@ -22,7 +23,7 @@ export const compactCard = {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
     const textDark = '#333333';
-    const textLight = '#888888';
+    const textLight = MUTED_TEXT;
 
     const socialLinks = renderSocialLinks(data.socials, {
       style: data.iconStyle,
@@ -34,7 +35,7 @@ export const compactCard = {
 
     // Width only, so a non-square logo keeps its aspect ratio; clients that
     // support border-radius round it, the rest show it square.
-    const logo = renderLogo(data.logoUrl, { width: 52, alt: logoAlt(data), style: `border-radius: 50%; border: 2px solid ${accent};` });
+    const logo = renderBrandMark(data, { width: 52, logoStyle: `border-radius: 50%; border: 2px solid ${accent};`, background: data.primaryColor });
     const logoCell = logo ? `<td style="vertical-align: middle; padding-right: 12px;">${logo}</td>` : '';
 
     const role = roleAndCompany(data, ' &bull; ');
@@ -71,6 +72,6 @@ export const compactCard = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
   },
 } satisfies SignatureTemplate;

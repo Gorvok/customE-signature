@@ -1,18 +1,19 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  MUTED_TEXT,
+  LIGHT_SURFACE,
   finalizeHtml,
   fontStack,
   roleLine,
   nameWithPronouns,
-  renderLogo,
-  logoAlt,
   contactLinks,
   spacerCell,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const corporate = {
@@ -23,7 +24,7 @@ export const corporate = {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
     const textDark = '#2d2d2d';
-    const textMuted = '#777777';
+    const textMuted = MUTED_TEXT;
 
     const socialLinks = renderSocialLinks(data.socials, {
       style: data.iconStyle,
@@ -33,7 +34,7 @@ export const corporate = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 90, alt: logoAlt(data) });
+    const logo = renderBrandMark(data, { width: 90, monogramSize: 64, background: data.primaryColor });
     const role = roleLine(data.jobTitle, data.department);
 
     const muted = (inner: string) =>
@@ -67,6 +68,6 @@ export const corporate = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
   },
 } satisfies SignatureTemplate;

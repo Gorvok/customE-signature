@@ -20,7 +20,12 @@ import {
   spacerCell,
   PRODUCTION_ICON_BASE,
   logoAlt,
+  MUTED_TEXT,
 } from './templateHelpers';
+import { findDarkModeIssues } from './darkMode';
+import { AA_CONTRAST, contrastRatio } from './color';
+import { getSocialIconSvg } from './socialIcons';
+import { socialPlatforms } from '../data/socialPlatforms';
 import { templates } from '../templates';
 import { parseSignatureData } from './parseConfig';
 import { sampleData } from '../data/sampleData';
@@ -161,39 +166,139 @@ describe('renderCtaButton', () => {
 
 describe('renderDisclaimer', () => {
   it('escapes text and returns empty when blank', () => {
-    expect(renderDisclaimer('<script>', 'Inter')).toContain('&lt;script&gt;');
-    expect(renderDisclaimer('   ', 'Inter')).toBe('');
+    expect(renderDisclaimer('<script>', { font: 'Inter' })).toContain('&lt;script&gt;');
+    expect(renderDisclaimer('   ', { font: 'Inter' })).toBe('');
+  });
+
+  it('paints the background it is given, so small print survives dark mode', () => {
+    const html = renderDisclaimer('Confidential.', { font: 'Inter', background: '#ffffff' });
+    expect(html).toContain('bgcolor="#ffffff"');
+    expect(html).toContain('background-color: #ffffff');
+    expect(findDarkModeIssues(html)).toEqual([]);
+  });
+
+  it('paints nothing when the caller nests it inside a painted container', () => {
+    const html = renderDisclaimer('Confidential.', { font: 'Inter', color: '#f8fafc' });
+    expect(html).not.toContain('bgcolor');
+    // On its own it is unreadable; inside the dark box it is not.
+    expect(findDarkModeIssues(html)).not.toEqual([]);
+    expect(findDarkModeIssues(`<td bgcolor="#0f172a">${html}</td>`)).toEqual([]);
+  });
+
+  it('defaults to a gray that clears WCAG AA on a light surface', () => {
+    const html = renderDisclaimer('Confidential.', { font: 'Inter', background: '#ffffff' });
+    expect(html).toContain(`color: ${MUTED_TEXT}`);
+    expect(contrastRatio(MUTED_TEXT, '#ffffff')!).toBeGreaterThanOrEqual(AA_CONTRAST);
+  });
+});
+
+const malicious: SignatureData = {
+  fullName: '<img src=x onerror=alert(1)>',
+  pronouns: '"><b>x</b>',
+  jobTitle: '"><script>alert(2)</script>',
+  department: '<i>dept</i>',
+  company: 'Acme "Corp"',
+  phone: '123',
+  email: 'a@b.com',
+  website: 'example.com',
+  address: '<script>1</script> 1 Main St',
+  bookingLink: 'javascript:alert(4)',
+  socials: { github: 'octocat' },
+  socialOrder: ['github'],
+  logoUrl: 'javascript:alert(3)',
+  brandMark: 'logo',
+  monogramText: '',
+  ctaLabel: '<u>Click</u>',
+  ctaUrl: 'javascript:alert(5)',
+  disclaimer: 'Confidential <script>alert(6)</script>',
+  primaryColor: '#000000',
+  secondaryColor: '#FFFFFF',
+  fontFamily: 'Inter',
+  iconStyle: 'brand',
+  textDirection: 'ltr',
+  utmEnabled: false,
+  utmSource: 'email',
+  utmMedium: 'signature',
+  utmCampaign: '',
+};
+
+describe('the platforms added later build the right URLs', () => {
+  it('prefixes a handle for the platforms that have one host', () => {
+    expect(buildSocialUrl('threads', 'alexrivera')).toBe('https://www.threads.com/@alexrivera');
+    expect(buildSocialUrl('threads', '@alexrivera')).toBe('https://www.threads.com/@alexrivera');
+    expect(buildSocialUrl('bluesky', 'alex.bsky.social')).toBe('https://bsky.app/profile/alex.bsky.social');
+    expect(buildSocialUrl('telegram', 'alexrivera')).toBe('https://t.me/alexrivera');
+    expect(buildSocialUrl('medium', 'alexrivera')).toBe('https://medium.com/@alexrivera');
+    expect(buildSocialUrl('whatsapp', '15551234567')).toBe('https://wa.me/15551234567');
+  });
+
+  it('takes a pasted profile URL as it is, rather than prefixing it twice', () => {
+    expect(buildSocialUrl('bluesky', 'https://bsky.app/profile/alex.bsky.social')).toBe('https://bsky.app/profile/alex.bsky.social');
+    expect(buildSocialUrl('telegram', 't.me/alexrivera')).toBe('https://t.me/alexrivera');
+  });
+
+  it('normalizes the whole URL for the platforms that live on per-user hosts', () => {
+    // Mastodon, Discord and Substack have no single host to prefix.
+    expect(buildSocialUrl('mastodon', 'mastodon.social/@alex')).toBe('https://mastodon.social/@alex');
+    expect(buildSocialUrl('substack', 'alex.substack.com')).toBe('https://alex.substack.com');
+    expect(buildSocialUrl('discord', 'https://discord.gg/abc123')).toBe('https://discord.gg/abc123');
+  });
+
+  it('gives every platform an icon and a hosted PNG path', () => {
+    for (const platform of socialPlatforms) {
+      expect(getSocialIconSvg(platform.id, '#000000'), platform.id).toContain('<svg');
+      const html = renderSocialLinks({ [platform.id]: 'someone' }, { style: 'brand' });
+      expect(html, platform.id).toContain(`${PRODUCTION_ICON_BASE}/brand/${platform.id}.png`);
+    }
+  });
+});
+
+describe('finalizeHtml mirrors a right-to-left layout', () => {
+  it('leaves a left-to-right signature exactly as it was', () => {
+    const html = '<table><tr><td style="padding-right: 15px; text-align: left;">x</td></tr></table>';
+    expect(finalizeHtml(html)).toBe('<table role="presentation"><tr><td style="padding-right: 15px; text-align: left;">x</td></tr></table>');
+  });
+
+  it('marks every table rtl, so each row of cells reverses', () => {
+    const html = finalizeHtml('<table><tr><td><table><tr><td>x</td></tr></table></td></tr></table>', 'rtl');
+    expect(html.match(/dir="rtl"/g)).toHaveLength(2);
+  });
+
+  it('swaps the sided properties, so spacing lands on the mirrored side', () => {
+    const html = finalizeHtml('<td style="padding-right: 15px; border-left: 1px solid #000; margin-left: 4px;">x</td>', 'rtl');
+    expect(html).toContain('padding-left: 15px');
+    expect(html).toContain('border-right: 1px solid #000');
+    expect(html).toContain('margin-right: 4px');
+  });
+
+  it('swaps both sides at once rather than collapsing them onto one', () => {
+    const html = finalizeHtml('<td style="padding-left: 4px; padding-right: 15px;">x</td>', 'rtl');
+    expect(html).toContain('padding-right: 4px');
+    expect(html).toContain('padding-left: 15px');
+  });
+
+  it('swaps alignment, in CSS and in the attribute Outlook reads', () => {
+    const html = finalizeHtml('<td align="left" style="text-align: left;">x</td>', 'rtl');
+    expect(html).toContain('align="right"');
+    expect(html).toContain('text-align: right');
+  });
+
+  it('leaves centered alignment and symmetric properties alone', () => {
+    const html = finalizeHtml('<td align="center" style="text-align: center; padding: 10px; border-radius: 6px 6px 0 0;">x</td>', 'rtl');
+    expect(html).toContain('align="center"');
+    expect(html).toContain('text-align: center');
+    expect(html).toContain('padding: 10px');
+    expect(html).toContain('border-radius: 6px 6px 0 0');
+  });
+
+  it('does not add a second dir to a table that already carries one', () => {
+    const html = finalizeHtml('<table dir="ltr"><tr><td>x</td></tr></table>', 'rtl');
+    expect(html.match(/dir=/g)).toHaveLength(1);
+    expect(html).toContain('dir="ltr"');
   });
 });
 
 describe('templates escape malicious input', () => {
-  const malicious: SignatureData = {
-    fullName: '<img src=x onerror=alert(1)>',
-    pronouns: '"><b>x</b>',
-    jobTitle: '"><script>alert(2)</script>',
-    department: '<i>dept</i>',
-    company: 'Acme "Corp"',
-    phone: '123',
-    email: 'a@b.com',
-    website: 'example.com',
-    address: '<script>1</script> 1 Main St',
-    bookingLink: 'javascript:alert(4)',
-    socials: { github: 'octocat' },
-    socialOrder: ['github'],
-    logoUrl: 'javascript:alert(3)',
-    ctaLabel: '<u>Click</u>',
-    ctaUrl: 'javascript:alert(5)',
-    disclaimer: 'Confidential <script>alert(6)</script>',
-    primaryColor: '#000000',
-    secondaryColor: '#FFFFFF',
-    fontFamily: 'Inter',
-    iconStyle: 'brand',
-    utmEnabled: false,
-    utmSource: 'email',
-    utmMedium: 'signature',
-    utmCampaign: '',
-  };
-
   for (const template of templates) {
     it(`${template.id} does not emit unescaped tags or javascript: URLs`, () => {
       const html = template.render(malicious);
@@ -207,6 +312,17 @@ describe('templates escape malicious input', () => {
       expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
       expect(html).toContain('&lt;script&gt;alert(2)&lt;/script&gt;');
       expect(html).toContain('Confidential &lt;script&gt;alert(6)&lt;/script&gt;');
+    });
+  }
+});
+
+describe('templates escape a malicious monogram', () => {
+  for (const template of templates) {
+    it(`${template.id} neutralizes the monogram letters`, () => {
+      const html = template.render({ ...malicious, brandMark: 'monogram', monogramText: '"><' });
+      expect(html).not.toContain('<script');
+      expect(html).toContain('&quot;&gt;&lt;');
+      expect(html).not.toContain('src="javascript:');
     });
   }
 });

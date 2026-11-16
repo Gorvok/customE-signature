@@ -16,6 +16,22 @@ describe('generated signatures are email-safe', () => {
     });
   }
 
+  for (const template of templates) {
+    it(`${template.id} emits email-safe markup for a monogram too`, () => {
+      // The monogram leans on VML for Outlook, the one place these rules
+      // deliberately do not apply — so it needs its own pass.
+      const issues = findEmailSafetyIssues(template.render({ ...sampleData, brandMark: 'monogram' }));
+      expect(issues, `\n${formatIssues(issues)}\n`).toEqual([]);
+    });
+  }
+
+  for (const template of templates) {
+    it(`${template.id} emits email-safe markup mirrored for right-to-left text`, () => {
+      const issues = findEmailSafetyIssues(template.render({ ...hostedLogo, textDirection: 'rtl' }));
+      expect(issues, `\n${formatIssues(issues)}\n`).toEqual([]);
+    });
+  }
+
   it('covers every template, so a new one cannot slip past unchecked', () => {
     expect(templates.length).toBeGreaterThanOrEqual(7);
   });
