@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { act, cleanup, renderHook } from '@testing-library/react';
-import { REPLACE_PROMPT, hasContent, useSignatureState } from './useSignatureState';
+import { hasContent, useSignatureState } from './useSignatureState';
 import { encodeConfig } from '../utils/shareConfig';
 import { sampleData } from '../data/sampleData';
 import { defaultData } from '../data/defaults';
@@ -97,31 +97,47 @@ describe('useSignatureState', () => {
 
   it('applies a share link without asking when nothing is saved, then strips the fragment', () => {
     history.replaceState(null, '', '/' + fragment(sampleData, 'corporate'));
-    const confirm = vi.fn(() => false);
-    const { result } = renderHook(() => useSignatureState({ confirm }));
+    const { result } = renderHook(() => useSignatureState());
     expect(result.current.data.fullName).toBe('Alex Rivera');
     expect(result.current.templateId).toBe('corporate');
-    expect(confirm).not.toHaveBeenCalled();
+    expect(result.current.pendingShare).toBeNull();
     expect(window.location.hash).toBe('');
     expect(stored().data?.fullName).toBe('Alex Rivera');
   });
 
-  it('asks before replacing saved work and keeps it on decline', () => {
+  it('holds a link that would overwrite saved work, and keeps the work meanwhile', () => {
     localStorage.setItem(SIGNATURE_STORAGE_KEY, JSON.stringify({ data: { fullName: 'Jane' }, templateId: 'minimal' }));
     history.replaceState(null, '', '/' + fragment(sampleData));
-    const confirm = vi.fn(() => false);
-    const { result } = renderHook(() => useSignatureState({ confirm }));
-    expect(confirm).toHaveBeenCalledTimes(1);
-    expect(confirm).toHaveBeenCalledWith(REPLACE_PROMPT);
+    const { result } = renderHook(() => useSignatureState());
+
+    expect(result.current.pendingShare?.data.fullName).toBe('Alex Rivera');
     expect(result.current.data.fullName).toBe('Jane');
     expect(result.current.templateId).toBe('minimal');
+    // The fragment goes either way: the config is in memory, and a reload
+    // should not ask again.
     expect(window.location.hash).toBe('');
   });
 
-  it('replaces saved work when the user agrees', () => {
+  it('keeps the saved signature when the link is dismissed', () => {
+    localStorage.setItem(SIGNATURE_STORAGE_KEY, JSON.stringify({ data: { fullName: 'Jane' }, templateId: 'minimal' }));
+    history.replaceState(null, '', '/' + fragment(sampleData));
+    const { result } = renderHook(() => useSignatureState());
+
+    act(() => result.current.dismissPending());
+
+    expect(result.current.pendingShare).toBeNull();
+    expect(result.current.data.fullName).toBe('Jane');
+    expect(stored().data?.fullName).toBe('Jane');
+  });
+
+  it('replaces saved work when the link is accepted', () => {
     localStorage.setItem(SIGNATURE_STORAGE_KEY, JSON.stringify({ data: { fullName: 'Jane' }, templateId: 'minimal' }));
     history.replaceState(null, '', '/' + fragment(sampleData, 'elegant'));
-    const { result } = renderHook(() => useSignatureState({ confirm: () => true }));
+    const { result } = renderHook(() => useSignatureState());
+
+    act(() => result.current.acceptPending());
+
+    expect(result.current.pendingShare).toBeNull();
     expect(result.current.data.fullName).toBe('Alex Rivera');
     expect(result.current.templateId).toBe('elegant');
   });
@@ -129,29 +145,30 @@ describe('useSignatureState', () => {
   it('does not ask when the link matches what is already saved', () => {
     localStorage.setItem(SIGNATURE_STORAGE_KEY, JSON.stringify({ data: sampleData, templateId: 'minimal' }));
     history.replaceState(null, '', '/' + fragment(sampleData));
-    const confirm = vi.fn(() => false);
-    renderHook(() => useSignatureState({ confirm }));
-    expect(confirm).not.toHaveBeenCalled();
+    const { result } = renderHook(() => useSignatureState());
+    expect(result.current.pendingShare).toBeNull();
   });
 
-  it('applies a link pasted into an open tab', () => {
-    const confirm = vi.fn(() => true);
-    const { result } = renderHook(() => useSignatureState({ confirm }));
-    act(() => result.current.setData({ ...defaultData, fullName: 'Draft' }));
-
+  it('applies a link pasted into an open tab when there is nothing to lose', () => {
+    const { result } = renderHook(() => useSignatureState());
     act(() => pasteLink(fragment(sampleData, 'elegant')));
-
-    expect(confirm).toHaveBeenCalledWith(REPLACE_PROMPT);
+    expect(result.current.pendingShare).toBeNull();
     expect(result.current.data.fullName).toBe('Alex Rivera');
     expect(result.current.templateId).toBe('elegant');
     expect(window.location.hash).toBe('');
   });
 
-  it('keeps the draft when a pasted link is declined', () => {
-    const { result } = renderHook(() => useSignatureState({ confirm: () => false }));
+  it('holds a link pasted over a draft until it is answered', () => {
+    const { result } = renderHook(() => useSignatureState());
     act(() => result.current.setData({ ...defaultData, fullName: 'Draft' }));
+
     act(() => pasteLink(fragment(sampleData)));
+
     expect(result.current.data.fullName).toBe('Draft');
+    expect(result.current.pendingShare?.data.fullName).toBe('Alex Rivera');
     expect(window.location.hash).toBe('');
+
+    act(() => result.current.acceptPending());
+    expect(result.current.data.fullName).toBe('Alex Rivera');
   });
 });

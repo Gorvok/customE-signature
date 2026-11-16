@@ -3,7 +3,7 @@ import { getTemplate } from './templates';
 import { sampleData } from './data/sampleData';
 import { useTheme } from './theme';
 import { useToast } from './toast';
-import { hasContent, useSignatureState } from './hooks/useSignatureState';
+import { REPLACE_PROMPT, hasContent, useSignatureState } from './hooks/useSignatureState';
 import SignatureForm from './components/SignatureForm';
 import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
@@ -15,16 +15,18 @@ import TeamPanel from './components/TeamPanel';
 import UpdatePrompt from './components/UpdatePrompt';
 
 export default function App() {
-  const { data, templateId, setData, setTemplateId, applyConfig, reset, signatures } = useSignatureState();
+  const { data, templateId, setData, setTemplateId, applyConfig, reset, signatures, pendingShare, acceptPending, dismissPending } =
+    useSignatureState();
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const { theme, toggle } = useTheme();
   const { addToast } = useToast();
 
   function handleReset() {
-    if (window.confirm('Clear all fields and start over?')) {
-      reset();
-      addToast('Cleared all fields', 'info');
-    }
+    // A confirm dialog makes every reset cost two clicks to protect the rare
+    // mistake. Undo costs nothing until the mistake happens.
+    const previous = data;
+    reset();
+    addToast('Cleared all fields', 'info', { label: 'Undo', onClick: () => setData(previous) });
   }
 
   function handleLoadSample() {
@@ -94,6 +96,45 @@ export default function App() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-28 lg:pb-8 space-y-6">
+        {/* A share link that would overwrite saved work asks here, on the
+            page, rather than in a browser dialog that arrives before the page
+            can be seen. */}
+        {pendingShare && (
+          <div
+            role="alertdialog"
+            aria-labelledby="share-prompt"
+            className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-blue-200 dark:border-blue-500/40 bg-blue-50 dark:bg-blue-500/10 px-4 py-3"
+          >
+            <p id="share-prompt" className="flex-1 min-w-64 text-sm text-blue-900 dark:text-blue-200">
+              {REPLACE_PROMPT}
+              {pendingShare.data.fullName.trim() && (
+                <span className="block text-xs opacity-80">
+                  The link holds a signature for {pendingShare.data.fullName.trim()}.
+                </span>
+              )}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  acceptPending();
+                  addToast('Loaded the signature from the link');
+                }}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+              >
+                Replace mine
+              </button>
+              <button
+                type="button"
+                onClick={dismissPending}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium text-blue-800 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors"
+              >
+                Keep mine
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Template Selector */}
         <TemplateSelector
           selected={templateId}

@@ -11,8 +11,6 @@ interface Props {
   onDuplicate: (id: string) => string | null;
   onRename: (id: string, name: string) => void;
   onRemove: (id: string) => void;
-  /** Overridable for tests; defaults to window.confirm. */
-  confirmDelete?: (message: string) => boolean;
 }
 
 /**
@@ -30,13 +28,14 @@ export default function SignatureLibrary({
   onDuplicate,
   onRename,
   onRemove,
-  confirmDelete,
 }: Props) {
   const { addToast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftName, setDraftName] = useState('');
   const [expanded, setExpanded] = useState(false);
-  const confirm = confirmDelete ?? ((message: string) => window.confirm(message));
+  // Deleting confirms in the row itself: a browser dialog cannot say which
+  // signature it means in the place the person is looking.
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
   const active = items.find((item) => item.id === activeId) ?? items[0];
 
@@ -52,14 +51,6 @@ export default function SignatureLibrary({
   function commitRename() {
     if (editingId) onRename(editingId, draftName);
     setEditingId(null);
-  }
-
-  function handleRemove(item: SavedSignature) {
-    const last = items.length === 1;
-    const message = last
-      ? `Clear "${item.name}"? This browser has no other saved signature, so its fields will be emptied.`
-      : `Delete "${item.name}"? This cannot be undone.`;
-    if (confirm(message)) onRemove(item.id);
   }
 
   // With one signature there is nothing to switch between, and rename,
@@ -148,13 +139,36 @@ export default function SignatureLibrary({
               >
                 Duplicate
               </button>
-              <button
-                type="button"
-                onClick={() => { handleRemove(item); }}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-danger"
-              >
-                {items.length === 1 ? 'Clear' : 'Delete'}
-              </button>
+              {pendingDelete === item.id ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onRemove(item.id);
+                      setPendingDelete(null);
+                    }}
+                    aria-label={`${items.length === 1 ? 'Clear' : 'Delete'} ${item.name}, confirm`}
+                    className="text-xs font-semibold text-danger"
+                  >
+                    {items.length === 1 ? 'Clear it?' : 'Delete it?'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPendingDelete(null)}
+                    className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setPendingDelete(item.id)}
+                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-danger"
+                >
+                  {items.length === 1 ? 'Clear' : 'Delete'}
+                </button>
+              )}
             </li>
           );
         })}

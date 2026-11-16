@@ -79,11 +79,22 @@ describe('SignatureLibrary with several signatures', () => {
     expect(screen.getByRole('button', { name: 'Personal' }).hasAttribute('aria-current')).toBe(false);
   });
 
-  it('deletes only after the confirmation is accepted', () => {
-    const confirmDelete = vi.fn(() => false);
-    const props = renderLibrary(two, { confirmDelete });
+  it('asks in the row before deleting, and does nothing until confirmed', () => {
+    const props = renderLibrary(two);
     fireEvent.click(screen.getAllByRole('button', { name: 'Delete' })[0]!);
-    expect(confirmDelete).toHaveBeenCalled();
+    expect(props.onRemove).not.toHaveBeenCalled();
+
+    // The confirmation names the signature, which a browser dialog in the
+    // corner of the screen cannot do.
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Work, confirm' }));
+    expect(props.onRemove).toHaveBeenCalledWith('a');
+  });
+
+  it('can be called off', () => {
+    const props = renderLibrary(two);
+    fireEvent.click(screen.getAllByRole('button', { name: 'Delete' })[0]!);
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByRole('button', { name: 'Delete Work, confirm' })).toBeNull();
     expect(props.onRemove).not.toHaveBeenCalled();
   });
 });
