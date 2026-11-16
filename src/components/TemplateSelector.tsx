@@ -82,7 +82,7 @@ export default function TemplateSelector({ selected, onSelect, previewData, show
           <p className="text-xs text-hint">Previews use sample details until you type your own.</p>
         )}
       </div>
-      <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-4">
+      <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {templates.map((t) => {
           const active = selected === t.id;
           return (
