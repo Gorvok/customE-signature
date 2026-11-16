@@ -10,6 +10,7 @@ import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
 import SignatureLibrary from './components/SignatureLibrary';
+import BrandMark from './components/BrandMark';
 import MobileActionBar from './components/MobileActionBar';
 import LazySection from './components/LazySection';
 
@@ -51,12 +52,17 @@ export default function App() {
       <header className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-4 sm:px-6 py-4 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="grid place-items-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
-            </span>
+            {/* The ink tile is nearly the colour of the dark header, so on dark
+                the seal stands free rather than sitting on an edge you can
+                only just make out. */}
+            <BrandMark
+              size={40}
+              variant={theme === 'dark' ? 'bare' : 'dark'}
+              className="w-9 h-9 sm:w-11 sm:h-11 flex-shrink-0 rounded-xl"
+            />
             <div className="min-w-0">
-              <h1 className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white truncate">Email Signature Generator</h1>
-              <p className="hidden sm:block text-sm text-muted">Free &amp; open source — no login required</p>
+              <h1 className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white truncate leading-tight">Envoi</h1>
+              <p className="text-[11px] sm:text-sm text-muted truncate">Email signature generator — free, no login</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">

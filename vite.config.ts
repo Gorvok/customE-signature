@@ -57,13 +57,13 @@ export default defineConfig({
       registerType: 'prompt',
       // The preview renders the hosted social icons, so they must be cached
       // for the app to work offline. The Open Graph image is only for crawlers.
-      includeAssets: ['icons/png/**/*.png', 'icons/app-192.png'],
+      includeAssets: ['icons/png/**/*.png', 'icons/app-180.png', 'favicon.svg', 'favicon-32.png', 'favicon-16.png'],
       manifest: {
-        name: 'Email Signature Generator',
-        short_name: 'Signature',
+        name: 'Envoi — Email Signature Generator',
+        short_name: 'Envoi',
         description: 'Create professional email signatures in your browser — free, open source, no login.',
-        theme_color: '#2563eb',
-        background_color: '#0b1220',
+        theme_color: '#14110E',
+        background_color: '#14110E',
         display: 'standalone',
         scope: '/customE-signature/',
         start_url: '/customE-signature/',
