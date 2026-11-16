@@ -19,6 +19,7 @@ export const minimal = {
   id: 'minimal',
   name: 'Minimal',
   description: 'Simple, text-focused signature',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const textColor = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);

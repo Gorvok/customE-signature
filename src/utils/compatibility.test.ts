@@ -121,7 +121,36 @@ describe('compatibilityWarnings', () => {
 
   it('says nothing about a light surface, whatever the client', () => {
     const html = '<table bgcolor="#ffffff"><tr><td style="color: #111111;">Name</td></tr></table>';
-    expect(ids(compatibilityWarnings({ html, data: hosted, provider: outlook }))).toEqual([]);
+    // The sample picks light icons to suit the dark default template, which is
+    // its own warning; this test is about the surface.
+    const data = { ...hosted, iconStyle: 'brand' as const };
+    expect(ids(compatibilityWarnings({ html, data, provider: outlook }))).toEqual([]);
+  });
+
+  it('warns when white icons would sit on a white signature', () => {
+    const light = { ...hosted, iconStyle: 'light' as const, socials: { github: 'octocat' } };
+    const html = '<table bgcolor="#ffffff"><tr><td style="color: #111111;">Name</td></tr></table>';
+    expect(ids(compatibilityWarnings({ html, data: light }))).toContain('light-icons-on-light');
+  });
+
+  it('says nothing when there is a dark area for them to sit on', () => {
+    const light = { ...hosted, iconStyle: 'light' as const, socials: { github: 'octocat' } };
+    const html = '<table bgcolor="#0f172a"><tr><td style="color: #ffffff;">Name</td></tr></table>';
+    expect(ids(compatibilityWarnings({ html, data: light }))).not.toContain('light-icons-on-light');
+  });
+
+  it('says nothing when there are no social links to show', () => {
+    const light = { ...hosted, iconStyle: 'light' as const, socials: {} };
+    const html = '<table bgcolor="#ffffff"><tr><td style="color: #111111;">Name</td></tr></table>';
+    expect(ids(compatibilityWarnings({ html, data: light }))).not.toContain('light-icons-on-light');
+  });
+
+  it('leaves the other icon styles alone', () => {
+    const html = '<table bgcolor="#ffffff"><tr><td style="color: #111111;">Name</td></tr></table>';
+    for (const iconStyle of ['brand', 'dark', 'gray'] as const) {
+      const data = { ...hosted, iconStyle, socials: { github: 'octocat' } };
+      expect(ids(compatibilityWarnings({ html, data })), iconStyle).not.toContain('light-icons-on-light');
+    }
   });
 
   it('reports both the logo and the size when a big embedded logo is used', () => {

@@ -23,6 +23,7 @@ export const elegant = {
   id: 'elegant',
   name: 'Elegant',
   description: 'Refined style with centered layout and dividers',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);

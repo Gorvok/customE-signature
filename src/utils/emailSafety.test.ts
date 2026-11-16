@@ -33,7 +33,7 @@ describe('generated signatures are email-safe', () => {
   }
 
   it('covers every template, so a new one cannot slip past unchecked', () => {
-    expect(templates.length).toBeGreaterThanOrEqual(7);
+    expect(templates.length).toBeGreaterThanOrEqual(10);
   });
 
   it('catches the embedded logo that started all this', () => {

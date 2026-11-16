@@ -5,7 +5,7 @@ import { findDarkModeIssues, formatDarkModeIssues } from '../utils/darkMode';
 import { defaultData } from '../data/defaults';
 
 /** Templates on a transparent background that must paint their own white for non-inverting dark-mode clients. */
-const LIGHT_TEMPLATES = ['modern-light', 'minimal', 'corporate', 'elegant', 'compact-card'];
+const LIGHT_TEMPLATES = ['modern-light', 'minimal', 'corporate', 'elegant', 'compact-card', 'sidebar', 'one-line', 'mono'];
 
 const data = { ...sampleData, logoUrl: 'https://example.com/logo.png' };
 
@@ -36,8 +36,13 @@ for (const template of templates) {
       expect(html).toContain('href="https://cal.com/alex"');
     });
 
-    it('renders the logo with width and border attributes', () => {
+    it('renders the brand mark it claims to, and none if it claims none', () => {
       const logo = html.match(/<img[^>]*src="https:\/\/example\.com\/logo\.png"[^>]*>/)?.[0];
+      if (!template.features.brandMark) {
+        // One Line leaves it out on purpose; it must not creep back in.
+        expect(logo, 'renders a logo it does not declare').toBeUndefined();
+        return;
+      }
       expect(logo).toBeDefined();
       expect(logo).toMatch(/\swidth="\d+"/);
       expect(logo).toContain('border="0"');
@@ -82,9 +87,17 @@ for (const template of templates) {
     it('renders the monogram in place of the logo when that is the chosen mark', () => {
       const html = template.render({ ...data, brandMark: 'monogram' });
       expect(html).not.toContain('logo.png');
-      expect(html).toContain('>AR<');
+      if (template.features.brandMark) expect(html).toContain('>AR<');
+      else expect(html).not.toContain('>AR<');
       const issues = findDarkModeIssues(html);
       expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
+    });
+
+    it('renders the call-to-action button it claims to', () => {
+      const withCta = template.render({ ...data, ctaLabel: 'Book a demo', ctaUrl: 'northwind.io/demo' });
+      expect(withCta.includes('Book a demo'), `cta declared ${String(template.features.cta)}`).toBe(
+        template.features.cta,
+      );
     });
 
     it('mirrors cleanly for right-to-left text', () => {

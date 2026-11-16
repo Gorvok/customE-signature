@@ -20,6 +20,7 @@ export const modernLight = {
   id: 'modern-light',
   name: 'Modern Light',
   description: 'Clean light theme with accent color bar',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const accentColor = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);

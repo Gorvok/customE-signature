@@ -12,8 +12,10 @@ describe('htmlToPlainText', () => {
       expect(text).toContain('Head of Product');
       expect(text).toContain('alex@northwind.io');
       expect(text).toContain('https://northwind.io');
-      expect(text).toContain('Book a meeting (https://cal.com/alex)');
-      expect(text).toContain('Book a demo (https://northwind.io/demo)');
+      // The booking link's label is the template's own wording; the address
+      // behind it is what has to survive.
+      expect(text).toContain('https://cal.com/alex');
+      if (template.features.cta) expect(text).toContain('Book a demo (https://northwind.io/demo)');
       expect(text).toContain('LinkedIn (https://www.linkedin.com/in/alexrivera)');
       expect(text).toContain('This email and any attachments are confidential');
       expect(text).not.toMatch(/[<>]/);

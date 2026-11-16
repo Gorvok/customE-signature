@@ -20,6 +20,7 @@ export const compactCard = {
   id: 'compact-card',
   name: 'Compact Card',
   description: 'Space-efficient card with rounded photo area',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);

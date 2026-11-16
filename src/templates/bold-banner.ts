@@ -20,6 +20,7 @@ export const boldBanner = {
   id: 'bold-banner',
   name: 'Bold Banner',
   description: 'Eye-catching colored banner with large name',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const fgRaw = data.secondaryColor || '#FFFFFF';
     const bg = esc(data.primaryColor);

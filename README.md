@@ -4,7 +4,7 @@ A free, open-source web app for creating professional email signatures. No login
 
 ## Features
 
-- **7 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card
+- **10 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card, Sidebar (a panel of brand color beside your details), One Line (the smallest useful signature — two lines, no images, no button) and Mono (monospace, labelled lines)
 - **Live preview** that updates as you type
 - **Rich fields**: name, pronouns, job title, department, company, phone, email, website, office address, booking link, a call-to-action button, and a legal disclaimer
 - **Full customization**: colors, fonts, logo upload, 16 social platforms (drag to reorder), and four social-icon styles
@@ -24,7 +24,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Installable PWA** with offline support and an in-app prompt when a new version has been deployed
 - **Light & dark mode** with system-preference detection, plus reduced-motion and keyboard-focus support
 - **Dark-mode safe**: every template paints its own background and picks text to suit it, so a client in dark mode cannot leave gray small print on a near-black canvas. The export panel also warns when your own color choices are unreadable, or when you pick a client that recolors content in dark mode while using a dark template
-- **Mail-client checks**: the signature's size and character count are shown against Gmail's limits, and an uploaded logo is flagged when the client you picked strips embedded images — the browser preview renders them perfectly, so this is otherwise invisible until a recipient tells you
+- **Mail-client checks**: the signature's size and character count are shown against Gmail's limits, white social icons on a white template are caught before they vanish, and an uploaded logo is flagged when the client you picked strips embedded images — the browser preview renders them perfectly, so this is otherwise invisible until a recipient tells you
 - **Logo URL help**: a Google Drive or Dropbox *share* link is converted to a direct image link in one click, `http` is upgraded to `https`, and the link is checked to confirm it really loads an image
 - **Optional link tagging**: add campaign (`utm_*`) parameters to your website, booking and call-to-action links for attribution. Off by default, and social profiles are never tagged
 - **See it as a received message**: download a `.eml` and open it — your mail client renders the signature with its own engine, which is the closest thing to a test send a page with no server can offer
