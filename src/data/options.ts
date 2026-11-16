@@ -1,4 +1,4 @@
-import type { BrandMark, IconStyle, TextDirection } from '../types';
+import type { BrandMark, BrandMarkSide, Density, IconStyle, TextDirection } from '../types';
 
 /**
  * Choices offered by the form. The config validator (`parseConfig.ts`)
@@ -61,6 +61,31 @@ export const TEXT_DIRECTION_OPTIONS: { value: TextDirection; label: string }[] =
 
 export function isTextDirection(value: unknown): value is TextDirection {
   return typeof value === 'string' && (TEXT_DIRECTIONS as readonly string[]).includes(value);
+}
+
+export const DENSITIES = ['comfortable', 'compact'] as const satisfies readonly Density[];
+
+export const DENSITY_OPTIONS: { value: Density; label: string }[] = [
+  { value: 'comfortable', label: 'Comfortable' },
+  { value: 'compact', label: 'Compact' },
+];
+
+export function isDensity(value: unknown): value is Density {
+  return typeof value === 'string' && (DENSITIES as readonly string[]).includes(value);
+}
+
+/** How much of the original spacing a compact signature keeps. */
+export const COMPACT_SPACING = 0.6;
+
+export const BRAND_MARK_SIDES = ['start', 'end'] as const satisfies readonly BrandMarkSide[];
+
+export const BRAND_MARK_SIDE_OPTIONS: { value: BrandMarkSide; label: string }[] = [
+  { value: 'start', label: 'Before your name' },
+  { value: 'end', label: 'After your name' },
+];
+
+export function isBrandMarkSide(value: unknown): value is BrandMarkSide {
+  return typeof value === 'string' && (BRAND_MARK_SIDES as readonly string[]).includes(value);
 }
 
 /**

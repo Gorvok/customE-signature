@@ -1,6 +1,7 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  brandMarkCells,
   MUTED_TEXT,
   LIGHT_SURFACE,
   finalizeHtml,
@@ -19,6 +20,7 @@ export const modernLight = {
   id: 'modern-light',
   name: 'Modern Light',
   description: 'Clean light theme with accent color bar',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const accentColor = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
@@ -32,7 +34,7 @@ export const modernLight = {
     });
 
     const logo = renderBrandMark(data, { width: 70, logoStyle: 'border-radius: 4px;', background: data.primaryColor });
-    const logoCell = logo ? `<td style="padding-right: 15px; vertical-align: middle;">${logo}</td>` : '';
+    const mark = brandMarkCells(logo, data.brandMarkSide, 15);
 
     const role = roleAndCompany(data, ' | ');
     const contact = contactLinks(data, {
@@ -49,12 +51,13 @@ export const modernLight = {
     <td style="padding-top: 12px;">
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
-          ${logoCell}
+          ${mark.start}
           <td style="vertical-align: top;">
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="font-size: 18px; font-weight: bold; color: ${textColor}; font-family: ${font};">${nameWithPronouns(data, `font-size: 12px; font-weight: normal; color: ${MUTED_TEXT};`)}</td>
-              </tr>
+                ${mark.end}
+        </tr>
               ${role ? `<tr><td style="font-size: 12px; color: ${accentColor}; font-family: ${font}; padding-top: 2px;">${role}</td></tr>` : ''}
               ${data.address.trim() ? `<tr><td style="font-size: 12px; color: ${MUTED_TEXT}; font-family: ${font}; padding-top: 2px;">${esc(data.address.trim())}</td></tr>` : ''}
               ${contact.length ? `<tr><td style="padding-top: 6px; font-family: ${font};">${contact.join(' &nbsp;|&nbsp; ')}</td></tr>` : ''}
@@ -67,6 +70,6 @@ export const modernLight = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data);
   },
 } satisfies SignatureTemplate;

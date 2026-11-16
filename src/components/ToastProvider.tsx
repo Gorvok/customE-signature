@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ToastContext, type Toast, type ToastType } from '../toast';
+import { ToastContext, type Toast, type ToastAction, type ToastType } from '../toast';
 
 const STYLES: Record<ToastType, string> = {
   success: 'bg-green-600 text-white',
@@ -23,6 +23,9 @@ const ICONS: Record<ToastType, ReactNode> = {
 /** Long enough to read a two-line message; errors stay a little longer. */
 const DURATION: Record<ToastType, number> = { success: 3500, info: 4500, error: 6000 };
 
+/** A toast offering an action has to outlast the decision to take it. */
+const ACTION_DURATION = 8000;
+
 export default function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
@@ -34,10 +37,10 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addToast = useCallback(
-    (message: string, type: ToastType = 'success') => {
+    (message: string, type: ToastType = 'success', action?: ToastAction) => {
       const id = Date.now() + Math.random();
-      setToasts((prev) => [...prev, { id, message, type }]);
-      timers.current.set(id, setTimeout(() => removeToast(id), DURATION[type]));
+      setToasts((prev) => [...prev, { id, message, type, ...(action ? { action } : {}) }]);
+      timers.current.set(id, setTimeout(() => removeToast(id), action ? ACTION_DURATION : DURATION[type]));
     },
     [removeToast],
   );
@@ -54,7 +57,13 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
       {/* One live region; each toast is announced as it is added. */}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2" role="status" aria-live="polite">
+      {/* Centred, and above the mobile action bar: bottom-right sat on top of
+          the export panel, which is exactly what a copy toast talks about. */}
+      <div
+        className="fixed bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 w-[calc(100%-2rem)] max-w-md"
+        role="status"
+        aria-live="polite"
+      >
         {toasts.map((t) => (
           <div
             key={t.id}
@@ -62,6 +71,18 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
           >
             <span aria-hidden="true">{ICONS[t.type]}</span>
             <span>{t.message}</span>
+            {t.action && (
+              <button
+                type="button"
+                onClick={() => {
+                  t.action?.onClick();
+                  removeToast(t.id);
+                }}
+                className="ml-1 rounded px-2 py-1 text-sm font-semibold underline underline-offset-2 hover:bg-white/15 focus:bg-white/15 transition-colors"
+              >
+                {t.action.label}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => removeToast(t.id)}

@@ -21,6 +21,7 @@ import {
   PRODUCTION_ICON_BASE,
   logoAlt,
   MUTED_TEXT,
+  brandMarkCells,
 } from './templateHelpers';
 import { findDarkModeIssues } from './darkMode';
 import { AA_CONTRAST, contrastRatio } from './color';
@@ -216,6 +217,8 @@ const malicious: SignatureData = {
   fontFamily: 'Inter',
   iconStyle: 'brand',
   textDirection: 'ltr',
+  density: 'comfortable',
+  brandMarkSide: 'start',
   utmEnabled: false,
   utmSource: 'email',
   utmMedium: 'signature',
@@ -253,6 +256,74 @@ describe('the platforms added later build the right URLs', () => {
   });
 });
 
+describe('density scales the spacing and nothing else', () => {
+  const html = '<td style="padding: 25px; font-size: 20px;">x</td><td style="padding-top: 10px;">y</td>';
+
+  it('leaves a comfortable signature untouched', () => {
+    expect(finalizeHtml(html)).toContain('padding: 25px');
+    expect(finalizeHtml(html, { density: 'comfortable' })).toContain('padding: 25px');
+  });
+
+  it('scales every padding, shorthand included', () => {
+    const compact = finalizeHtml('<td style="padding: 12px 20px;">x</td>', { density: 'compact' });
+    expect(compact).toContain('padding: 7px 12px');
+  });
+
+  it('scales the sided properties too', () => {
+    expect(finalizeHtml(html, { density: 'compact' })).toContain('padding-top: 6px');
+  });
+
+  it('does not touch the text size: compact means less air, not smaller type', () => {
+    expect(finalizeHtml(html, { density: 'compact' })).toContain('font-size: 20px');
+  });
+
+  it('leaves the spacer cells Outlook depends on alone', () => {
+    // They carry width/height attributes rather than padding.
+    const spacer = spacerCell({ width: 4, height: 1, background: '#000000' });
+    expect(finalizeHtml(spacer, { density: 'compact' })).toBe(finalizeHtml(spacer));
+  });
+
+  it('never produces a negative or fractional pixel', () => {
+    const compact = finalizeHtml('<td style="padding: 1px 3px 4px 2px;">x</td>', { density: 'compact' });
+    expect(compact).toMatch(/padding: \d+px \d+px \d+px \d+px/);
+    expect(compact).not.toContain('-');
+    expect(compact).not.toContain('.');
+  });
+
+  it('leaves a unitless zero alone rather than writing 0px', () => {
+    expect(finalizeHtml('<td style="padding: 10px 0;">x</td>', { density: 'compact' })).toContain('padding: 6px 0');
+  });
+
+  it('still mirrors for right-to-left text at the same time', () => {
+    const both = finalizeHtml('<td style="padding-right: 20px;">x</td>', { density: 'compact', textDirection: 'rtl' });
+    expect(both).toContain('padding-left: 12px');
+  });
+});
+
+describe('brandMarkCells', () => {
+  const mark = '<img src="x.png" width="52" border="0" alt="" />';
+
+  it('puts the mark before the text by default, with the gap after it', () => {
+    const cells = brandMarkCells(mark, 'start', 12);
+    expect(cells.start).toContain('padding-right: 12px');
+    expect(cells.start).toContain(mark);
+    expect(cells.end).toBe('');
+  });
+
+  it('puts it after the text, with the gap on the other side', () => {
+    const cells = brandMarkCells(mark, 'end', 12);
+    expect(cells.start).toBe('');
+    expect(cells.end).toContain('padding-left: 12px');
+    expect(cells.end).toContain(mark);
+  });
+
+  it('is empty both ways when there is no mark, so no empty cell is left behind', () => {
+    for (const side of ['start', 'end'] as const) {
+      expect(brandMarkCells('', side, 12)).toEqual({ start: '', end: '' });
+    }
+  });
+});
+
 describe('finalizeHtml mirrors a right-to-left layout', () => {
   it('leaves a left-to-right signature exactly as it was', () => {
     const html = '<table><tr><td style="padding-right: 15px; text-align: left;">x</td></tr></table>';
@@ -260,31 +331,31 @@ describe('finalizeHtml mirrors a right-to-left layout', () => {
   });
 
   it('marks every table rtl, so each row of cells reverses', () => {
-    const html = finalizeHtml('<table><tr><td><table><tr><td>x</td></tr></table></td></tr></table>', 'rtl');
+    const html = finalizeHtml('<table><tr><td><table><tr><td>x</td></tr></table></td></tr></table>', { textDirection: 'rtl' });
     expect(html.match(/dir="rtl"/g)).toHaveLength(2);
   });
 
   it('swaps the sided properties, so spacing lands on the mirrored side', () => {
-    const html = finalizeHtml('<td style="padding-right: 15px; border-left: 1px solid #000; margin-left: 4px;">x</td>', 'rtl');
+    const html = finalizeHtml('<td style="padding-right: 15px; border-left: 1px solid #000; margin-left: 4px;">x</td>', { textDirection: 'rtl' });
     expect(html).toContain('padding-left: 15px');
     expect(html).toContain('border-right: 1px solid #000');
     expect(html).toContain('margin-right: 4px');
   });
 
   it('swaps both sides at once rather than collapsing them onto one', () => {
-    const html = finalizeHtml('<td style="padding-left: 4px; padding-right: 15px;">x</td>', 'rtl');
+    const html = finalizeHtml('<td style="padding-left: 4px; padding-right: 15px;">x</td>', { textDirection: 'rtl' });
     expect(html).toContain('padding-right: 4px');
     expect(html).toContain('padding-left: 15px');
   });
 
   it('swaps alignment, in CSS and in the attribute Outlook reads', () => {
-    const html = finalizeHtml('<td align="left" style="text-align: left;">x</td>', 'rtl');
+    const html = finalizeHtml('<td align="left" style="text-align: left;">x</td>', { textDirection: 'rtl' });
     expect(html).toContain('align="right"');
     expect(html).toContain('text-align: right');
   });
 
   it('leaves centered alignment and symmetric properties alone', () => {
-    const html = finalizeHtml('<td align="center" style="text-align: center; padding: 10px; border-radius: 6px 6px 0 0;">x</td>', 'rtl');
+    const html = finalizeHtml('<td align="center" style="text-align: center; padding: 10px; border-radius: 6px 6px 0 0;">x</td>', { textDirection: 'rtl' });
     expect(html).toContain('align="center"');
     expect(html).toContain('text-align: center');
     expect(html).toContain('padding: 10px');
@@ -292,7 +363,7 @@ describe('finalizeHtml mirrors a right-to-left layout', () => {
   });
 
   it('does not add a second dir to a table that already carries one', () => {
-    const html = finalizeHtml('<table dir="ltr"><tr><td>x</td></tr></table>', 'rtl');
+    const html = finalizeHtml('<table dir="ltr"><tr><td>x</td></tr></table>', { textDirection: 'rtl' });
     expect(html.match(/dir=/g)).toHaveLength(1);
     expect(html).toContain('dir="ltr"');
   });

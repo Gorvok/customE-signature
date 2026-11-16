@@ -11,16 +11,12 @@ import {
 import { parseLibrary, parseSharedConfig, parseSignatureData, type SignatureLibrary } from '../utils/parseConfig';
 import { readConfigFromHash, type SharedConfig } from '../utils/shareConfig';
 
-type Confirm = (message: string) => boolean;
-
 const DEFAULT_TEMPLATE_ID = DEFAULT_TEMPLATE.id;
 const HAS_SHARE_FRAGMENT = /(?:^#|&)cfg=/;
 
 export const REPLACE_PROMPT = 'This link contains a signature. Replace the one saved in this browser with it?';
 export const FIRST_SIGNATURE_NAME = 'My signature';
 export const AT_CAPACITY = `A browser can hold ${MAX_SIGNATURES} signatures. Delete one first.`;
-
-const defaultConfirm: Confirm = (message) => window.confirm(message);
 
 function newId(): string {
   // randomUUID needs a secure context; the fallback only has to be unique
@@ -103,34 +99,34 @@ function sameData(a: SignatureData, b: SignatureData): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-/** Whether a share link may replace what is saved: yes when there is nothing to lose, otherwise ask. */
-function mayReplace(current: SignatureData, incoming: SignatureData, confirm: Confirm): boolean {
-  return !hasContent(current) || sameData(current, incoming) || confirm(REPLACE_PROMPT);
+/**
+ * Answering a share link is a question about the page the person is looking
+ * at, so it is asked on the page. The config waits here until they answer.
+ */
+interface State {
+  library: SignatureLibrary;
+  pending: SharedConfig | null;
+}
+
+function initialState(): State {
+  const library = readLibrary();
+  const shared = readConfigFromHash();
+  if (!shared) return { library, pending: null };
+  const current = activeOf(library).data;
+  // Nothing to lose, or nothing would change: apply it and say nothing.
+  if (!hasContent(current) || sameData(current, shared.data)) {
+    return { library: patchActive(library, merge(activeOf(library), shared)), pending: null };
+  }
+  return { library, pending: shared };
 }
 
 /**
- * Answers already given for a link, so React StrictMode's double-invoked
- * state initializer asks once. Entries are dropped once the fragment is
- * stripped after mount.
+ * Take the config out of the URL once it has been read into memory, so a
+ * reload does not ask again — and so the address bar stops carrying someone
+ * else's details.
  */
-const decisions = new Map<string, boolean>();
-
-function initialState(confirm: Confirm): SignatureLibrary {
-  const library = readLibrary();
-  const shared = readConfigFromHash();
-  if (!shared) return library;
-  const key = window.location.hash;
-  let decision = decisions.get(key);
-  if (decision === undefined) {
-    decision = mayReplace(activeOf(library).data, shared.data, confirm);
-    decisions.set(key, decision);
-  }
-  return decision ? patchActive(library, merge(activeOf(library), shared)) : library;
-}
-
 function stripShareFragment() {
   if (HAS_SHARE_FRAGMENT.test(window.location.hash)) {
-    decisions.delete(window.location.hash);
     history.replaceState(null, '', window.location.pathname + window.location.search);
   }
 }
@@ -148,11 +144,6 @@ function uniqueName(items: SavedSignature[], base: string): string {
 
 const cleanName = (name: string) => name.trim().slice(0, LIMITS.signatureName);
 
-interface Options {
-  /** Overridable for tests; defaults to window.confirm. */
-  confirm?: Confirm;
-}
-
 /**
  * The signature being edited, its template, and the other signatures saved
  * alongside it in this browser. There is no account: the library lives in
@@ -163,25 +154,30 @@ interface Options {
  * with the user's consent, and the fragment is stripped afterwards so a
  * reload does not ask again.
  */
-export function useSignatureState({ confirm }: Options = {}) {
-  const [library, setLibrary] = useState<SignatureLibrary>(() => initialState(confirm ?? defaultConfirm));
+export function useSignatureState() {
+  const [{ library, pending }, setState] = useState<State>(initialState);
+  const setLibrary = useCallback(
+    (update: (current: SignatureLibrary) => SignatureLibrary) =>
+      setState((state) => ({ ...state, library: update(state.library) })),
+    [],
+  );
   const active = activeOf(library);
   const { data, templateId } = active;
 
-  const setData = useCallback((next: SignatureData) => setLibrary((s) => patchActive(s, { data: next })), []);
+  const setData = useCallback((next: SignatureData) => setLibrary((s) => patchActive(s, { data: next })), [setLibrary]);
   const setTemplateId = useCallback(
     (next: string) => setLibrary((s) => (isTemplateId(next) ? patchActive(s, { templateId: next }) : s)),
-    [],
+    [setLibrary],
   );
   const applyConfig = useCallback(
     (config: SharedConfig) => setLibrary((s) => patchActive(s, merge(activeOf(s), config))),
-    [],
+    [setLibrary],
   );
-  const reset = useCallback(() => setLibrary((s) => patchActive(s, { data: defaultData })), []);
+  const reset = useCallback(() => setLibrary((s) => patchActive(s, { data: defaultData })), [setLibrary]);
 
   const select = useCallback((id: string) => {
     setLibrary((s) => (s.items.some((item) => item.id === id) ? { ...s, activeId: id } : s));
-  }, []);
+  }, [setLibrary]);
 
   // The cap is reported from the state this render already has: a functional
   // updater does not run synchronously, so a reason set inside one would
@@ -197,7 +193,7 @@ export function useSignatureState({ confirm }: Options = {}) {
       return { activeId: added.id, items: [...s.items, added] };
     });
     return null;
-  }, [full]);
+  }, [full, setLibrary]);
 
   /** Copies a signature and switches to the copy. Returns a reason when it cannot. */
   const duplicate = useCallback((id: string): string | null => {
@@ -210,7 +206,7 @@ export function useSignatureState({ confirm }: Options = {}) {
       return { activeId: copy.id, items: [...s.items, copy] };
     });
     return null;
-  }, [full]);
+  }, [full, setLibrary]);
 
   const rename = useCallback((id: string, name: string) => {
     const next = cleanName(name);
@@ -219,7 +215,7 @@ export function useSignatureState({ confirm }: Options = {}) {
       ...s,
       items: s.items.map((item) => (item.id === id ? { ...item, name: uniqueName(s.items.filter((i) => i.id !== id), next) } : item)),
     }));
-  }, []);
+  }, [setLibrary]);
 
   /** Removes a signature. The library is never empty: the last one is replaced by a blank. */
   const remove = useCallback((id: string) => {
@@ -229,7 +225,7 @@ export function useSignatureState({ confirm }: Options = {}) {
       const activeId = s.activeId === id ? remaining[0]!.id : s.activeId;
       return { activeId, items: remaining };
     });
-  }, []);
+  }, [setLibrary]);
 
   // Persist, and retire the single-signature keys once the library holds them.
   useEffect(() => {
@@ -246,20 +242,31 @@ export function useSignatureState({ confirm }: Options = {}) {
   // The fragment consumed by the initializer is removed once mounted.
   useEffect(stripShareFragment, []);
 
+  /** Take the signature the link carried. */
+  const acceptPending = useCallback(() => {
+    setState((state) =>
+      state.pending
+        ? { library: patchActive(state.library, merge(activeOf(state.library), state.pending)), pending: null }
+        : state,
+    );
+  }, []);
+
+  /** Keep what is saved and forget the link. */
+  const dismissPending = useCallback(() => setState((state) => ({ ...state, pending: null })), []);
+
   // A link pasted into an already-open tab only changes the hash.
   const dataRef = useRef(data);
-  const confirmRef = useRef(confirm ?? defaultConfirm);
   useEffect(() => {
     dataRef.current = data;
   }, [data]);
   useEffect(() => {
-    confirmRef.current = confirm ?? defaultConfirm;
-  }, [confirm]);
-  useEffect(() => {
     const onHashChange = () => {
       const config = readConfigFromHash();
       if (!config) return;
-      if (mayReplace(dataRef.current, config.data, confirmRef.current)) applyConfig(config);
+      // Same rule as on load: replace silently when there is nothing to lose,
+      // otherwise hold it and let the page ask.
+      if (!hasContent(dataRef.current) || sameData(dataRef.current, config.data)) applyConfig(config);
+      else setState((state) => ({ ...state, pending: config }));
       stripShareFragment();
     };
     window.addEventListener('hashchange', onHashChange);
@@ -275,5 +282,9 @@ export function useSignatureState({ confirm }: Options = {}) {
     reset,
     /** Every saved signature, the active one, and the operations on them. */
     signatures: { items: library.items, activeId: active.id, select, create, duplicate, rename, remove },
+    /** A share link waiting to be accepted or dismissed, or null. */
+    pendingShare: pending,
+    acceptPending,
+    dismissPending,
   };
 }

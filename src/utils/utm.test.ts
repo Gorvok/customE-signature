@@ -86,8 +86,8 @@ describe('tagging in a rendered signature', () => {
     expect(website).not.toContain('utm_');
   });
 
-  it('tags the call-to-action button in every template', () => {
-    for (const template of templates) {
+  it('tags the call-to-action button in every template that has one', () => {
+    for (const template of templates.filter((t) => t.features.cta)) {
       const html = template.render({ ...data, ...on });
       expect(html, template.id).toContain('northwind.example/demo?utm_source=email');
     }

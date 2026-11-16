@@ -20,6 +20,7 @@ export const corporate = {
   id: 'corporate',
   name: 'Corporate',
   description: 'Professional enterprise style with left accent',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
@@ -68,6 +69,6 @@ export const corporate = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data);
   },
 } satisfies SignatureTemplate;

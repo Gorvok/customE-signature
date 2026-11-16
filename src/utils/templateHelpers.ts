@@ -1,6 +1,6 @@
 import { socialPlatforms } from '../data/socialPlatforms';
-import { FONT_STACKS, isIconStyle } from '../data/options';
-import type { IconStyle, SignatureData, TextDirection } from '../types';
+import { COMPACT_SPACING, FONT_STACKS, isIconStyle } from '../data/options';
+import type { BrandMarkSide, Density, IconStyle, SignatureData, TextDirection } from '../types';
 import { withUtm } from './utm';
 
 /**
@@ -278,6 +278,12 @@ const ALIGN_ATTRIBUTE = /\balign\s*=\s*"(left|right)"/g;
 
 const flip = (side: string) => (side === 'left' ? 'right' : 'left');
 
+/** The layout choices applied centrally, after a template has rendered. */
+export interface LayoutOptions {
+  textDirection?: TextDirection;
+  density?: Density;
+}
+
 /**
  * Mirror a layout for right-to-left text.
  *
@@ -294,14 +300,52 @@ function mirrorSides(html: string): string {
     .replace(ALIGN_ATTRIBUTE, (_, side: string) => `align="${flip(side)}"`);
 }
 
+/** Every padding declaration, whole-value, so a shorthand is scaled as one. */
+const PADDING_DECL = /\bpadding(-top|-right|-bottom|-left)?\s*:\s*([^;"'}]+)/g;
+
+/**
+ * Scale the spacing without touching anything else.
+ *
+ * Compact means less air, not smaller text: shrinking font sizes would make a
+ * signature harder to read, while the whitespace is what makes one feel long
+ * in a thread. Only `padding` is scaled — the spacer cells that keep Outlook
+ * honest carry width/height attributes instead, and are left exactly as they
+ * are.
+ */
+function scaleSpacing(html: string, factor: number): string {
+  if (factor === 1) return html;
+  return html.replace(PADDING_DECL, (_, side: string | undefined, value: string) => {
+    const scaled = value.replace(/(\d+(?:\.\d+)?)px/g, (__, px: string) =>
+      `${Math.max(0, Math.round(Number(px) * factor))}px`,
+    );
+    return `padding${side ?? ''}: ${scaled.trim()}`;
+  });
+}
+
+/**
+ * The brand mark's cell, on whichever end of the row it belongs to. Returns
+ * both slots so a template can drop them either side of its text cell without
+ * caring which one is filled; the padding follows the mark, and the RTL
+ * mirror then flips both for a right-to-left layout.
+ */
+export function brandMarkCells(mark: string, side: BrandMarkSide, gap: number): { start: string; end: string } {
+  if (!mark.trim()) return { start: '', end: '' };
+  const cell = (padding: 'right' | 'left') =>
+    `<td style="padding-${padding}: ${gap}px; vertical-align: middle;">${mark}</td>`;
+  return side === 'end' ? { start: '', end: cell('left') } : { start: cell('right'), end: '' };
+}
+
 /**
  * Harden generated markup for email clients: give every `<table>` a
  * presentation role so screen readers and Outlook treat it as layout, not
- * data, and mirror the layout when the text runs right to left.
+ * data, scale the spacing to the chosen density, and mirror the layout when
+ * the text runs right to left.
  */
-export function finalizeHtml(html: string, direction: TextDirection = 'ltr'): string {
-  const roled = html.replace(/<table(?![^>]*\brole=)/g, '<table role="presentation"');
-  if (direction !== 'rtl') return roled;
+export function finalizeHtml(html: string, layout: LayoutOptions = {}): string {
+  const { textDirection = 'ltr', density = 'comfortable' } = layout;
+  const spaced = scaleSpacing(html, density === 'compact' ? COMPACT_SPACING : 1);
+  const roled = spaced.replace(/<table(?![^>]*\brole=)/g, '<table role="presentation"');
+  if (textDirection !== 'rtl') return roled;
   // Every table, not just the outermost: each one lays out its own row of
   // cells, and they all have to reverse.
   return mirrorSides(roled).replace(/<table(?![^>]*\bdir=)/g, '<table dir="rtl"');

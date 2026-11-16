@@ -26,6 +26,8 @@ const data: SignatureData = {
   fontFamily: 'Inter',
   iconStyle: 'brand',
   textDirection: 'ltr',
+  density: 'comfortable',
+  brandMarkSide: 'start',
   utmEnabled: false,
   utmSource: 'email',
   utmMedium: 'signature',

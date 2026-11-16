@@ -1,6 +1,7 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  brandMarkCells,
   MUTED_TEXT,
   LIGHT_SURFACE,
   finalizeHtml,
@@ -19,6 +20,7 @@ export const compactCard = {
   id: 'compact-card',
   name: 'Compact Card',
   description: 'Space-efficient card with rounded photo area',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
@@ -36,7 +38,7 @@ export const compactCard = {
     // Width only, so a non-square logo keeps its aspect ratio; clients that
     // support border-radius round it, the rest show it square.
     const logo = renderBrandMark(data, { width: 52, logoStyle: `border-radius: 50%; border: 2px solid ${accent};`, background: data.primaryColor });
-    const logoCell = logo ? `<td style="vertical-align: middle; padding-right: 12px;">${logo}</td>` : '';
+    const mark = brandMarkCells(logo, data.brandMarkSide, 12);
 
     const role = roleAndCompany(data, ' &bull; ');
     const contact = contactLinks(data, {
@@ -54,12 +56,13 @@ export const compactCard = {
     <td style="padding: 14px;">
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
-          ${logoCell}
+          ${mark.start}
           <td style="vertical-align: middle;">
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="font-size: 15px; font-weight: bold; color: ${textDark}; font-family: ${font}; line-height: 1.2;">${nameWithPronouns(data, `font-size: 11px; font-weight: normal; color: ${textLight};`)}</td>
-              </tr>
+                ${mark.end}
+        </tr>
               ${role ? `<tr><td style="font-size: 11px; color: ${textLight}; font-family: ${font}; padding-top: 1px;">${role}</td></tr>` : ''}
               ${data.address.trim() ? `<tr><td style="font-size: 11px; color: ${textLight}; font-family: ${font}; padding-top: 1px;">${esc(data.address.trim())}</td></tr>` : ''}
               ${contact.length ? `<tr><td style="font-size: 11px; font-family: ${font}; padding-top: 4px;">${contact.join(' &nbsp;| ')}</td></tr>` : ''}
@@ -72,6 +75,6 @@ export const compactCard = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data);
   },
 } satisfies SignatureTemplate;

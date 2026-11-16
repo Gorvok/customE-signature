@@ -19,6 +19,7 @@ export const minimal = {
   id: 'minimal',
   name: 'Minimal',
   description: 'Simple, text-focused signature',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const textColor = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
@@ -48,6 +49,6 @@ export const minimal = {
   ${cta ? `<tr><td style="padding-top: 8px;">${cta}</td></tr>` : ''}
   ${socialLinks ? `<tr><td style="padding-top: 6px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${socialLinks}</tr></table></td></tr>` : ''}
 </table>
-${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data);
   },
 } satisfies SignatureTemplate;

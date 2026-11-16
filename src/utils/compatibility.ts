@@ -113,6 +113,22 @@ export function compatibilityWarnings({
     });
   }
 
+  // White icons on a white signature. The icon style is chosen once in the
+  // branding panel and the template is chosen elsewhere, so the two drift
+  // apart easily — and the icons do not fail loudly, they just vanish.
+  if (data.iconStyle === 'light' && Object.values(data.socials).some((value) => value.trim())) {
+    const painted = paintedBackgrounds(html);
+    if (painted.length && !painted.some(isDarkColor)) {
+      warnings.push({
+        id: 'light-icons-on-light',
+        level: 'warning',
+        message:
+          'Your social icons are the light (white) style and this template has no dark area for them to sit on, ' +
+          'so they will be invisible. Pick Brand, Dark or Gray icons instead.',
+      });
+    }
+  }
+
   // A signature that paints a dark surface is at the mercy of the clients
   // that recolor content in dark mode. Only raised for a client known to do
   // it, because there is nothing to fix otherwise.

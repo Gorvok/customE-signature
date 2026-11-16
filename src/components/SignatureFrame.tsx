@@ -9,6 +9,8 @@ interface Props {
   background?: string;
   /** Thumbnails: removed from the tab order and the accessibility tree. */
   decorative?: boolean;
+  /** Called with the content height whenever it is measured, for callers that scale to fit. */
+  onMeasure?: (height: number) => void;
 }
 
 /**
@@ -20,7 +22,7 @@ interface Props {
  * reached the HTML is therefore inert, even if the config validation upstream
  * were bypassed, and styles inside the frame cannot touch the page.
  */
-export default function SignatureFrame({ html, title, background = 'transparent', decorative = false }: Props) {
+export default function SignatureFrame({ html, title, background = 'transparent', decorative = false, onMeasure }: Props) {
   const ref = useRef<HTMLIFrameElement>(null);
   const observerRef = useRef<ResizeObserver | null>(null);
   const [height, setHeight] = useState(0);
@@ -31,11 +33,22 @@ export default function SignatureFrame({ html, title, background = 'transparent'
     [html, background],
   );
 
+  // A ref, so a caller may pass an inline function without restarting the
+  // observer on every render.
+  const measureRef = useRef(onMeasure);
+  useEffect(() => {
+    measureRef.current = onMeasure;
+  }, [onMeasure]);
+
   // Size the frame to its content, and keep following it as images load.
   const handleLoad = useCallback(() => {
     const doc = ref.current?.contentDocument;
     if (!doc) return;
-    const update = () => setHeight(doc.documentElement.scrollHeight);
+    const update = () => {
+      const next = doc.documentElement.scrollHeight;
+      setHeight(next);
+      measureRef.current?.(next);
+    };
     update();
     observerRef.current?.disconnect();
     if (typeof ResizeObserver !== 'undefined' && doc.body) {

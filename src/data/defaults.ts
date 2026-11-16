@@ -29,6 +29,8 @@ export const defaultData: SignatureData = {
   fontFamily: 'Arial',
   iconStyle: 'brand',
   textDirection: 'ltr',
+  density: 'comfortable',
+  brandMarkSide: 'start',
   // Off until asked for: a signature should not rewrite links by surprise.
   utmEnabled: false,
   utmSource: 'email',

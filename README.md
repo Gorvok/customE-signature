@@ -4,17 +4,19 @@ A free, open-source web app for creating professional email signatures. No login
 
 ## Features
 
-- **7 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card
+- **10 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card, Sidebar (a panel of brand color beside your details), One Line (the smallest useful signature — two lines, no images, no button) and Mono (monospace, labelled lines)
 - **Live preview** that updates as you type
 - **Rich fields**: name, pronouns, job title, department, company, phone, email, website, office address, booking link, a call-to-action button, and a legal disclaimer
 - **Full customization**: colors, fonts, logo upload, 16 social platforms (drag to reorder), and four social-icon styles
+- **Layout knobs**: comfortable or compact spacing (which takes out the air, not the text size), and the brand mark before or after your name on the templates that put it beside you
 - **Right-to-left layouts**: switch the text direction and the whole layout mirrors — columns reverse, spacing and borders move to the other side — for Arabic, Hebrew, Persian and Urdu
 - **Contrast check while you pick**: the two brand colors are measured against each other as you choose them, against WCAG AA
-- **Monogram brand mark**: your initials in a circle, drawn with markup instead of an image — under a kilobyte, needs no hosting, and arrives intact in every client (Outlook gets a VML oval, since its engine ignores `border-radius`). Pick it instead of a logo when you have nowhere to host one
+- **Monogram brand mark**: your initials in a circle, drawn with markup instead of an image — under a kilobyte, needs no hosting, and arrives intact in every client (Outlook gets a VML oval, since its engine ignores `border-radius`). Pick it instead of a logo when you have nowhere to host one, and download it as a PNG for editors that only take an image
 - **Inline validation** for email and URL fields, with a bulletproof (Outlook-safe) CTA button
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
 - **Save & share**: copy a self-restoring share link or export/import your setup as JSON
+- **Check a signature you already have**: paste the HTML of the signature you use today and the same checks these templates are held to run over it — markup mail clients strip, text that vanishes in dark mode, Gmail's size limits. Useful even if you never make a new one
 - **Team mode**: paste a roster (CSV) and everyone gets their own signature from the one you built — downloaded as a ZIP of HTML files plus a sheet of edit links. The roster never leaves the browser
 - **Multiple saved signatures**: keep several side by side (work, personal, a second brand), switch between them, rename, duplicate and delete. They live in this browser only — there is no account — so a share link is how you move one to another device.
 - **Autosave**: your details and chosen template are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear). Opening a share link over saved work asks before replacing it.
@@ -22,9 +24,10 @@ A free, open-source web app for creating professional email signatures. No login
 - **Installable PWA** with offline support and an in-app prompt when a new version has been deployed
 - **Light & dark mode** with system-preference detection, plus reduced-motion and keyboard-focus support
 - **Dark-mode safe**: every template paints its own background and picks text to suit it, so a client in dark mode cannot leave gray small print on a near-black canvas. The export panel also warns when your own color choices are unreadable, or when you pick a client that recolors content in dark mode while using a dark template
-- **Mail-client checks**: the signature's size and character count are shown against Gmail's limits, and an uploaded logo is flagged when the client you picked strips embedded images — the browser preview renders them perfectly, so this is otherwise invisible until a recipient tells you
+- **Mail-client checks**: the signature's size and character count are shown against Gmail's limits, white social icons on a white template are caught before they vanish, and an uploaded logo is flagged when the client you picked strips embedded images — the browser preview renders them perfectly, so this is otherwise invisible until a recipient tells you
 - **Logo URL help**: a Google Drive or Dropbox *share* link is converted to a direct image link in one click, `http` is upgraded to `https`, and the link is checked to confirm it really loads an image
 - **Optional link tagging**: add campaign (`utm_*`) parameters to your website, booking and call-to-action links for attribution. Off by default, and social profiles are never tagged
+- **See it as a received message**: download a `.eml` and open it — your mail client renders the signature with its own engine, which is the closest thing to a test send a page with no server can offer
 - **Contact card**: download a `.vcf`, and a QR code holding the same details. The QR is generated in your browser — nothing is sent to a QR service
 - **Safe output**: all input is HTML-escaped and links are sanitized before being placed in the generated signature
 - **Fully client-side**: zero backend, zero tracking, zero data collection
@@ -66,6 +69,21 @@ that path is a public contract: do not rename the repository, move the
 deployment, or change the look of the existing PNGs. A test pins
 `PRODUCTION_ICON_BASE` to this URL. If the icons are ever redesigned, add them
 under a new path and leave the current files in place.
+
+## Checking a Signature You Already Have
+
+The three checkers the templates are held to — client-safe markup
+(`emailSafety.ts`), dark-mode survival (`darkMode.ts`) and Gmail's limits
+(`compatibility.ts`) — are pure functions over HTML, so they work just as well
+on a signature that came from somewhere else. **Check a signature you already
+have** takes pasted markup and reports what a mail client will strip, what
+disappears on a dark background, and whether Gmail will clip the message,
+quoting the markup at fault in each case. The pasted signature is rendered in
+the same sandboxed frame as everything else: no scripts, no access to the
+page, nothing uploaded.
+
+This is usually the fastest answer to "why does my signature look wrong in
+Outlook?", which the sender's own mail client cannot tell them.
 
 ## Team Mode
 
@@ -131,8 +149,9 @@ server here to hand it to.
 - **The call-to-action button in Outlook for Windows** keeps its shape only
   when the downloaded HTML file is installed. Pasting into a signature editor
   drops the Outlook-specific fallback, and Outlook then shows a styled link.
-- Email clients are inconsistent by nature; always send yourself a test email
-  before relying on a new signature.
+- Email clients are inconsistent by nature. The `.eml` download is the nearest
+  thing to a test send this app can manage — your client renders it with its
+  own engine — but it shows your *own* client, not your recipients'.
 
 ## Testing
 

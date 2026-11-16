@@ -36,25 +36,26 @@ async function names(page: Page): Promise<string[]> {
 test.describe('the signature library', () => {
   test('keeps several signatures apart and remembers them', async ({ page }) => {
     const console_ = watchConsole(page);
-    // Deleting asks for confirmation, and Playwright dismisses dialogs unless
-    // a handler accepts them.
-    page.on('dialog', (dialog) => void dialog.accept());
+    // Nothing here opens a browser dialog any more: deleting confirms in the
+    // row, so a dismissed dialog can no longer silently skip a step.
+    page.on('dialog', (dialog) => void dialog.dismiss());
 
     await page.goto(site.url, { waitUntil: 'load' });
-    await expect(page.getByRole('heading', { name: 'Saved signatures' })).toBeVisible();
 
     // The Personal section is open on load. Clicking its heading would close
     // it, and filling a clipped input never reaches React.
     const fullName = page.getByLabel('Full Name');
 
-    await test.step('starts as one signature, and typing lands in it', async () => {
-      await expect(rows(page)).toHaveCount(1);
+    await test.step('starts compact: one signature is nothing to manage', async () => {
+      await expect(page.getByRole('heading', { name: 'My signature' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Saved signatures' })).toHaveCount(0);
       await fullName.fill('First Person');
       await expect(fullName).toHaveValue('First Person');
     });
 
-    await test.step('a new signature starts blank rather than inheriting', async () => {
+    await test.step('a new signature starts blank, and the full panel appears', async () => {
       await page.getByRole('button', { name: '+ New signature' }).click();
+      await expect(page.getByRole('heading', { name: 'Saved signatures' })).toBeVisible();
       await expect(rows(page)).toHaveCount(2);
       await expect(fullName).toHaveValue('');
       await fullName.fill('Second Person');
@@ -88,8 +89,12 @@ test.describe('the signature library', () => {
       expect(await names(page)).toEqual(before);
     });
 
-    await test.step('deleting removes one', async () => {
-      await rows(page).last().getByRole('button', { name: 'Delete' }).click();
+    await test.step('deleting asks in the row, and removes one when confirmed', async () => {
+      const last = rows(page).last();
+      await last.getByRole('button', { name: 'Delete', exact: true }).click();
+      // Still three until the confirmation in the row is taken.
+      await expect(rows(page)).toHaveCount(3);
+      await last.getByRole('button', { name: /confirm$/ }).click();
       await expect(rows(page)).toHaveCount(2);
     });
 

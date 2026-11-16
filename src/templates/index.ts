@@ -6,9 +6,23 @@ import { boldBanner } from './bold-banner';
 import { corporate } from './corporate';
 import { elegant } from './elegant';
 import { compactCard } from './compact-card';
+import { sidebar } from './sidebar';
+import { oneLine } from './one-line';
+import { mono } from './mono';
 
 /** Every template, in display order. The first is the default. */
-export const templates = [classicDark, modernLight, minimal, boldBanner, corporate, elegant, compactCard] as const satisfies readonly SignatureTemplate[];
+export const templates = [
+  classicDark,
+  modernLight,
+  minimal,
+  boldBanner,
+  corporate,
+  elegant,
+  compactCard,
+  sidebar,
+  oneLine,
+  mono,
+] as const satisfies readonly SignatureTemplate[];
 
 /** The literal id of a known template, e.g. 'classic-dark'. */
 export type TemplateId = (typeof templates)[number]['id'];

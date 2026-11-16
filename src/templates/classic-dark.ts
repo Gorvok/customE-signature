@@ -17,6 +17,7 @@ export const classicDark = {
   id: 'classic-dark',
   name: 'Classic Dark',
   description: 'Professional dark theme with two-column layout',
+  features: { brandMark: true, cta: true },
   render: (data: SignatureData, options: RenderOptions = {}) => {
     const secondaryRaw = data.secondaryColor || '#FFFFFF';
     const primary = esc(data.primaryColor);
@@ -77,6 +78,6 @@ export const classicDark = {
       ${disclaimer}
     </td>
   </tr>
-</table>`, data.textDirection);
+</table>`, data);
   },
 } satisfies SignatureTemplate;

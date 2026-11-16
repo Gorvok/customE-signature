@@ -4,7 +4,6 @@ import { MAX_TEAM_ROWS, TEAM_COLUMNS, buildRoster, readmeText, shareLinksCsv } f
 import { createZip, type ZipEntry } from '../utils/zip';
 import { downloadBlob, signatureDocument } from '../utils/exportHelpers';
 import { useToast } from '../toast';
-import CollapsibleSection from './CollapsibleSection';
 
 interface Props {
   data: SignatureData;
@@ -17,15 +16,6 @@ Alex Rivera,alex@northwind.io,Head of Product,Product,+1 (415) 555-0123
 Sam Okafor,sam@northwind.io,Staff Engineer,Engineering,+1 (415) 555-0144
 Dana Lin,dana@northwind.io,Account Director,Sales,+1 (415) 555-0190`;
 
-const icon = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  </svg>
-);
-
 /**
  * Generate a signature for everyone on a roster, in one archive.
  *
@@ -36,7 +26,6 @@ const icon = (
  */
 export default function TeamPanel({ data, template, templateId }: Props) {
   const { addToast } = useToast();
-  const [open, setOpen] = useState(false);
   const [csv, setCsv] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const textareaId = useId();
@@ -70,16 +59,7 @@ export default function TeamPanel({ data, template, templateId }: Props) {
   }
 
   return (
-    <CollapsibleSection
-      id="sec-team"
-      title="Team mode"
-      subtitle="One signature per person, from a CSV"
-      icon={icon}
-      filled={Boolean(roster?.people.length)}
-      open={open}
-      onToggle={() => setOpen((value) => !value)}
-    >
-      <div className="space-y-4">
+    <div className="space-y-4">
         <p className="text-sm text-gray-600 dark:text-gray-300">
           The signature you have built above is the template — its colors, font, logo, company and
           social links. Paste a roster and everyone gets their own copy with their own details.
@@ -177,8 +157,7 @@ export default function TeamPanel({ data, template, templateId }: Props) {
           <span className="text-xs text-hint">
             One HTML file per person, a sheet of edit links, and a note explaining both.
           </span>
-        </div>
       </div>
-    </CollapsibleSection>
+    </div>
   );
 }
