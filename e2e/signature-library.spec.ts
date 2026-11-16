@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { serveBuild, type StaticSite } from './support/deploy-harness';
+import { watchConsole } from './support/console-watch';
 
 const PROJECT_ROOT = fileURLToPath(new URL('..', import.meta.url));
 
@@ -34,11 +35,7 @@ async function names(page: Page): Promise<string[]> {
 
 test.describe('the signature library', () => {
   test('keeps several signatures apart and remembers them', async ({ page }) => {
-    const consoleErrors: string[] = [];
-    page.on('console', (message) => {
-      if (message.type() === 'error') consoleErrors.push(message.text());
-    });
-    page.on('pageerror', (error) => consoleErrors.push(String(error)));
+    const console_ = watchConsole(page);
     // Deleting asks for confirmation, and Playwright dismisses dialogs unless
     // a handler accepts them.
     page.on('dialog', (dialog) => void dialog.accept());
@@ -96,6 +93,7 @@ test.describe('the signature library', () => {
       await expect(rows(page)).toHaveCount(2);
     });
 
-    expect(consoleErrors).toEqual([]);
+    expect(console_.pageErrors()).toEqual([]);
+    expect(console_.unexpected()).toEqual([]);
   });
 });

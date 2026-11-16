@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { serveBuild, type StaticSite } from './support/deploy-harness';
+import { watchConsole } from './support/console-watch';
 
 const PROJECT_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
@@ -25,11 +26,7 @@ test.afterAll(async () => {
 
 test.describe('the contact card', () => {
   test('downloads a usable vCard and QR code', async ({ page }) => {
-    const consoleErrors: string[] = [];
-    page.on('console', (message) => {
-      if (message.type() === 'error') consoleErrors.push(message.text());
-    });
-    page.on('pageerror', (error) => consoleErrors.push(String(error)));
+    const console_ = watchConsole(page);
 
     await page.goto(site.url, { waitUntil: 'load' });
 
@@ -80,6 +77,7 @@ test.describe('the contact card', () => {
       expect(width).toBeGreaterThan(100);
     });
 
-    expect(consoleErrors).toEqual([]);
+    expect(console_.pageErrors()).toEqual([]);
+    expect(console_.unexpected()).toEqual([]);
   });
 });

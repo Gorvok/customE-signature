@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { expect, test, type Page } from '@playwright/test'
+import { watchConsole } from './support/console-watch'
 import {
   BASE_PATH,
   BUILD_MARKER,
@@ -14,24 +15,6 @@ import {
 
 const PROMPT_TEXT = 'A new version is available.'
 const PROJECT_ROOT = fileURLToPath(new URL('..', import.meta.url))
-
-/**
- * Console output that is expected rather than the app misbehaving.
- *
- * The signature preview renders inside an iframe sandboxed *without*
- * `allow-scripts`, deliberately — see SignatureFrame. Playwright's trace
- * recorder injects a snapshot script into every frame, Chromium refuses it
- * there, and says so once per frame per navigation. It is the sandbox doing its
- * job: the generated srcdoc contains no script of its own. The message shows up
- * only while tracing is enabled, which is to say only on CI.
- */
-const EXPECTED_CONSOLE_ERRORS = [
-  /Blocked script execution in 'about:srcdoc'/,
-  /favicon/i,
-  /404 \(Not Found\)/i,
-]
-
-const isUnexpected = (text: string) => !EXPECTED_CONSOLE_ERRORS.some((pattern) => pattern.test(text))
 
 let site: StaticSite
 let releases: Releases
@@ -123,12 +106,7 @@ const deployNextRelease = () =>
 
 test.describe('service worker update prompt', () => {
   test('offers a reload when a new version is deployed, and applies it on demand', async ({ page }) => {
-    const consoleErrors: string[] = []
-    const pageErrors: string[] = []
-    page.on('console', (message) => {
-      if (message.type() === 'error') consoleErrors.push(message.text())
-    })
-    page.on('pageerror', (error) => pageErrors.push(String(error)))
+    const console_ = watchConsole(page)
 
     const prompt = page.getByText(PROMPT_TEXT)
 
@@ -204,7 +182,7 @@ test.describe('service worker update prompt', () => {
       expect(await servedRelease(page)).toBe('next')
     })
 
-    expect(pageErrors).toEqual([])
-    expect(consoleErrors.filter(isUnexpected)).toEqual([])
+    expect(console_.pageErrors()).toEqual([])
+    expect(console_.unexpected()).toEqual([])
   })
 })
