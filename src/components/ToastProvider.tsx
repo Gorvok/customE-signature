@@ -54,7 +54,13 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
       {/* One live region; each toast is announced as it is added. */}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2" role="status" aria-live="polite">
+      {/* Centred, and above the mobile action bar: bottom-right sat on top of
+          the export panel, which is exactly what a copy toast talks about. */}
+      <div
+        className="fixed bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 w-[calc(100%-2rem)] max-w-md"
+        role="status"
+        aria-live="polite"
+      >
         {toasts.map((t) => (
           <div
             key={t.id}

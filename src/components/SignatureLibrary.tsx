@@ -35,6 +35,7 @@ export default function SignatureLibrary({
   const { addToast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftName, setDraftName] = useState('');
+  const [expanded, setExpanded] = useState(false);
   const confirm = confirmDelete ?? ((message: string) => window.confirm(message));
 
   const active = items.find((item) => item.id === activeId) ?? items[0];
@@ -59,6 +60,31 @@ export default function SignatureLibrary({
       ? `Clear "${item.name}"? This browser has no other saved signature, so its fields will be emptied.`
       : `Delete "${item.name}"? This cannot be undone.`;
     if (confirm(message)) onRemove(item.id);
+  }
+
+  // With one signature there is nothing to switch between, and rename,
+  // duplicate and delete are not what a first visit is for. So it stays a
+  // single line until there are two, or until asked for.
+  if (items.length === 1 && !expanded) {
+    return (
+      <section className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-2.5">
+        <h2 className="text-sm font-medium text-gray-900 dark:text-white">{active?.name}</h2>
+        <button
+          type="button"
+          onClick={() => { report(onCreate()); }}
+          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          + New signature
+        </button>
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+        >
+          Manage
+        </button>
+      </section>
+    );
   }
 
   return (

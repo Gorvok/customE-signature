@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { getTemplate } from './templates';
 import { sampleData } from './data/sampleData';
 import { useTheme } from './theme';
 import { useToast } from './toast';
-import { useSignatureState } from './hooks/useSignatureState';
+import { hasContent, useSignatureState } from './hooks/useSignatureState';
 import SignatureForm from './components/SignatureForm';
 import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
 import SignatureLibrary from './components/SignatureLibrary';
+import MobileActionBar from './components/MobileActionBar';
 import TeamPanel from './components/TeamPanel';
 import UpdatePrompt from './components/UpdatePrompt';
 
@@ -33,6 +34,10 @@ export default function App() {
   }
 
   const template = getTemplate(templateId);
+  // Until there is something of the person's own, the thumbnails show the
+  // sample: seven near-identical empty boxes say nothing about the templates.
+  const blank = !hasContent(data);
+  const exportHtml = useMemo(() => template.render(data), [template, data]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white transition-colors">
@@ -40,11 +45,11 @@ export default function App() {
       <header className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-4 sm:px-6 py-4 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
+            <span className="grid place-items-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
             </span>
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white truncate">Email Signature Generator</h1>
+              <h1 className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white truncate">Email Signature Generator</h1>
               <p className="hidden sm:block text-sm text-muted">Free &amp; open source — no login required</p>
             </div>
           </div>
@@ -52,7 +57,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleLoadSample}
-              className="hidden sm:inline-flex text-sm font-medium px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+              className="inline-flex flex-shrink-0 text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
             >
               Load sample
             </button>
@@ -88,9 +93,14 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-28 lg:pb-8 space-y-6">
         {/* Template Selector */}
-        <TemplateSelector selected={templateId} onSelect={setTemplateId} previewData={data} />
+        <TemplateSelector
+          selected={templateId}
+          onSelect={setTemplateId}
+          previewData={blank ? sampleData : data}
+          showingSample={blank}
+        />
 
         {/* Mobile edit/preview switcher */}
         <div className="lg:hidden sticky top-[68px] z-10 -mx-4 px-4 py-2 bg-gray-50/90 dark:bg-gray-950/90 backdrop-blur">
@@ -144,6 +154,7 @@ export default function App() {
           Open source email signature generator. Your details are saved in this browser only — nothing is sent to a server.
         </div>
       </footer>
+      <MobileActionBar html={exportHtml} onShowPreview={() => setMobileTab('preview')} />
       <UpdatePrompt />
     </div>
   );
