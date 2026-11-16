@@ -10,18 +10,49 @@
  *   danger  red-600  on white 4.5:1   | red-400  on gray-900 6.4:1
  * Defined as plain custom properties so the dark theme can swap them, and
  * exposed to Tailwind with @theme inline so utilities read the live value.
+ *
+ * Envoi's accent sits alongside them, as semantic roles rather than a raw brand
+ * color. The mark is ink and amber, and neither works as a single accent across
+ * both themes: ink disappears on a dark page, and amber on white is 2.17:1 —
+ * nowhere near readable. So the roles swap by theme. A primary button is ink in
+ * light mode and amber in dark; accent-colored TEXT is a darkened amber in light
+ * mode, because the brand amber itself can never carry text on white.
+ *   light  white on ink 18.8:1 | accent-text on white 5.5:1 | on surface 5.1:1
+ *   dark   ink on amber 8.7:1  | accent-text on gray-900 8.8:1 | on surface 7.4:1
+ * All of it is measured, not eyeballed, and pinned in src/brand.test.ts.
  */
 :root {
   --text-muted: #6b7280;
   --text-hint: #4b5563;
   --text-danger: #dc2626;
+  --accent: #14110E;
+  --accent-hover: #2A2420;
+  --accent-fg: #ffffff;
+  --accent-text: #935E10;
+  --accent-surface: #FDF6EA;
+  --accent-border: #E8D5B0;
+  --accent-ring: #935E10;
 }
 .dark {
   --text-muted: #9ca3af;
   --text-hint: #9ca3af;
   --text-danger: #f87171;
+  --accent: #E9A23B;
+  --accent-hover: #F1B65F;
+  --accent-fg: #14110E;
+  --accent-text: #EBAA4C;
+  --accent-surface: rgb(233 162 59 / 0.10);
+  --accent-border: rgb(233 162 59 / 0.40);
+  --accent-ring: #E9A23B;
 }
 @theme inline {
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-text: var(--accent-text);
+  --color-accent-surface: var(--accent-surface);
+  --color-accent-border: var(--accent-border);
+  --color-accent-ring: var(--accent-ring);
   --color-muted: var(--text-muted);
   --color-hint: var(--text-hint);
   --color-danger: var(--text-danger);
@@ -42,7 +73,7 @@
  */
 @layer base {
   :where(a, button, [tabindex]):focus-visible {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid var(--accent-ring);
     outline-offset: 2px;
     border-radius: 6px;
   }

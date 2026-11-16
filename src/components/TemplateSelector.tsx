@@ -91,9 +91,9 @@ export default function TemplateSelector({ selected, onSelect, previewData, show
             // button's ::after stretches over the whole card to keep it clickable.
             <div
               key={t.id}
-              className={`relative w-[62%] flex-shrink-0 snap-start sm:w-auto sm:flex-shrink rounded-xl border-2 p-3 transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500 has-[:focus-visible]:ring-offset-2 dark:has-[:focus-visible]:ring-offset-gray-950 ${
+              className={`relative w-[62%] flex-shrink-0 snap-start sm:w-auto sm:flex-shrink rounded-xl border-2 p-3 transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent-ring has-[:focus-visible]:ring-offset-2 dark:has-[:focus-visible]:ring-offset-gray-950 ${
                 active
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 shadow-sm'
+                  ? 'border-accent-ring bg-accent-surface shadow-sm'
                   : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-500'
               }`}
             >

@@ -48,7 +48,7 @@ function ExportActions({
       ? 'bg-green-600 text-white'
       : copyStatus === 'error'
         ? 'bg-red-600 text-white'
-        : 'bg-blue-600 hover:bg-blue-500 text-white';
+        : 'bg-accent hover:bg-accent-hover text-accent-fg';
   const copyLabel = copyStatus === 'success' ? 'Copied!' : copyStatus === 'error' ? 'Failed — try download' : 'Copy to Clipboard';
 
   return (
@@ -195,7 +195,7 @@ export default function ExportPanel({ data, template }: Props) {
             aria-pressed={selectedProvider === p.id}
             className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
               selectedProvider === p.id
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                ? 'border-accent-ring bg-accent-surface text-accent-text'
                 : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-gray-900'
             }`}
           >

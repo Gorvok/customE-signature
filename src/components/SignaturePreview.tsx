@@ -104,12 +104,12 @@ export default function SignaturePreview({ data, template, onLoadSample }: Props
       </div>
 
       {isEmpty && (
-        <div className="flex items-center justify-between gap-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 px-4 py-3">
-          <p className="text-sm text-blue-700 dark:text-blue-300">Fields you fill appear here instantly.</p>
+        <div className="flex items-center justify-between gap-3 rounded-lg bg-accent-surface border border-accent-border px-4 py-3">
+          <p className="text-sm text-accent-text">Fields you fill appear here instantly.</p>
           <button
             type="button"
             onClick={onLoadSample}
-            className="flex-shrink-0 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            className="flex-shrink-0 text-sm font-medium text-accent-text hover:underline"
           >
             Load sample data
           </button>

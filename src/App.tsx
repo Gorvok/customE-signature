@@ -69,7 +69,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleLoadSample}
-              className="inline-flex flex-shrink-0 text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+              className="inline-flex flex-shrink-0 text-xs sm:text-sm font-medium px-2.5 sm:px-3 py-1.5 rounded-lg bg-accent hover:bg-accent-hover text-accent-fg transition-colors"
             >
               Load sample
             </button>
@@ -113,9 +113,9 @@ export default function App() {
           <div
             role="alertdialog"
             aria-labelledby="share-prompt"
-            className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-blue-200 dark:border-blue-500/40 bg-blue-50 dark:bg-blue-500/10 px-4 py-3"
+            className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-accent-border bg-accent-surface px-4 py-3"
           >
-            <p id="share-prompt" className="flex-1 min-w-64 text-sm text-blue-900 dark:text-blue-200">
+            <p id="share-prompt" className="flex-1 min-w-64 text-sm text-accent-text">
               {REPLACE_PROMPT}
               {pendingShare.data.fullName.trim() && (
                 <span className="block text-xs opacity-80">
@@ -130,14 +130,14 @@ export default function App() {
                   acceptPending();
                   addToast('Loaded the signature from the link');
                 }}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-accent-fg transition-colors"
               >
                 Replace mine
               </button>
               <button
                 type="button"
                 onClick={dismissPending}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium text-blue-800 dark:text-blue-200 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium text-accent-text hover:bg-accent-surface transition-colors"
               >
                 Keep mine
               </button>

@@ -29,7 +29,7 @@ export default function ColorPicker({ label, value, onChange }: Props) {
         aria-label={`${label} hex value`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-24 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-sm text-gray-900 dark:text-white font-mono focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+        className="w-24 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-sm text-gray-900 dark:text-white font-mono focus:border-accent-ring focus:ring-1 focus:ring-accent-ring focus:outline-none transition-colors"
       />
     </div>
   );

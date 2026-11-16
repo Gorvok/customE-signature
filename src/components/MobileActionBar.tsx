@@ -49,7 +49,7 @@ export default function MobileActionBar({ html, onShowPreview }: Props) {
           type="button"
           onClick={() => void handleCopy()}
           className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-colors ${
-            copied ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-500'
+            copied ? 'bg-green-600' : 'bg-accent hover:bg-accent-hover'
           }`}
         >
           {copied ? 'Copied!' : 'Copy signature'}

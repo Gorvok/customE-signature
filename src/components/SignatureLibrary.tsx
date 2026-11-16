@@ -63,14 +63,14 @@ export default function SignatureLibrary({
         <button
           type="button"
           onClick={() => { report(onCreate()); }}
-          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+          className="text-sm font-medium text-accent-text hover:underline"
         >
           + New signature
         </button>
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-accent-text"
         >
           Manage
         </button>
@@ -108,7 +108,7 @@ export default function SignatureLibrary({
                     if (e.key === 'Enter') commitRename();
                     if (e.key === 'Escape') setEditingId(null);
                   }}
-                  className="flex-1 bg-white dark:bg-gray-800 border border-blue-500 rounded-lg px-2 py-1 text-sm text-gray-900 dark:text-white focus:outline-none"
+                  className="flex-1 bg-white dark:bg-gray-800 border border-accent-ring rounded-lg px-2 py-1 text-sm text-gray-900 dark:text-white focus:outline-none"
                 />
               ) : (
                 <button
@@ -117,7 +117,7 @@ export default function SignatureLibrary({
                   aria-current={isActive ? 'true' : undefined}
                   className={`flex-1 text-left rounded-lg px-2 py-1 text-sm transition-colors ${
                     isActive
-                      ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 font-medium'
+                      ? 'bg-accent-surface text-accent-text font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
@@ -128,14 +128,14 @@ export default function SignatureLibrary({
               <button
                 type="button"
                 onClick={() => startRename(item)}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-accent-text"
               >
                 Rename
               </button>
               <button
                 type="button"
                 onClick={() => { report(onDuplicate(item.id)); }}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-accent-text"
               >
                 Duplicate
               </button>
@@ -178,7 +178,7 @@ export default function SignatureLibrary({
         <button
           type="button"
           onClick={() => { report(onCreate()); }}
-          className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+          className="text-sm font-medium text-accent-text hover:underline"
         >
           + New signature
         </button>

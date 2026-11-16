@@ -3,6 +3,17 @@ import { BRAND, BRAND_NAME, MARK_VARIANTS, markGeometry } from './brand';
 // The generator's source as text: it is a plain Node script, so the only way
 // to assert it agrees with this module is to read what it says.
 import generator from '../scripts/generate-brand.mjs?raw';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { AA_CONTRAST, AA_LARGE_CONTRAST, contrastRatio, parseHexColor } from './utils/color';
+
+// Read from disk rather than with `?raw`: Vite's CSS pipeline intercepts a raw
+// import of a stylesheet and hands the test an empty string, so every assertion
+// against it would quietly pass while checking nothing.
+const css = readFileSync(resolve(__dirname, 'index.css'), 'utf8');
+
+/** Every component's source, so the suite can assert what the UI does not contain. */
+const components = import.meta.glob('./components/*.tsx', { eager: true, query: '?raw', import: 'default' });
 
 describe('the palette', () => {
   it('is three colors, all hex', () => {
@@ -97,5 +108,89 @@ describe('the name', () => {
   it('is used by the app and the generated assets alike', () => {
     expect(BRAND_NAME).toBe('Envoi');
     expect(generator).toContain('Envo\\u0131');
+  });
+});
+
+describe('the accent tokens', () => {
+  // The accent is split by theme because neither brand color works alone: ink
+  // vanishes on a dark page, and brand amber on white is 2.17:1. These pairings
+  // were computed, not chosen by eye, so they are pinned here — a "nicer"
+  // amber that drops accent text below 4.5:1 should fail the suite, not ship.
+  const token = (block: 'root' | 'dark', name: string) => {
+    const scope = block === 'root' ? ':root' : '\\.dark';
+    const body = new RegExp(`${scope} \\{([^}]*)\\}`).exec(css)?.[1] ?? '';
+    const value = new RegExp(`--${name}:\\s*([^;]+);`).exec(body)?.[1];
+    if (!value) throw new Error(`no --${name} in ${block}`);
+    return value.trim();
+  };
+
+  /** Flatten `rgb(r g b / a)` over an opaque backdrop so it can be measured. */
+  const flatten = (value: string, backdrop: string) => {
+    const parts = /rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)\)/.exec(value);
+    if (!parts) return value;
+    const alpha = Number(parts[4]);
+    const under = parseHexColor(backdrop);
+    if (!under) throw new Error(`bad backdrop ${backdrop}`);
+    const mix = (fg: number, bg: number) => Math.round(fg * alpha + bg * (1 - alpha));
+    const hex = [
+      mix(Number(parts[1]), under.r),
+      mix(Number(parts[2]), under.g),
+      mix(Number(parts[3]), under.b),
+    ]
+      .map((n) => n.toString(16).padStart(2, '0'))
+      .join('');
+    return `#${hex}`;
+  };
+
+  const atLeast = (fg: string, bg: string, min: number, label: string) => {
+    const ratio = contrastRatio(fg, bg);
+    expect(ratio, `${label} (${fg} on ${bg})`).not.toBeNull();
+    expect(ratio!, `${label} (${fg} on ${bg})`).toBeGreaterThanOrEqual(min);
+  };
+
+  const WHITE = '#ffffff';
+  const GRAY_900 = '#111827';
+
+  it('carries button text in light mode', () => {
+    atLeast(token('root', 'accent-fg'), token('root', 'accent'), AA_CONTRAST, 'light button');
+    atLeast(token('root', 'accent-fg'), token('root', 'accent-hover'), AA_CONTRAST, 'light hover');
+  });
+
+  it('carries button text in dark mode', () => {
+    atLeast(token('dark', 'accent-fg'), token('dark', 'accent'), AA_CONTRAST, 'dark button');
+    atLeast(token('dark', 'accent-fg'), token('dark', 'accent-hover'), AA_CONTRAST, 'dark hover');
+  });
+
+  it('carries accent text on the page and on its own tinted surface', () => {
+    atLeast(token('root', 'accent-text'), WHITE, AA_CONTRAST, 'light link on page');
+    atLeast(token('root', 'accent-text'), token('root', 'accent-surface'), AA_CONTRAST, 'light link on surface');
+    atLeast(token('dark', 'accent-text'), GRAY_900, AA_CONTRAST, 'dark link on page');
+    atLeast(
+      token('dark', 'accent-text'),
+      flatten(token('dark', 'accent-surface'), GRAY_900),
+      AA_CONTRAST,
+      'dark link on surface',
+    );
+  });
+
+  it('draws a focus ring that is visible against the page', () => {
+    // A ring is a non-text indicator, so 3:1 is the bar it has to clear.
+    atLeast(token('root', 'accent-ring'), WHITE, AA_LARGE_CONTRAST, 'light ring');
+    atLeast(token('dark', 'accent-ring'), GRAY_900, AA_LARGE_CONTRAST, 'dark ring');
+  });
+
+  it('is built from the brand palette rather than a fourth color', () => {
+    expect(token('root', 'accent')).toBe(BRAND.ink);
+    expect(token('dark', 'accent')).toBe(BRAND.amber);
+    expect(token('dark', 'accent-fg')).toBe(BRAND.ink);
+  });
+
+  it('is what the interface actually uses, with no blue left from the old identity', () => {
+    // The identity this replaced was four different blues in three files. The
+    // point of the swap was to end that, so the absence is worth asserting.
+    expect(css).not.toMatch(/#3b82f6/i);
+    for (const [path, source] of Object.entries(components)) {
+      expect(source, path).not.toMatch(/\bblue-\d/);
+    }
   });
 });
