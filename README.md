@@ -12,10 +12,15 @@ A free, open-source web app for creating professional email signatures. No login
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
 - **Save & share**: copy a self-restoring share link or export/import your setup as JSON
+- **Multiple saved signatures**: keep several side by side (work, personal, a second brand), switch between them, rename, duplicate and delete. They live in this browser only — there is no account — so a share link is how you move one to another device.
 - **Autosave**: your details and chosen template are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear). Opening a share link over saved work asks before replacing it.
 - **Polished UX**: one-click sample data, collapsible form sections with quick-jump nav, a realistic email-window preview (desktop/mobile width, light/dark background, raw-HTML view), color-palette presets, and toast feedback
 - **Installable PWA** with offline support and an in-app prompt when a new version has been deployed
 - **Light & dark mode** with system-preference detection, plus reduced-motion and keyboard-focus support
+- **Mail-client checks**: the signature's size and character count are shown against Gmail's limits, and an uploaded logo is flagged when the client you picked strips embedded images — the browser preview renders them perfectly, so this is otherwise invisible until a recipient tells you
+- **Logo URL help**: a Google Drive or Dropbox *share* link is converted to a direct image link in one click, `http` is upgraded to `https`, and the link is checked to confirm it really loads an image
+- **Optional link tagging**: add campaign (`utm_*`) parameters to your website, booking and call-to-action links for attribution. Off by default, and social profiles are never tagged
+- **Contact card**: download a `.vcf`, and a QR code holding the same details. The QR is generated in your browser — nothing is sent to a QR service
 - **Safe output**: all input is HTML-escaped and links are sanitized before being placed in the generated signature
 - **Fully client-side**: zero backend, zero tracking, zero data collection
 
@@ -54,10 +59,19 @@ under a new path and leave the current files in place.
 
 ## Known Limitations
 
-- **Uploaded logos** are embedded as base64 data URIs, which Gmail and Outlook
-  may strip. For maximum compatibility, paste a hosted image **URL** in the
-  logo field instead of uploading a file. Uploaded logos are also left out of
-  share links, which would otherwise be too long for most chat apps.
+- **Uploaded logos** are embedded as base64 data URIs, which Gmail, Outlook and
+  Yahoo Mail strip — so an uploaded logo shows in the preview and then does not
+  arrive. The app now says so while one is in use, and names the client when you
+  pick one, but the fix is still to paste a hosted image **URL** instead. An
+  embedded logo also eats the signature's size budget: Gmail's signature box
+  holds about 10,000 characters, and a small PNG can use half of that on its
+  own. Uploaded logos are left out of share links too, which would otherwise be
+  too long for most chat apps.
+- **A QR code in a signature needs hosting** for the same reason. The app gives
+  you the PNG; put it somewhere public and paste the link, as with a logo.
+  Drawing the code as a table of cells would avoid an image, but measures at
+  ~14 KB of markup for a short URL and ~60 KB for a whole vCard, well past
+  Gmail's allowance.
 - **The call-to-action button in Outlook for Windows** keeps its shape only
   when the downloaded HTML file is installed. Pasting into a signature editor
   drops the Outlook-specific fallback, and Outlook then shows a styled link.
@@ -67,7 +81,8 @@ under a new path and leave the current files in place.
 ## Testing
 
 ```bash
-npm test           # Vitest
+npm test           # Vitest (unit and component)
+npm run test:e2e   # Playwright, against a production build
 npm run lint       # ESLint, type-aware, with jsx-a11y
 npm run typecheck  # tsc
 ```
@@ -78,9 +93,24 @@ modes. Every template is checked structurally and against a committed
 snapshot, and must neutralize malicious input. Component tests (Testing
 Library and user-event) cover the error boundary, the sandboxed preview
 frame, keyboard reordering and the uploader, and an axe-core run over the
-whole app asserts no accessibility violations. `.github/workflows/ci.yml`
-runs lint, typecheck, tests and the build on every pull request and push to
-`master`.
+whole app asserts no accessibility violations.
+
+Rules that email clients impose are enforced rather than left in comments:
+`emailSafety.ts` checks every template's output for markup a client breaks on
+— embedded or `http` images, scripts, `<style>` blocks, `class` attributes,
+images without `width`/`alt`, layout tables without `role="presentation"`, and
+CSS Outlook drops. Outlook-only VML blocks are excluded, since they use markup
+no other client sees.
+
+The Playwright suite drives a real browser against the built app: the service
+worker update prompt through a genuine release-to-release update, the saved
+signature library, and the contact-card downloads. `npm run test:e2e` builds
+first. If your environment ships a browser that Playwright cannot download,
+point `PLAYWRIGHT_CHROMIUM_PATH` at it.
+
+`.github/workflows/ci.yml` runs lint, typecheck, tests and the build on every
+pull request and push to `master`, with the end-to-end suite as a separate job
+(pinned to `ubuntu-24.04`, which Playwright supports).
 
 ## Generated assets
 
@@ -97,9 +127,14 @@ npm run generate:icons   # public/icons/png/<style>/<platform>.png (see Social I
 
 1. Pick a template (Classic Dark, Modern Light, Minimal, and more)
 2. Fill in your details — name, title, company, contact info, social links
-3. Customize colors, font, and upload a logo
-4. Choose your email provider (Gmail, Outlook, etc.)
+3. Customize colors and font, and add a logo (paste a hosted image URL for one
+   that survives every client)
+4. Choose your email provider (Gmail, Outlook, etc.) and read the warnings, if
+   any — they cover what the preview cannot show
 5. Follow the instructions to copy/paste or install the signature
+
+Keeping more than one? Use **+ New signature** in the Saved signatures panel
+and switch between them; each keeps its own template.
 
 ## Tech Stack
 

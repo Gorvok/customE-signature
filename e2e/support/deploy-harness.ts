@@ -70,6 +70,19 @@ export async function serveDirectory(root: string): Promise<StaticSite> {
 }
 
 /**
+ * Serves the production build at the sub-path it is deployed under, for tests
+ * that only need the app running rather than two releases to update between.
+ */
+export async function serveBuild(distDir: string, workDir: string): Promise<StaticSite> {
+  if (!existsSync(join(distDir, 'index.html'))) {
+    throw new Error(`no build at ${distDir} — run \`npm run build\` before the e2e suite`);
+  }
+  const root = join(workDir, 'serve');
+  await cp(distDir, join(root, BASE_PATH), { recursive: true });
+  return serveDirectory(root);
+}
+
+/**
  * Turns a copy of the production build into the *next* release.
  *
  * A browser decides a new version exists purely by comparing `sw.js` byte for

@@ -25,6 +25,12 @@ export default defineConfig({
     launchOptions: {
       // Chromium cannot use its own sandbox inside an unprivileged container.
       args: ['--no-sandbox'],
+      // Some sandboxes ship a browser already and cannot download one. Point
+      // PLAYWRIGHT_CHROMIUM_PATH at it to use it instead of Playwright's own;
+      // unset (the normal case, CI included) Playwright resolves its own.
+      ...(process.env.PLAYWRIGHT_CHROMIUM_PATH
+        ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH }
+        : {}),
     },
   },
   projects: [
