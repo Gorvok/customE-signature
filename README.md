@@ -202,6 +202,39 @@ point `PLAYWRIGHT_CHROMIUM_PATH` at it.
 pull request and push to `master`, with the end-to-end suite as a separate job
 (pinned to `ubuntu-24.04`, which Playwright supports).
 
+## TypeScript 6, and what TypeScript 7 needs
+
+The project is on **TypeScript 6.0.x**, pinned with a tilde rather than a
+caret. That is not caution for its own sake: typescript-eslint's `typescript`
+peer is `>=4.8.4 <6.1.0`, because typed linting runs on the classic
+(JavaScript) compiler API, so 6.1 would break the type-aware rules exactly as
+7 would. Dependabot's standing TypeScript 7 pull request is blocked by that
+peer range, not by anything in this codebase — `tsc -b` alone passes on 7.
+
+TypeScript 7's native compiler **can** already drive typed linting, through
+typescript-eslint's experimental `tsgo` backend. It is installed *alongside* a
+classic build rather than replacing it:
+
+```bash
+npm install -D "@typescript/native@npm:typescript@7.1.0-beta"
+TYPESCRIPT_ESLINT_EXPERIMENTAL_BACKEND=tsgo npm run lint
+```
+
+Verified on this repository: the same clean result, with wall-clock lint
+roughly unchanged (9.3s → 8.6s) and CPU time down about a third (16.2s →
+10.0s user). Remove the alias and the run fails loudly rather than quietly
+falling back, which is how you can tell the native backend is really doing the
+work.
+
+It is left out of `devDependencies` deliberately: it is a beta compiler, it is
+a second full copy of TypeScript for every contributor and every CI run, and
+`EXPERIMENTAL_` in the option name is the authors telling you the shape may
+change. The recipe above is here so the upgrade can be re-measured in one
+command whenever that changes. Requirements, for when it does: Node 20.19 /
+22.12 or newer, classic TypeScript 6.0 (not 6.1+) still in the `typescript`
+slot, and `projectService` or `project` set in the ESLint config — all true
+here.
+
 ## Generated assets
 
 The social-share image and the PWA app icons are rendered from SVG with a
