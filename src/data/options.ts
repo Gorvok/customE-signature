@@ -1,4 +1,4 @@
-import type { IconStyle } from '../types';
+import type { BrandMark, IconStyle } from '../types';
 
 /**
  * Choices offered by the form. The config validator (`parseConfig.ts`)
@@ -41,6 +41,17 @@ export function isIconStyle(value: unknown): value is IconStyle {
   return typeof value === 'string' && (ICON_STYLES as readonly string[]).includes(value);
 }
 
+export const BRAND_MARKS = ['logo', 'monogram'] as const satisfies readonly BrandMark[];
+
+export const BRAND_MARK_OPTIONS: { value: BrandMark; label: string; hint: string }[] = [
+  { value: 'logo', label: 'Logo image', hint: 'A hosted image URL, or a file (which most clients strip)' },
+  { value: 'monogram', label: 'Monogram', hint: 'Your initials in a circle — needs no hosting, shows everywhere' },
+];
+
+export function isBrandMark(value: unknown): value is BrandMark {
+  return typeof value === 'string' && (BRAND_MARKS as readonly string[]).includes(value);
+}
+
 /**
  * Upper bounds applied to every imported, shared or stored config. The form
  * mirrors these with `maxLength` so typed and imported data obey the same
@@ -57,6 +68,8 @@ export const LIMITS = {
   logoUrl: 1_500_000,
   /** The name a person gives a saved signature. */
   signatureName: 60,
+  /** Monogram letters; more than three stops reading as a monogram. */
+  monogramText: 3,
 } as const;
 
 /**

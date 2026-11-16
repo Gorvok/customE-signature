@@ -7,14 +7,13 @@ import {
   fontStack,
   roleLine,
   nameWithPronouns,
-  renderLogo,
-  logoAlt,
   contactLinks,
   spacerCell,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const corporate = {
@@ -35,7 +34,7 @@ export const corporate = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 90, alt: logoAlt(data) });
+    const logo = renderBrandMark(data, { width: 90, monogramSize: 64, background: data.primaryColor });
     const role = roleLine(data.jobTitle, data.department);
 
     const muted = (inner: string) =>

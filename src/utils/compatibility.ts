@@ -55,20 +55,24 @@ export function compatibilityWarnings({
   const warnings: CompatibilityWarning[] = [];
 
   // An embedded logo renders perfectly in the preview and then vanishes in the
-  // clients that strip data URIs, which is most of them.
-  if (isEmbeddedImage(data.logoUrl)) {
+  // clients that strip data URIs, which is most of them. A monogram is drawn
+  // with markup, so none of this applies to it.
+  if (data.brandMark === 'logo' && isEmbeddedImage(data.logoUrl)) {
     if (provider && !provider.rendersEmbeddedImages) {
       warnings.push({
         id: 'embedded-logo',
         level: 'warning',
-        message: `${provider.name} removes embedded images, so your uploaded logo will not appear. Upload it somewhere public and paste the image URL instead.`,
+        message:
+          `${provider.name} removes embedded images, so your uploaded logo will not appear. Paste a public ` +
+          'image URL instead, or switch the brand mark to a monogram, which is drawn with markup and needs no hosting.',
       });
     } else if (!provider) {
       warnings.push({
         id: 'embedded-logo',
         level: 'caution',
         message:
-          'Your logo is embedded in the signature. Gmail, Outlook and Yahoo Mail remove embedded images — paste a public image URL instead so it shows everywhere.',
+          'Your logo is embedded in the signature. Gmail, Outlook and Yahoo Mail remove embedded images — paste a ' +
+          'public image URL instead, or switch the brand mark to a monogram, which needs no hosting.',
       });
     }
   }

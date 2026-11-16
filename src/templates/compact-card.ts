@@ -7,13 +7,12 @@ import {
   fontStack,
   nameWithPronouns,
   roleAndCompany,
-  renderLogo,
-  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const compactCard = {
@@ -36,7 +35,7 @@ export const compactCard = {
 
     // Width only, so a non-square logo keeps its aspect ratio; clients that
     // support border-radius round it, the rest show it square.
-    const logo = renderLogo(data.logoUrl, { width: 52, alt: logoAlt(data), style: `border-radius: 50%; border: 2px solid ${accent};` });
+    const logo = renderBrandMark(data, { width: 52, logoStyle: `border-radius: 50%; border: 2px solid ${accent};`, background: data.primaryColor });
     const logoCell = logo ? `<td style="vertical-align: middle; padding-right: 12px;">${logo}</td>` : '';
 
     const role = roleAndCompany(data, ' &bull; ');

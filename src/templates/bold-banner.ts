@@ -7,13 +7,12 @@ import {
   fontStack,
   roleLine,
   nameWithPronouns,
-  renderLogo,
-  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const boldBanner = {
@@ -33,7 +32,7 @@ export const boldBanner = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 50, alt: logoAlt(data), style: 'border-radius: 50%;' });
+    const logo = renderBrandMark(data, { width: 50, logoStyle: 'border-radius: 50%;', background: fgRaw, color: data.primaryColor });
     const logoCell = logo ? `<td style="padding-right: 14px; vertical-align: middle;">${logo}</td>` : '';
 
     const role = roleLine(data.jobTitle, data.department);

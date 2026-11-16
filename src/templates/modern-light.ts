@@ -7,13 +7,12 @@ import {
   fontStack,
   nameWithPronouns,
   roleAndCompany,
-  renderLogo,
-  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const modernLight = {
@@ -32,7 +31,7 @@ export const modernLight = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 70, alt: logoAlt(data), style: 'border-radius: 4px;' });
+    const logo = renderBrandMark(data, { width: 70, logoStyle: 'border-radius: 4px;', background: data.primaryColor });
     const logoCell = logo ? `<td style="padding-right: 15px; vertical-align: middle;">${logo}</td>` : '';
 
     const role = roleAndCompany(data, ' | ');

@@ -190,34 +190,36 @@ describe('renderDisclaimer', () => {
   });
 });
 
-describe('templates escape malicious input', () => {
-  const malicious: SignatureData = {
-    fullName: '<img src=x onerror=alert(1)>',
-    pronouns: '"><b>x</b>',
-    jobTitle: '"><script>alert(2)</script>',
-    department: '<i>dept</i>',
-    company: 'Acme "Corp"',
-    phone: '123',
-    email: 'a@b.com',
-    website: 'example.com',
-    address: '<script>1</script> 1 Main St',
-    bookingLink: 'javascript:alert(4)',
-    socials: { github: 'octocat' },
-    socialOrder: ['github'],
-    logoUrl: 'javascript:alert(3)',
-    ctaLabel: '<u>Click</u>',
-    ctaUrl: 'javascript:alert(5)',
-    disclaimer: 'Confidential <script>alert(6)</script>',
-    primaryColor: '#000000',
-    secondaryColor: '#FFFFFF',
-    fontFamily: 'Inter',
-    iconStyle: 'brand',
-    utmEnabled: false,
-    utmSource: 'email',
-    utmMedium: 'signature',
-    utmCampaign: '',
-  };
+const malicious: SignatureData = {
+  fullName: '<img src=x onerror=alert(1)>',
+  pronouns: '"><b>x</b>',
+  jobTitle: '"><script>alert(2)</script>',
+  department: '<i>dept</i>',
+  company: 'Acme "Corp"',
+  phone: '123',
+  email: 'a@b.com',
+  website: 'example.com',
+  address: '<script>1</script> 1 Main St',
+  bookingLink: 'javascript:alert(4)',
+  socials: { github: 'octocat' },
+  socialOrder: ['github'],
+  logoUrl: 'javascript:alert(3)',
+  brandMark: 'logo',
+  monogramText: '',
+  ctaLabel: '<u>Click</u>',
+  ctaUrl: 'javascript:alert(5)',
+  disclaimer: 'Confidential <script>alert(6)</script>',
+  primaryColor: '#000000',
+  secondaryColor: '#FFFFFF',
+  fontFamily: 'Inter',
+  iconStyle: 'brand',
+  utmEnabled: false,
+  utmSource: 'email',
+  utmMedium: 'signature',
+  utmCampaign: '',
+};
 
+describe('templates escape malicious input', () => {
   for (const template of templates) {
     it(`${template.id} does not emit unescaped tags or javascript: URLs`, () => {
       const html = template.render(malicious);
@@ -231,6 +233,17 @@ describe('templates escape malicious input', () => {
       expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
       expect(html).toContain('&lt;script&gt;alert(2)&lt;/script&gt;');
       expect(html).toContain('Confidential &lt;script&gt;alert(6)&lt;/script&gt;');
+    });
+  }
+});
+
+describe('templates escape a malicious monogram', () => {
+  for (const template of templates) {
+    it(`${template.id} neutralizes the monogram letters`, () => {
+      const html = template.render({ ...malicious, brandMark: 'monogram', monogramText: '"><' });
+      expect(html).not.toContain('<script');
+      expect(html).toContain('&quot;&gt;&lt;');
+      expect(html).not.toContain('src="javascript:');
     });
   }
 });

@@ -7,13 +7,12 @@ import {
   fontStack,
   nameWithPronouns,
   roleAndCompany,
-  renderLogo,
-  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const minimal = {
@@ -31,7 +30,7 @@ export const minimal = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 80, alt: logoAlt(data) });
+    const logo = renderBrandMark(data, { width: 80, monogramSize: 64, background: data.primaryColor });
     const role = roleAndCompany(data, ', ');
     const contact = contactLinks(data, { color: '#666666', accent: data.primaryColor });
     const cta = renderCtaButton(data.ctaLabel, withUtm(data.ctaUrl, data), { bg: data.primaryColor, fg: '#FFFFFF', font: data.fontFamily });

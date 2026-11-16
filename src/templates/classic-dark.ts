@@ -5,13 +5,12 @@ import {
   fontStack,
   roleLine,
   nameWithPronouns,
-  renderLogo,
-  logoAlt,
   contactLinks,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 export const classicDark = {
@@ -31,7 +30,7 @@ export const classicDark = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 100, alt: logoAlt(data) });
+    const logo = renderBrandMark(data, { width: 100, monogramSize: 64, background: secondaryRaw, color: data.primaryColor });
     const role = roleLine(data.jobTitle, data.department);
 
     const rows = contactLinks(data, { color: secondaryRaw, style: 'font-size: 12px;' }).map(

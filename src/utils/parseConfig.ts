@@ -1,9 +1,9 @@
-import type { IconStyle, SavedSignature, SignatureData } from '../types';
+import type { BrandMark, IconStyle, SavedSignature, SignatureData } from '../types';
 import type { SharedConfig } from './shareConfig';
 import { defaultData } from '../data/defaults';
 import { socialPlatforms } from '../data/socialPlatforms';
 import { DEFAULT_TEMPLATE, templates } from '../templates';
-import { LIMITS, MAX_SIGNATURES, isFont, isIconStyle } from '../data/options';
+import { LIMITS, MAX_SIGNATURES, isBrandMark, isFont, isIconStyle } from '../data/options';
 
 /**
  * The single entry point for untrusted signature data: share links, imported
@@ -36,6 +36,10 @@ function font(value: unknown, fallback: string): string {
 
 function iconStyle(value: unknown, fallback: IconStyle): IconStyle {
   return isIconStyle(value) ? value : fallback;
+}
+
+function brandMark(value: unknown, fallback: BrandMark): BrandMark {
+  return isBrandMark(value) ? value : fallback;
 }
 
 function logoUrl(value: unknown): string {
@@ -88,6 +92,8 @@ export function parseSignatureData(input: unknown, defaults: SignatureData = def
     socials: socials(src.socials),
     socialOrder: socialOrder(src.socialOrder, defaults.socialOrder),
     logoUrl: logoUrl(src.logoUrl),
+    brandMark: brandMark(src.brandMark, defaults.brandMark),
+    monogramText: text(src.monogramText, LIMITS.monogramText, defaults.monogramText),
     ctaLabel: text(src.ctaLabel, LIMITS.text, defaults.ctaLabel),
     ctaUrl: text(src.ctaUrl, LIMITS.url, defaults.ctaUrl),
     disclaimer: text(src.disclaimer, LIMITS.disclaimer, defaults.disclaimer),

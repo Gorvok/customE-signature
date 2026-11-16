@@ -79,6 +79,14 @@ for (const template of templates) {
       expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
     });
 
+    it('renders the monogram in place of the logo when that is the chosen mark', () => {
+      const html = template.render({ ...data, brandMark: 'monogram' });
+      expect(html).not.toContain('logo.png');
+      expect(html).toContain('>AR<');
+      const issues = findDarkModeIssues(html);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
+    });
+
     it('survives dark mode with the default colors too', () => {
       // The sample data picks a deliberate palette; the defaults are black on
       // white, which is what a first-time visitor's signature uses.

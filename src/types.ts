@@ -1,5 +1,12 @@
 export type IconStyle = 'brand' | 'dark' | 'light' | 'gray';
 
+/**
+ * Which brand mark the signature shows. 'monogram' draws the person's
+ * initials with markup, which needs no hosting — unlike an uploaded logo,
+ * which most clients strip. See utils/monogram.ts.
+ */
+export type BrandMark = 'logo' | 'monogram';
+
 export interface SignatureData {
   fullName: string;
   pronouns: string;
@@ -14,6 +21,9 @@ export interface SignatureData {
   socials: Record<string, string>;
   socialOrder: string[];
   logoUrl: string;
+  brandMark: BrandMark;
+  /** Letters for the monogram; derived from the name or company when blank. */
+  monogramText: string;
   ctaLabel: string;
   ctaUrl: string;
   disclaimer: string;

@@ -16,6 +16,8 @@ const data: SignatureData = {
   socials: { github: 'jane' },
   socialOrder: ['github', 'linkedin'],
   logoUrl: '',
+  brandMark: 'logo',
+  monogramText: '',
   ctaLabel: 'Book',
   ctaUrl: 'acme.com/book',
   disclaimer: 'Confidential',

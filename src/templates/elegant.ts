@@ -7,14 +7,13 @@ import {
   fontStack,
   nameWithPronouns,
   roleAndCompany,
-  renderLogo,
-  logoAlt,
   contactLinks,
   spacerCell,
   renderCtaButton,
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { renderBrandMark } from '../utils/monogram';
 import { withUtm } from '../utils/utm';
 
 /** The name is always set in a serif regardless of the chosen body font. */
@@ -38,7 +37,7 @@ export const elegant = {
       order: data.socialOrder,
     });
 
-    const logo = renderLogo(data.logoUrl, { width: 60, alt: logoAlt(data) });
+    const logo = renderBrandMark(data, { width: 60, background: data.primaryColor });
     const role = roleAndCompany(data, '  &mdash;  ');
 
     const contact = contactLinks(data, { color: mutedColor, accent: data.primaryColor });

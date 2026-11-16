@@ -8,6 +8,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Live preview** that updates as you type
 - **Rich fields**: name, pronouns, job title, department, company, phone, email, website, office address, booking link, a call-to-action button, and a legal disclaimer
 - **Full customization**: colors, fonts, logo upload, social links (drag to reorder), and four social-icon styles
+- **Monogram brand mark**: your initials in a circle, drawn with markup instead of an image — under a kilobyte, needs no hosting, and arrives intact in every client (Outlook gets a VML oval, since its engine ignores `border-radius`). Pick it instead of a logo when you have nowhere to host one
 - **Inline validation** for email and URL fields, with a bulletproof (Outlook-safe) CTA button
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
@@ -63,7 +64,9 @@ under a new path and leave the current files in place.
 - **Uploaded logos** are embedded as base64 data URIs, which Gmail, Outlook and
   Yahoo Mail strip — so an uploaded logo shows in the preview and then does not
   arrive. The app now says so while one is in use, and names the client when you
-  pick one, but the fix is still to paste a hosted image **URL** instead. An
+  pick one. The fixes are to paste a hosted image **URL**, or to switch the
+  brand mark to a **monogram**, which is drawn with markup and needs no host at
+  all. An
   embedded logo also eats the signature's size budget: Gmail's signature box
   holds about 10,000 characters, and a small PNG can use half of that on its
   own. Uploaded logos are left out of share links too, which would otherwise be
@@ -146,8 +149,8 @@ npm run generate:icons   # public/icons/png/<style>/<platform>.png (see Social I
 
 1. Pick a template (Classic Dark, Modern Light, Minimal, and more)
 2. Fill in your details — name, title, company, contact info, social links
-3. Customize colors and font, and add a logo (paste a hosted image URL for one
-   that survives every client)
+3. Customize colors and font, and add a brand mark — a hosted image URL for a
+   logo that survives every client, or a monogram, which needs no hosting
 4. Choose your email provider (Gmail, Outlook, etc.) and read the warnings, if
    any — they cover what the preview cannot show
 5. Follow the instructions to copy/paste or install the signature
