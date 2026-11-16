@@ -7,10 +7,10 @@
 /** Holds the whole library: `{ activeId, items: [{ id, name, data, templateId }] }`. */
 export const LIBRARY_STORAGE_KEY = 'signatures-v1';
 
-/** Pre-1.2 key holding a single `{ data, templateId }`; read once for migration, then removed. */
+/** Earlier key holding a single `{ data, templateId }`; read once for migration, then removed. */
 export const SIGNATURE_STORAGE_KEY = 'signature-v2';
 
-/** Pre-1.1 key that held the form data alone; read once for migration, then removed. */
+/** The first key, holding the form data alone; read once for migration, then removed. */
 export const LEGACY_SIGNATURE_STORAGE_KEY = 'signature-data';
 
 export const THEME_STORAGE_KEY = 'theme';
