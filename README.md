@@ -10,7 +10,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Full customization**: colors, fonts, logo upload, 16 social platforms (drag to reorder), and four social-icon styles
 - **Right-to-left layouts**: switch the text direction and the whole layout mirrors — columns reverse, spacing and borders move to the other side — for Arabic, Hebrew, Persian and Urdu
 - **Contrast check while you pick**: the two brand colors are measured against each other as you choose them, against WCAG AA
-- **Monogram brand mark**: your initials in a circle, drawn with markup instead of an image — under a kilobyte, needs no hosting, and arrives intact in every client (Outlook gets a VML oval, since its engine ignores `border-radius`). Pick it instead of a logo when you have nowhere to host one
+- **Monogram brand mark**: your initials in a circle, drawn with markup instead of an image — under a kilobyte, needs no hosting, and arrives intact in every client (Outlook gets a VML oval, since its engine ignores `border-radius`). Pick it instead of a logo when you have nowhere to host one, and download it as a PNG for editors that only take an image
 - **Inline validation** for email and URL fields, with a bulletproof (Outlook-safe) CTA button
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
@@ -26,6 +26,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Mail-client checks**: the signature's size and character count are shown against Gmail's limits, and an uploaded logo is flagged when the client you picked strips embedded images — the browser preview renders them perfectly, so this is otherwise invisible until a recipient tells you
 - **Logo URL help**: a Google Drive or Dropbox *share* link is converted to a direct image link in one click, `http` is upgraded to `https`, and the link is checked to confirm it really loads an image
 - **Optional link tagging**: add campaign (`utm_*`) parameters to your website, booking and call-to-action links for attribution. Off by default, and social profiles are never tagged
+- **See it as a received message**: download a `.eml` and open it — your mail client renders the signature with its own engine, which is the closest thing to a test send a page with no server can offer
 - **Contact card**: download a `.vcf`, and a QR code holding the same details. The QR is generated in your browser — nothing is sent to a QR service
 - **Safe output**: all input is HTML-escaped and links are sanitized before being placed in the generated signature
 - **Fully client-side**: zero backend, zero tracking, zero data collection
@@ -147,8 +148,9 @@ server here to hand it to.
 - **The call-to-action button in Outlook for Windows** keeps its shape only
   when the downloaded HTML file is installed. Pasting into a signature editor
   drops the Outlook-specific fallback, and Outlook then shows a styled link.
-- Email clients are inconsistent by nature; always send yourself a test email
-  before relying on a new signature.
+- Email clients are inconsistent by nature. The `.eml` download is the nearest
+  thing to a test send this app can manage — your client renders it with its
+  own engine — but it shows your *own* client, not your recipients'.
 
 ## Testing
 

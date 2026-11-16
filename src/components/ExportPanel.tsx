@@ -3,6 +3,7 @@ import type { SignatureData, SignatureTemplate } from '../types';
 import { providers } from '../data/providers';
 import { copyHtmlToClipboard, downloadBlob, downloadHtmlFile, type CopyResult } from '../utils/exportHelpers';
 import { buildVCard, vcardFilename } from '../utils/vcard';
+import { buildEml, emlFilename } from '../utils/eml';
 import { qrPngBlob } from '../utils/qrCode';
 import {
   compatibilityWarnings,
@@ -173,6 +174,11 @@ export default function ExportPanel({ data, template }: Props) {
     addToast('Downloaded signature HTML');
   }
 
+  function handleEml() {
+    downloadBlob(new Blob([buildEml(data, html)], { type: 'message/rfc822' }), emlFilename(data));
+    addToast('Downloaded — open it to see the signature as a received message');
+  }
+
   return (
     <div className="space-y-4">
       <h2 className="text-base font-semibold text-gray-900 dark:text-white">Export</h2>
@@ -219,6 +225,24 @@ export default function ExportPanel({ data, template }: Props) {
           <ExportActions showCopy showDownload copyStatus={copyStatus} onCopy={() => void handleCopy()} onDownload={handleDownload} />
         </div>
       )}
+
+      {/* The nearest thing to a test send that a page without a server can
+          offer: the file opens as a received message in the real client. */}
+      <div className="space-y-2 border-t border-gray-200 dark:border-gray-800 pt-4">
+        <h3 className="font-medium text-gray-900 dark:text-white">See it as a received message</h3>
+        <button
+          type="button"
+          onClick={handleEml}
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors"
+        >
+          Download .eml
+        </button>
+        <p className="text-xs text-hint">
+          Open the file and your mail client renders the signature with its own engine, the way a
+          recipient will see it — which the preview above, being a browser, cannot do. Nothing is
+          sent: the message is written here and never leaves your computer.
+        </p>
+      </div>
 
       <ContactCard data={data} />
     </div>

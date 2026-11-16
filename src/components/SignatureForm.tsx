@@ -5,6 +5,9 @@ import { socialPlatforms } from '../data/socialPlatforms';
 import { palettes } from '../data/palettes';
 import { BRAND_MARK_OPTIONS, FONTS, ICON_STYLE_OPTIONS, LIMITS, TEXT_DIRECTION_OPTIONS } from '../data/options';
 import { monogramLetters } from '../utils/monogram';
+import { monogramFilename, monogramPngBlob } from '../utils/monogramImage';
+import { downloadBlob } from '../utils/exportHelpers';
+import { useToast } from '../toast';
 import { getSocialIconSvg } from '../utils/socialIcons';
 import { isValidEmail, isLikelyUrl } from '../utils/validators';
 import ImageUploader from './ImageUploader';
@@ -70,6 +73,7 @@ function InputField({ label, value, onChange, placeholder, type = 'text', error,
 }
 
 export default function SignatureForm({ data, onChange }: Props) {
+  const { addToast } = useToast();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   // After a keyboard move, focus follows the moved row: the same arrow button
   // if it is still enabled, otherwise its sibling (at the top or bottom the
@@ -103,6 +107,17 @@ export default function SignatureForm({ data, onChange }: Props) {
     requestAnimationFrame(() => {
       document.getElementById(`sec-${id}`)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     });
+  }
+
+  async function handleMonogramPng() {
+    try {
+      const letters = monogramLetters(data);
+      const blob = await monogramPngBlob(letters, { background: data.primaryColor, font: data.fontFamily });
+      downloadBlob(blob, monogramFilename(letters));
+      addToast('Downloaded the monogram as a PNG');
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Could not draw the monogram.', 'error');
+    }
   }
 
   function update(partial: Partial<SignatureData>) {
@@ -326,6 +341,20 @@ export default function SignatureForm({ data, onChange }: Props) {
                   ? `Shows as ${monogramLetters(data)} in a circle of your primary color. Leave blank to use your initials.`
                   : 'Add your name above, or type the letters here.'}
               </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => void handleMonogramPng()}
+                  disabled={!monogramLetters(data)}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-40 text-gray-900 dark:text-white transition-colors"
+                >
+                  Download as PNG
+                </button>
+                <span className="text-xs text-hint">
+                  For editors that only take an image. The signature itself needs no file.
+                </span>
+              </div>
+
             </div>
           )}
           <div>
