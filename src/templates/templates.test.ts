@@ -87,6 +87,21 @@ for (const template of templates) {
       expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
     });
 
+    it('mirrors cleanly for right-to-left text', () => {
+      const ltr = template.render(data);
+      const rtl = template.render({ ...data, textDirection: 'rtl' });
+      const count = (html: string, needle: RegExp) => html.match(needle)?.length ?? 0;
+      expect(rtl).toContain('dir="rtl"');
+      // Each sided declaration moved to the other side: the counts trade places.
+      expect(count(rtl, /padding-left/g)).toBe(count(ltr, /padding-right/g));
+      expect(count(rtl, /padding-right/g)).toBe(count(ltr, /padding-left/g));
+      expect(count(rtl, /border-left/g)).toBe(count(ltr, /border-right/g));
+      expect(rtl).not.toMatch(/text-align: left/);
+      // And mirroring must not break the other guarantees.
+      const issues = findDarkModeIssues(rtl);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
+    });
+
     it('survives dark mode with the default colors too', () => {
       // The sample data picks a deliberate palette; the defaults are black on
       // white, which is what a first-time visitor's signature uses.

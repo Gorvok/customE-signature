@@ -24,6 +24,8 @@ import {
 } from './templateHelpers';
 import { findDarkModeIssues } from './darkMode';
 import { AA_CONTRAST, contrastRatio } from './color';
+import { getSocialIconSvg } from './socialIcons';
+import { socialPlatforms } from '../data/socialPlatforms';
 import { templates } from '../templates';
 import { parseSignatureData } from './parseConfig';
 import { sampleData } from '../data/sampleData';
@@ -213,11 +215,88 @@ const malicious: SignatureData = {
   secondaryColor: '#FFFFFF',
   fontFamily: 'Inter',
   iconStyle: 'brand',
+  textDirection: 'ltr',
   utmEnabled: false,
   utmSource: 'email',
   utmMedium: 'signature',
   utmCampaign: '',
 };
+
+describe('the platforms added later build the right URLs', () => {
+  it('prefixes a handle for the platforms that have one host', () => {
+    expect(buildSocialUrl('threads', 'alexrivera')).toBe('https://www.threads.com/@alexrivera');
+    expect(buildSocialUrl('threads', '@alexrivera')).toBe('https://www.threads.com/@alexrivera');
+    expect(buildSocialUrl('bluesky', 'alex.bsky.social')).toBe('https://bsky.app/profile/alex.bsky.social');
+    expect(buildSocialUrl('telegram', 'alexrivera')).toBe('https://t.me/alexrivera');
+    expect(buildSocialUrl('medium', 'alexrivera')).toBe('https://medium.com/@alexrivera');
+    expect(buildSocialUrl('whatsapp', '15551234567')).toBe('https://wa.me/15551234567');
+  });
+
+  it('takes a pasted profile URL as it is, rather than prefixing it twice', () => {
+    expect(buildSocialUrl('bluesky', 'https://bsky.app/profile/alex.bsky.social')).toBe('https://bsky.app/profile/alex.bsky.social');
+    expect(buildSocialUrl('telegram', 't.me/alexrivera')).toBe('https://t.me/alexrivera');
+  });
+
+  it('normalizes the whole URL for the platforms that live on per-user hosts', () => {
+    // Mastodon, Discord and Substack have no single host to prefix.
+    expect(buildSocialUrl('mastodon', 'mastodon.social/@alex')).toBe('https://mastodon.social/@alex');
+    expect(buildSocialUrl('substack', 'alex.substack.com')).toBe('https://alex.substack.com');
+    expect(buildSocialUrl('discord', 'https://discord.gg/abc123')).toBe('https://discord.gg/abc123');
+  });
+
+  it('gives every platform an icon and a hosted PNG path', () => {
+    for (const platform of socialPlatforms) {
+      expect(getSocialIconSvg(platform.id, '#000000'), platform.id).toContain('<svg');
+      const html = renderSocialLinks({ [platform.id]: 'someone' }, { style: 'brand' });
+      expect(html, platform.id).toContain(`${PRODUCTION_ICON_BASE}/brand/${platform.id}.png`);
+    }
+  });
+});
+
+describe('finalizeHtml mirrors a right-to-left layout', () => {
+  it('leaves a left-to-right signature exactly as it was', () => {
+    const html = '<table><tr><td style="padding-right: 15px; text-align: left;">x</td></tr></table>';
+    expect(finalizeHtml(html)).toBe('<table role="presentation"><tr><td style="padding-right: 15px; text-align: left;">x</td></tr></table>');
+  });
+
+  it('marks every table rtl, so each row of cells reverses', () => {
+    const html = finalizeHtml('<table><tr><td><table><tr><td>x</td></tr></table></td></tr></table>', 'rtl');
+    expect(html.match(/dir="rtl"/g)).toHaveLength(2);
+  });
+
+  it('swaps the sided properties, so spacing lands on the mirrored side', () => {
+    const html = finalizeHtml('<td style="padding-right: 15px; border-left: 1px solid #000; margin-left: 4px;">x</td>', 'rtl');
+    expect(html).toContain('padding-left: 15px');
+    expect(html).toContain('border-right: 1px solid #000');
+    expect(html).toContain('margin-right: 4px');
+  });
+
+  it('swaps both sides at once rather than collapsing them onto one', () => {
+    const html = finalizeHtml('<td style="padding-left: 4px; padding-right: 15px;">x</td>', 'rtl');
+    expect(html).toContain('padding-right: 4px');
+    expect(html).toContain('padding-left: 15px');
+  });
+
+  it('swaps alignment, in CSS and in the attribute Outlook reads', () => {
+    const html = finalizeHtml('<td align="left" style="text-align: left;">x</td>', 'rtl');
+    expect(html).toContain('align="right"');
+    expect(html).toContain('text-align: right');
+  });
+
+  it('leaves centered alignment and symmetric properties alone', () => {
+    const html = finalizeHtml('<td align="center" style="text-align: center; padding: 10px; border-radius: 6px 6px 0 0;">x</td>', 'rtl');
+    expect(html).toContain('align="center"');
+    expect(html).toContain('text-align: center');
+    expect(html).toContain('padding: 10px');
+    expect(html).toContain('border-radius: 6px 6px 0 0');
+  });
+
+  it('does not add a second dir to a table that already carries one', () => {
+    const html = finalizeHtml('<table dir="ltr"><tr><td>x</td></tr></table>', 'rtl');
+    expect(html.match(/dir=/g)).toHaveLength(1);
+    expect(html).toContain('dir="ltr"');
+  });
+});
 
 describe('templates escape malicious input', () => {
   for (const template of templates) {

@@ -25,6 +25,13 @@ describe('generated signatures are email-safe', () => {
     });
   }
 
+  for (const template of templates) {
+    it(`${template.id} emits email-safe markup mirrored for right-to-left text`, () => {
+      const issues = findEmailSafetyIssues(template.render({ ...hostedLogo, textDirection: 'rtl' }));
+      expect(issues, `\n${formatIssues(issues)}\n`).toEqual([]);
+    });
+  }
+
   it('covers every template, so a new one cannot slip past unchecked', () => {
     expect(templates.length).toBeGreaterThanOrEqual(7);
   });

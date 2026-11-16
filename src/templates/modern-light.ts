@@ -67,6 +67,6 @@ export const modernLight = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
   },
 } satisfies SignatureTemplate;

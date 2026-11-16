@@ -1,4 +1,4 @@
-import type { BrandMark, IconStyle } from '../types';
+import type { BrandMark, IconStyle, TextDirection } from '../types';
 
 /**
  * Choices offered by the form. The config validator (`parseConfig.ts`)
@@ -50,6 +50,17 @@ export const BRAND_MARK_OPTIONS: { value: BrandMark; label: string; hint: string
 
 export function isBrandMark(value: unknown): value is BrandMark {
   return typeof value === 'string' && (BRAND_MARKS as readonly string[]).includes(value);
+}
+
+export const TEXT_DIRECTIONS = ['ltr', 'rtl'] as const satisfies readonly TextDirection[];
+
+export const TEXT_DIRECTION_OPTIONS: { value: TextDirection; label: string }[] = [
+  { value: 'ltr', label: 'Left to right' },
+  { value: 'rtl', label: 'Right to left (Arabic, Hebrew)' },
+];
+
+export function isTextDirection(value: unknown): value is TextDirection {
+  return typeof value === 'string' && (TEXT_DIRECTIONS as readonly string[]).includes(value);
 }
 
 /**

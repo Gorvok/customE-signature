@@ -48,6 +48,6 @@ export const minimal = {
   ${cta ? `<tr><td style="padding-top: 8px;">${cta}</td></tr>` : ''}
   ${socialLinks ? `<tr><td style="padding-top: 6px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${socialLinks}</tr></table></td></tr>` : ''}
 </table>
-${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
   },
 } satisfies SignatureTemplate;

@@ -24,6 +24,14 @@ const brandColors = {
   github: '#181717',
   youtube: '#FF0000',
   tiktok: '#000000',
+  threads: '#000000',
+  bluesky: '#0285FF',
+  mastodon: '#6364FF',
+  discord: '#5865F2',
+  substack: '#FF6719',
+  medium: '#000000',
+  telegram: '#26A5E4',
+  whatsapp: '#25D366',
 };
 
 const styleColors = {

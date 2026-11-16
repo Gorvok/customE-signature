@@ -3,12 +3,13 @@ import type { ReactNode } from 'react';
 import type { IconStyle, SignatureData, SocialPlatform } from '../types';
 import { socialPlatforms } from '../data/socialPlatforms';
 import { palettes } from '../data/palettes';
-import { BRAND_MARK_OPTIONS, FONTS, ICON_STYLE_OPTIONS, LIMITS } from '../data/options';
+import { BRAND_MARK_OPTIONS, FONTS, ICON_STYLE_OPTIONS, LIMITS, TEXT_DIRECTION_OPTIONS } from '../data/options';
 import { monogramLetters } from '../utils/monogram';
 import { getSocialIconSvg } from '../utils/socialIcons';
 import { isValidEmail, isLikelyUrl } from '../utils/validators';
 import ImageUploader from './ImageUploader';
 import ColorPicker from './ColorPicker';
+import ContrastNote from './ContrastNote';
 import CollapsibleSection from './CollapsibleSection';
 
 interface Props {
@@ -349,6 +350,7 @@ export default function SignatureForm({ data, onChange }: Props) {
           </div>
           <ColorPicker label="Primary Color" value={data.primaryColor} onChange={(v) => update({ primaryColor: v })} />
           <ColorPicker label="Secondary Color" value={data.secondaryColor} onChange={(v) => update({ secondaryColor: v })} />
+          <ContrastNote primary={data.primaryColor} secondary={data.secondaryColor} />
           <div>
             <label htmlFor="font-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Font</label>
             <select
@@ -375,6 +377,20 @@ export default function SignatureForm({ data, onChange }: Props) {
               ))}
             </select>
             <p className="mt-1 text-xs text-hint">Icons are hosted as images so they display in Gmail &amp; Outlook.</p>
+          </div>
+          <div>
+            <label htmlFor="direction-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Text Direction</label>
+            <select
+              id="direction-select"
+              value={data.textDirection}
+              onChange={(e) => update({ textDirection: e.target.value === 'rtl' ? 'rtl' : 'ltr' })}
+              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+            >
+              {TEXT_DIRECTION_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-hint">Mirrors the whole layout, not just the text.</p>
           </div>
         </div>
       </CollapsibleSection>

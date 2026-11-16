@@ -7,7 +7,9 @@ A free, open-source web app for creating professional email signatures. No login
 - **7 signature templates**: Classic Dark, Modern Light, Minimal, Bold Banner, Corporate, Elegant, Compact Card
 - **Live preview** that updates as you type
 - **Rich fields**: name, pronouns, job title, department, company, phone, email, website, office address, booking link, a call-to-action button, and a legal disclaimer
-- **Full customization**: colors, fonts, logo upload, social links (drag to reorder), and four social-icon styles
+- **Full customization**: colors, fonts, logo upload, 16 social platforms (drag to reorder), and four social-icon styles
+- **Right-to-left layouts**: switch the text direction and the whole layout mirrors — columns reverse, spacing and borders move to the other side — for Arabic, Hebrew, Persian and Urdu
+- **Contrast check while you pick**: the two brand colors are measured against each other as you choose them, against WCAG AA
 - **Monogram brand mark**: your initials in a circle, drawn with markup instead of an image — under a kilobyte, needs no hosting, and arrives intact in every client (Outlook gets a VML oval, since its engine ignores `border-radius`). Pick it instead of a logo when you have nowhere to host one
 - **Inline validation** for email and URL fields, with a bulletproof (Outlook-safe) CTA button
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
@@ -36,6 +38,11 @@ npm run dev
 Then open [http://localhost:5173/customE-signature/](http://localhost:5173/customE-signature/) in your browser. The app is served under the same base path as on GitHub Pages.
 
 ## Social Icons
+
+Sixteen platforms are supported: Website, Instagram, LinkedIn, Facebook,
+Twitter/X, GitHub, YouTube, TikTok, Threads, Bluesky, Mastodon, Discord,
+Substack, Medium, Telegram and WhatsApp. The ones that live on per-user hosts
+(Mastodon, Discord, Substack) take a full URL; the rest take a handle.
 
 Social icons in the generated signature are **hosted PNGs** (served from the
 deployed site), because Gmail and Outlook strip inline/data-URI SVGs. Four
@@ -84,6 +91,10 @@ under a new path and leave the current files in place.
   Mail and Outlook from force-inverting an installed signature, but those
   metas need a real document and do nothing for markup pasted into a
   signature editor.
+- **Right-to-left layouts mirror, but one label stays English.** "Book a
+  meeting" on the booking link is generated text rather than something you
+  type, so it is not translated. Everything you enter yourself appears exactly
+  as you write it.
 - **The call-to-action button in Outlook for Windows** keeps its shape only
   when the downloaded HTML file is installed. Pasting into a signature editor
   drops the Outlook-specific fallback, and Outlook then shows a styled link.

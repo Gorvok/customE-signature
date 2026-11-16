@@ -1,9 +1,9 @@
-import type { BrandMark, IconStyle, SavedSignature, SignatureData } from '../types';
+import type { BrandMark, IconStyle, SavedSignature, SignatureData, TextDirection } from '../types';
 import type { SharedConfig } from './shareConfig';
 import { defaultData } from '../data/defaults';
 import { socialPlatforms } from '../data/socialPlatforms';
 import { DEFAULT_TEMPLATE, templates } from '../templates';
-import { LIMITS, MAX_SIGNATURES, isBrandMark, isFont, isIconStyle } from '../data/options';
+import { LIMITS, MAX_SIGNATURES, isBrandMark, isFont, isIconStyle, isTextDirection } from '../data/options';
 
 /**
  * The single entry point for untrusted signature data: share links, imported
@@ -36,6 +36,10 @@ function font(value: unknown, fallback: string): string {
 
 function iconStyle(value: unknown, fallback: IconStyle): IconStyle {
   return isIconStyle(value) ? value : fallback;
+}
+
+function textDirection(value: unknown, fallback: TextDirection): TextDirection {
+  return isTextDirection(value) ? value : fallback;
 }
 
 function brandMark(value: unknown, fallback: BrandMark): BrandMark {
@@ -101,6 +105,7 @@ export function parseSignatureData(input: unknown, defaults: SignatureData = def
     secondaryColor: color(src.secondaryColor, defaults.secondaryColor),
     fontFamily: font(src.fontFamily, defaults.fontFamily),
     iconStyle: iconStyle(src.iconStyle, defaults.iconStyle),
+    textDirection: textDirection(src.textDirection, defaults.textDirection),
     utmEnabled: typeof src.utmEnabled === 'boolean' ? src.utmEnabled : defaults.utmEnabled,
     utmSource: text(src.utmSource, LIMITS.text, defaults.utmSource),
     utmMedium: text(src.utmMedium, LIMITS.text, defaults.utmMedium),

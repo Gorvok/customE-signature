@@ -77,6 +77,6 @@ export const classicDark = {
       ${disclaimer}
     </td>
   </tr>
-</table>`);
+</table>`, data.textDirection);
   },
 } satisfies SignatureTemplate;

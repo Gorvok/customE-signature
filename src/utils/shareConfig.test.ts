@@ -25,6 +25,7 @@ const data: SignatureData = {
   secondaryColor: '#FFFFFF',
   fontFamily: 'Inter',
   iconStyle: 'brand',
+  textDirection: 'ltr',
   utmEnabled: false,
   utmSource: 'email',
   utmMedium: 'signature',

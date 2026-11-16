@@ -1,6 +1,6 @@
 import { socialPlatforms } from '../data/socialPlatforms';
 import { FONT_STACKS, isIconStyle } from '../data/options';
-import type { IconStyle, SignatureData } from '../types';
+import type { IconStyle, SignatureData, TextDirection } from '../types';
 import { withUtm } from './utm';
 
 /**
@@ -268,11 +268,43 @@ export function spacerCell({ width, height, background, style = '' }: SpacerOpti
 }
 
 /**
- * Harden generated markup for email clients: give every `<table>` a
- * presentation role so screen readers and Outlook treat it as layout, not data.
+ * Properties whose left/right halves have to swap when the layout mirrors.
+ * `border-radius` is left alone: the templates only use symmetric corners,
+ * and its shorthand orders corners rather than sides.
  */
-export function finalizeHtml(html: string): string {
-  return html.replace(/<table(?![^>]*\brole=)/g, '<table role="presentation"');
+const SIDED_PROPERTY = /\b(padding|margin|border)-(left|right)\b/g;
+const TEXT_ALIGN = /\btext-align\s*:\s*(left|right)\b/g;
+const ALIGN_ATTRIBUTE = /\balign\s*=\s*"(left|right)"/g;
+
+const flip = (side: string) => (side === 'left' ? 'right' : 'left');
+
+/**
+ * Mirror a layout for right-to-left text.
+ *
+ * Direction does most of the work itself: `dir="rtl"` on a table reverses the
+ * visual order of its cells, which is the column mirror. What it does not do
+ * is move the spacing, so a `padding-right` that separated two columns ends up
+ * on the wrong side — hence the swap here. Doing it centrally means all seven
+ * templates mirror without each one carrying a second set of styles.
+ */
+function mirrorSides(html: string): string {
+  return html
+    .replace(SIDED_PROPERTY, (_, property: string, side: string) => `${property}-${flip(side)}`)
+    .replace(TEXT_ALIGN, (_, side: string) => `text-align: ${flip(side)}`)
+    .replace(ALIGN_ATTRIBUTE, (_, side: string) => `align="${flip(side)}"`);
+}
+
+/**
+ * Harden generated markup for email clients: give every `<table>` a
+ * presentation role so screen readers and Outlook treat it as layout, not
+ * data, and mirror the layout when the text runs right to left.
+ */
+export function finalizeHtml(html: string, direction: TextDirection = 'ltr'): string {
+  const roled = html.replace(/<table(?![^>]*\brole=)/g, '<table role="presentation"');
+  if (direction !== 'rtl') return roled;
+  // Every table, not just the outermost: each one lays out its own row of
+  // cells, and they all have to reverse.
+  return mirrorSides(roled).replace(/<table(?![^>]*\bdir=)/g, '<table dir="rtl"');
 }
 
 /** A combined "Job Title, Department" line (either part may be empty). */

@@ -28,6 +28,7 @@ export const defaultData: SignatureData = {
   // Arial is what most recipients will actually see; Inter stays as an option.
   fontFamily: 'Arial',
   iconStyle: 'brand',
+  textDirection: 'ltr',
   // Off until asked for: a signature should not rewrite links by surprise.
   utmEnabled: false,
   utmSource: 'email',

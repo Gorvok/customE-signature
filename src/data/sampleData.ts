@@ -31,6 +31,7 @@ export const sampleData: SignatureData = {
   secondaryColor: '#f8fafc',
   fontFamily: 'Inter',
   iconStyle: 'light',
+  textDirection: 'ltr',
   utmEnabled: false,
   utmSource: 'email',
   utmMedium: 'signature',
