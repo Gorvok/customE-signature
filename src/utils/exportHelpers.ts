@@ -98,7 +98,12 @@ export function downloadBlob(blob: Blob, filename: string): void {
  * why the templates paint their own backgrounds instead of relying on this.
  */
 export function downloadHtmlFile(html: string, filename = 'email-signature.html'): void {
-  const fullHtml = [
+  downloadBlob(new Blob([signatureDocument(html)], { type: 'text/html' }), filename);
+}
+
+/** The signature wrapped as a complete HTML document. Shared with team mode. */
+export function signatureDocument(html: string): string {
+  return [
     '<!DOCTYPE html>',
     '<html><head><meta charset="UTF-8">',
     '<meta name="color-scheme" content="light dark">',
@@ -107,5 +112,4 @@ export function downloadHtmlFile(html: string, filename = 'email-signature.html'
     html,
     '</body></html>',
   ].join('\n');
-  downloadBlob(new Blob([fullHtml], { type: 'text/html' }), filename);
 }

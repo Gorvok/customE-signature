@@ -15,6 +15,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
 - **Save & share**: copy a self-restoring share link or export/import your setup as JSON
+- **Team mode**: paste a roster (CSV) and everyone gets their own signature from the one you built — downloaded as a ZIP of HTML files plus a sheet of edit links. The roster never leaves the browser
 - **Multiple saved signatures**: keep several side by side (work, personal, a second brand), switch between them, rename, duplicate and delete. They live in this browser only — there is no account — so a share link is how you move one to another device.
 - **Autosave**: your details and chosen template are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear). Opening a share link over saved work asks before replacing it.
 - **Polished UX**: one-click sample data, collapsible form sections with quick-jump nav, a realistic email-window preview (desktop/mobile width, light/dark background, raw-HTML view), color-palette presets, and toast feedback
@@ -66,6 +67,38 @@ deployment, or change the look of the existing PNGs. A test pins
 `PRODUCTION_ICON_BASE` to this URL. If the icons are ever redesigned, add them
 under a new path and leave the current files in place.
 
+## Team Mode
+
+For a whole team, build one signature the way you want it, then open **Team
+mode** and paste a roster:
+
+```csv
+name,email,title,department,phone
+Alex Rivera,alex@northwind.io,Head of Product,Product,+1 (415) 555-0123
+Sam Okafor,sam@northwind.io,Staff Engineer,Engineering,+1 (415) 555-0144
+```
+
+The first row names the columns. Understood: `name`, `email`, `title`,
+`department`, `phone`, `pronouns`, `booking` and `initials` (plus the usual
+aliases — `full name`, `job title`, `mobile`, `team`), and any social platform
+id, such as `linkedin`. Anything else is listed back to you as ignored.
+
+Two rules worth knowing:
+
+- A column the roster **does not have** is inherited from your signature. That
+  is the point: company, colors, font, logo, social links and the disclaimer
+  are set once.
+- A column it **does have** is the truth for every row, so an empty cell
+  clears that field. Otherwise a blank email cell would put your address in a
+  colleague's signature.
+
+A row with no name is skipped and counted; 200 people is the ceiling per
+roster. The download is a ZIP holding `signatures/<person>.html` for each
+person, a `share-links.csv` whose link reopens that person's signature in the
+app, and a `README.txt` explaining both. It is all built in this browser — a
+staff list is not something to hand to someone else's server, and there is no
+server here to hand it to.
+
 ## Known Limitations
 
 - **Uploaded logos** are embedded as base64 data URIs, which Gmail, Outlook and
@@ -112,7 +145,11 @@ npm run typecheck  # tsc
 
 Tests cover the config validator, the HTML-escaping and URL-sanitization
 helpers, the share-link encoder, the plain-text converter and the clipboard
-modes. Every template is checked structurally and against a committed
+modes. Team mode's CSV reader is tested against what spreadsheets actually
+emit (a BOM, CRLF, quoted commas, doubled quotes, a newline inside a field),
+and the ZIP writer is read back through its own central directory, with the
+CRC verified per entry — the archive it produces was also checked against
+`unzip` and Python's `zipfile`. Every template is checked structurally and against a committed
 snapshot, and must neutralize malicious input. Component tests (Testing
 Library and user-event) cover the error boundary, the sandboxed preview
 frame, keyboard reordering and the uploader, and an axe-core run over the
@@ -137,7 +174,8 @@ no other client sees.
 
 The Playwright suite drives a real browser against the built app: the service
 worker update prompt through a genuine release-to-release update, the saved
-signature library, and the contact-card downloads. `npm run test:e2e` builds
+signature library, the contact-card downloads, and team mode end to end — a
+roster in, a real ZIP out, read back entry by entry. `npm run test:e2e` builds
 first. If your environment ships a browser that Playwright cannot download,
 point `PLAYWRIGHT_CHROMIUM_PATH` at it.
 
