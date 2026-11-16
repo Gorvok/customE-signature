@@ -15,6 +15,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Provider-specific export**: Gmail, Outlook, Apple Mail, Yahoo, Thunderbird — with step-by-step setup instructions for each
 - **Copy to clipboard** (rich HTML) or **download as .html** file
 - **Save & share**: copy a self-restoring share link or export/import your setup as JSON
+- **Check a signature you already have**: paste the HTML of the signature you use today and the same checks these templates are held to run over it — markup mail clients strip, text that vanishes in dark mode, Gmail's size limits. Useful even if you never make a new one
 - **Team mode**: paste a roster (CSV) and everyone gets their own signature from the one you built — downloaded as a ZIP of HTML files plus a sheet of edit links. The roster never leaves the browser
 - **Multiple saved signatures**: keep several side by side (work, personal, a second brand), switch between them, rename, duplicate and delete. They live in this browser only — there is no account — so a share link is how you move one to another device.
 - **Autosave**: your details and chosen template are kept in the browser's local storage, so a refresh won't lose your work (use **Reset** to clear). Opening a share link over saved work asks before replacing it.
@@ -66,6 +67,21 @@ that path is a public contract: do not rename the repository, move the
 deployment, or change the look of the existing PNGs. A test pins
 `PRODUCTION_ICON_BASE` to this URL. If the icons are ever redesigned, add them
 under a new path and leave the current files in place.
+
+## Checking a Signature You Already Have
+
+The three checkers the templates are held to — client-safe markup
+(`emailSafety.ts`), dark-mode survival (`darkMode.ts`) and Gmail's limits
+(`compatibility.ts`) — are pure functions over HTML, so they work just as well
+on a signature that came from somewhere else. **Check a signature you already
+have** takes pasted markup and reports what a mail client will strip, what
+disappears on a dark background, and whether Gmail will clip the message,
+quoting the markup at fault in each case. The pasted signature is rendered in
+the same sandboxed frame as everything else: no scripts, no access to the
+page, nothing uploaded.
+
+This is usually the fastest answer to "why does my signature look wrong in
+Outlook?", which the sender's own mail client cannot tell them.
 
 ## Team Mode
 

@@ -11,6 +11,7 @@ import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
 import SignatureLibrary from './components/SignatureLibrary';
 import MobileActionBar from './components/MobileActionBar';
+import SignatureCheck from './components/SignatureCheck';
 import TeamPanel from './components/TeamPanel';
 import UpdatePrompt from './components/UpdatePrompt';
 
@@ -187,6 +188,9 @@ export default function App() {
 
         {/* Everything above is one person's signature; this makes everyone's. */}
         <TeamPanel data={data} template={template} templateId={templateId} />
+
+        {/* For the signature someone arrived with, rather than one made here. */}
+        <SignatureCheck />
       </main>
 
       {/* Footer */}
