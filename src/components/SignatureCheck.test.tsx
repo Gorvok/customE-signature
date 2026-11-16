@@ -7,23 +7,13 @@ import { sampleData } from '../data/sampleData';
 
 afterEach(cleanup);
 
+/** The panel itself; the collapsing section around it belongs to LazySection. */
 function open() {
   render(<SignatureCheck />);
-  fireEvent.click(screen.getByRole('button', { name: /Check a signature you already have/ }));
   return screen.getByLabelText('Signature HTML');
 }
 
 describe('SignatureCheck', () => {
-  it('starts collapsed: it is not part of making a signature', () => {
-    render(<SignatureCheck />);
-    const toggle = screen.getByRole('button', { name: /Check a signature you already have/ });
-    expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    // CollapsibleSection keeps the content mounted but inert, so the textarea
-    // is out of the tab order and the accessibility tree rather than removed.
-    const region = document.getElementById(toggle.getAttribute('aria-controls')!);
-    expect(region?.hasAttribute('inert')).toBe(true);
-  });
-
   it('says nothing until something is pasted', () => {
     open();
     expect(screen.queryByRole('status')).toBeNull();

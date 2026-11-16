@@ -1,15 +1,7 @@
 import { useId, useMemo, useState } from 'react';
 import { checkSignature, looksLikeHtml } from '../utils/signatureCheck';
 import { formatBytes } from '../utils/compatibility';
-import CollapsibleSection from './CollapsibleSection';
 import SignatureFrame from './SignatureFrame';
-
-const icon = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M9 11l3 3L22 4" />
-    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-  </svg>
-);
 
 function Finding({ level, children }: { level: 'problem' | 'note'; children: React.ReactNode }) {
   return (
@@ -38,7 +30,6 @@ function Finding({ level, children }: { level: 'problem' | 'note'; children: Rea
  * else: no scripts, no access to the page.
  */
 export default function SignatureCheck() {
-  const [open, setOpen] = useState(false);
   const [html, setHtml] = useState('');
   const textareaId = useId();
 
@@ -46,16 +37,7 @@ export default function SignatureCheck() {
   const report = useMemo(() => (looksLikeHtml(trimmed) ? checkSignature(trimmed) : null), [trimmed]);
 
   return (
-    <CollapsibleSection
-      id="sec-check"
-      title="Check a signature you already have"
-      subtitle="Paste its HTML to see what breaks"
-      icon={icon}
-      filled={Boolean(report && report.problems === 0)}
-      open={open}
-      onToggle={() => setOpen((value) => !value)}
-    >
-      <div className="space-y-4">
+    <div className="space-y-4">
         <p className="text-sm text-gray-600 dark:text-gray-300">
           Already using a signature from somewhere else? Paste its HTML and the same checks these
           templates are held to will run over it: markup a mail client strips, text that disappears
@@ -128,8 +110,7 @@ export default function SignatureCheck() {
               <SignatureFrame html={trimmed} title="The signature you pasted" />
             </div>
           </div>
-        )}
-      </div>
-    </CollapsibleSection>
+      )}
+    </div>
   );
 }

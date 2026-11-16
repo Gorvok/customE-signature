@@ -72,6 +72,6 @@ export const elegant = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data);
   },
 } satisfies SignatureTemplate;

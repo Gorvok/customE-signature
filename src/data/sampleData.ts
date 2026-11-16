@@ -32,6 +32,8 @@ export const sampleData: SignatureData = {
   fontFamily: 'Inter',
   iconStyle: 'light',
   textDirection: 'ltr',
+  density: 'comfortable',
+  brandMarkSide: 'start',
   utmEnabled: false,
   utmSource: 'email',
   utmMedium: 'signature',

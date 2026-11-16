@@ -1,6 +1,7 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  brandMarkCells,
   MUTED_TEXT,
   LIGHT_SURFACE,
   finalizeHtml,
@@ -33,7 +34,7 @@ export const boldBanner = {
     });
 
     const logo = renderBrandMark(data, { width: 50, logoStyle: 'border-radius: 50%;', background: fgRaw, color: data.primaryColor });
-    const logoCell = logo ? `<td style="padding-right: 14px; vertical-align: middle;">${logo}</td>` : '';
+    const mark = brandMarkCells(logo, data.brandMarkSide, 14);
 
     const role = roleLine(data.jobTitle, data.department);
     const company = data.company.trim() ? esc(data.company.trim()) : '';
@@ -53,11 +54,12 @@ export const boldBanner = {
     <td bgcolor="${bg}" style="background-color: ${bg}; padding: 16px 20px; border-radius: 6px 6px 0 0;">
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
-          ${logoCell}
+          ${mark.start}
           <td style="vertical-align: middle; font-family: ${font};">
             <span style="font-size: 22px; font-weight: bold; color: ${fg}; font-family: ${font}; letter-spacing: 0.5px;">${nameWithPronouns(data, 'font-size: 13px; font-weight: normal; letter-spacing: 0; opacity: 0.85;')}</span>
             ${subtitle ? `<br /><span style="font-size: 13px; color: ${fg}; opacity: 0.85; font-family: ${font};">${subtitle}</span>` : ''}
           </td>
+          ${mark.end}
         </tr>
       </table>
     </td>
@@ -73,6 +75,6 @@ export const boldBanner = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data.textDirection);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`, data);
   },
 } satisfies SignatureTemplate;

@@ -3,9 +3,16 @@ import type { ReactNode } from 'react';
 import type { IconStyle, SignatureData, SocialPlatform } from '../types';
 import { socialPlatforms } from '../data/socialPlatforms';
 import { palettes } from '../data/palettes';
-import { BRAND_MARK_OPTIONS, FONTS, ICON_STYLE_OPTIONS, LIMITS, TEXT_DIRECTION_OPTIONS } from '../data/options';
+import {
+  BRAND_MARK_OPTIONS,
+  BRAND_MARK_SIDE_OPTIONS,
+  DENSITY_OPTIONS,
+  FONTS,
+  ICON_STYLE_OPTIONS,
+  LIMITS,
+  TEXT_DIRECTION_OPTIONS,
+} from '../data/options';
 import { monogramLetters } from '../utils/monogram';
-import { monogramFilename, monogramPngBlob } from '../utils/monogramImage';
 import { downloadBlob } from '../utils/exportHelpers';
 import { useToast } from '../toast';
 import { getSocialIconSvg } from '../utils/socialIcons';
@@ -112,6 +119,7 @@ export default function SignatureForm({ data, onChange }: Props) {
   async function handleMonogramPng() {
     try {
       const letters = monogramLetters(data);
+      const { monogramFilename, monogramPngBlob } = await import('../utils/monogramImage');
       const blob = await monogramPngBlob(letters, { background: data.primaryColor, font: data.fontFamily });
       downloadBlob(blob, monogramFilename(letters));
       addToast('Downloaded the monogram as a PNG');
@@ -407,6 +415,37 @@ export default function SignatureForm({ data, onChange }: Props) {
             </select>
             <p className="mt-1 text-xs text-hint">Icons are hosted as images so they display in Gmail &amp; Outlook.</p>
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="density-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Spacing</label>
+              <select
+                id="density-select"
+                value={data.density}
+                onChange={(e) => update({ density: e.target.value === 'compact' ? 'compact' : 'comfortable' })}
+                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+              >
+                {DENSITY_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-hint">Compact keeps the text size and takes out the air.</p>
+            </div>
+            <div>
+              <label htmlFor="mark-side-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand mark position</label>
+              <select
+                id="mark-side-select"
+                value={data.brandMarkSide}
+                onChange={(e) => update({ brandMarkSide: e.target.value === 'end' ? 'end' : 'start' })}
+                className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+              >
+                {BRAND_MARK_SIDE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-hint">For templates that put the mark beside your name.</p>
+            </div>
+          </div>
+
           <div>
             <label htmlFor="direction-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Text Direction</label>
             <select

@@ -102,6 +102,25 @@ for (const template of templates) {
       expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
     });
 
+    it('keeps every guarantee when compact', () => {
+      const compact = template.render({ ...data, density: 'compact' });
+      const issues = findDarkModeIssues(compact);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
+      // Spacing shrank; text did not.
+      expect(compact.length).toBeLessThan(html.length + 1);
+      expect(compact).toContain(data.fullName);
+    });
+
+    it('can put the brand mark on either side without breaking', () => {
+      for (const brandMarkSide of ['start', 'end'] as const) {
+        const html_ = template.render({ ...data, brandMarkSide });
+        expect(html_, brandMarkSide).toContain(data.fullName);
+        expect(findDarkModeIssues(html_), brandMarkSide).toEqual([]);
+        // No empty cell is left where the mark used to be.
+        expect(html_, brandMarkSide).not.toMatch(/<td[^>]*>\s*<\/td>/);
+      }
+    });
+
     it('survives dark mode with the default colors too', () => {
       // The sample data picks a deliberate palette; the defaults are black on
       // white, which is what a first-time visitor's signature uses.

@@ -4,7 +4,6 @@ import { providers } from '../data/providers';
 import { copyHtmlToClipboard, downloadBlob, downloadHtmlFile, type CopyResult } from '../utils/exportHelpers';
 import { buildVCard, vcardFilename } from '../utils/vcard';
 import { buildEml, emlFilename } from '../utils/eml';
-import { qrPngBlob } from '../utils/qrCode';
 import {
   compatibilityWarnings,
   formatBytes,
@@ -113,6 +112,9 @@ function ContactCard({ data }: { data: SignatureData }) {
 
   async function handleQr() {
     try {
+      // uqr is only needed by this button, so it is fetched when it is pressed
+      // rather than shipped to every visit.
+      const { qrPngBlob } = await import('../utils/qrCode');
       const blob = await qrPngBlob(buildVCard(data));
       downloadBlob(blob, vcardFilename(data).replace(/\.vcf$/, '-qr.png'));
       addToast('Downloaded QR code — host it, then paste the link as your logo');

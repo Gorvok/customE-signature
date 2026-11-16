@@ -8,6 +8,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Live preview** that updates as you type
 - **Rich fields**: name, pronouns, job title, department, company, phone, email, website, office address, booking link, a call-to-action button, and a legal disclaimer
 - **Full customization**: colors, fonts, logo upload, 16 social platforms (drag to reorder), and four social-icon styles
+- **Layout knobs**: comfortable or compact spacing (which takes out the air, not the text size), and the brand mark before or after your name on the templates that put it beside you
 - **Right-to-left layouts**: switch the text direction and the whole layout mirrors — columns reverse, spacing and borders move to the other side — for Arabic, Hebrew, Persian and Urdu
 - **Contrast check while you pick**: the two brand colors are measured against each other as you choose them, against WCAG AA
 - **Monogram brand mark**: your initials in a circle, drawn with markup instead of an image — under a kilobyte, needs no hosting, and arrives intact in every client (Outlook gets a VML oval, since its engine ignores `border-radius`). Pick it instead of a logo when you have nowhere to host one, and download it as a PNG for editors that only take an image
