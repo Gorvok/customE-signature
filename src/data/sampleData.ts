@@ -29,4 +29,8 @@ export const sampleData: SignatureData = {
   secondaryColor: '#f8fafc',
   fontFamily: 'Inter',
   iconStyle: 'light',
+  utmEnabled: false,
+  utmSource: 'email',
+  utmMedium: 'signature',
+  utmCampaign: '',
 };

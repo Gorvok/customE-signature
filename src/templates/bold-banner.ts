@@ -12,6 +12,7 @@ import {
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { withUtm } from '../utils/utm';
 
 export const boldBanner = {
   id: 'bold-banner',
@@ -44,7 +45,7 @@ export const boldBanner = {
       bookingStyle: 'font-weight: bold;',
     });
 
-    const cta = renderCtaButton(data.ctaLabel, data.ctaUrl, { bg: data.primaryColor, fg: fgRaw, font: data.fontFamily });
+    const cta = renderCtaButton(data.ctaLabel, withUtm(data.ctaUrl, data), { bg: data.primaryColor, fg: fgRaw, font: data.fontFamily });
 
     return finalizeHtml(`<table cellpadding="0" cellspacing="0" border="0" style="font-family: ${font}; border-collapse: collapse;">
   <tr>

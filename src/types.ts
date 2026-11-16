@@ -21,6 +21,22 @@ export interface SignatureData {
   secondaryColor: string;
   fontFamily: string;
   iconStyle: IconStyle;
+  /**
+   * Campaign tagging for the website, booking and call-to-action links.
+   * Off by default; social profiles are never tagged. See utils/utm.ts.
+   */
+  utmEnabled: boolean;
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+}
+
+/** One signature in the library, as stored in this browser. */
+export interface SavedSignature {
+  id: string;
+  name: string;
+  data: SignatureData;
+  templateId: string;
 }
 
 export interface RenderOptions {

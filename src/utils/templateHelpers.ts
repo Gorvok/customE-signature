@@ -1,6 +1,7 @@
 import { socialPlatforms } from '../data/socialPlatforms';
 import { FONT_STACKS, isIconStyle } from '../data/options';
 import type { IconStyle, SignatureData } from '../types';
+import { withUtm } from './utm';
 
 /**
  * Absolute URL of the deployed hosted icons. Generated signatures must use
@@ -219,9 +220,9 @@ export function contactLinks(data: SignatureData, options: ContactLinkOptions): 
   const email = data.email.trim();
   if (email) parts.push(link(sanitizeLinkUrl(`mailto:${email}`), esc(email), color));
   const website = data.website.trim();
-  if (website) parts.push(link(sanitizeLinkUrl(normalizeWebsite(website)), esc(displayWebsite(website)), websiteColor, websiteStyle));
+  if (website) parts.push(link(sanitizeLinkUrl(withUtm(normalizeWebsite(website), data)), esc(displayWebsite(website)), websiteColor, websiteStyle));
   const booking = data.bookingLink.trim();
-  if (booking) parts.push(link(sanitizeLinkUrl(normalizeWebsite(booking)), 'Book a meeting', accent, bookingStyle));
+  if (booking) parts.push(link(sanitizeLinkUrl(withUtm(normalizeWebsite(booking), data)), 'Book a meeting', accent, bookingStyle));
   return parts;
 }
 

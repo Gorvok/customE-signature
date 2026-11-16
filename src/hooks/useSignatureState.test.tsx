@@ -5,7 +5,7 @@ import { REPLACE_PROMPT, hasContent, useSignatureState } from './useSignatureSta
 import { encodeConfig } from '../utils/shareConfig';
 import { sampleData } from '../data/sampleData';
 import { defaultData } from '../data/defaults';
-import { LEGACY_SIGNATURE_STORAGE_KEY, SIGNATURE_STORAGE_KEY } from '../data/storage';
+import { LEGACY_SIGNATURE_STORAGE_KEY, LIBRARY_STORAGE_KEY, SIGNATURE_STORAGE_KEY } from '../data/storage';
 import type { SignatureData } from '../types';
 
 const fragment = (data: SignatureData, templateId?: string) => `#cfg=${encodeConfig({ data, templateId })}`;
@@ -15,8 +15,13 @@ interface StoredShape {
   templateId?: string;
 }
 
+/** The active entry of the persisted library. */
 function stored(): StoredShape {
-  return JSON.parse(localStorage.getItem(SIGNATURE_STORAGE_KEY) ?? '{}') as StoredShape;
+  const raw = localStorage.getItem(LIBRARY_STORAGE_KEY);
+  if (!raw) return {};
+  const library = JSON.parse(raw) as { activeId?: string; items?: (StoredShape & { id: string })[] };
+  const items = library.items ?? [];
+  return items.find((item) => item.id === library.activeId) ?? items[0] ?? {};
 }
 
 beforeEach(() => {

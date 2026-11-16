@@ -12,6 +12,7 @@ import {
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { withUtm } from '../utils/utm';
 
 export const classicDark = {
   id: 'classic-dark',
@@ -40,7 +41,7 @@ export const classicDark = {
       rows.push(`<tr><td style="padding: 2px 0; color: ${secondary}; font-size: 12px; font-family: ${font};">${esc(data.address.trim())}</td></tr>`);
     }
 
-    const cta = renderCtaButton(data.ctaLabel, data.ctaUrl, {
+    const cta = renderCtaButton(data.ctaLabel, withUtm(data.ctaUrl, data), {
       bg: secondaryRaw,
       fg: data.primaryColor,
       font: data.fontFamily,

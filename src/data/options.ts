@@ -55,4 +55,13 @@ export const LIMITS = {
   url: 2048,
   /** Uploaded logos are base64 data URLs; ~1.5 MB is a generous ceiling. */
   logoUrl: 1_500_000,
+  /** The name a person gives a saved signature. */
+  signatureName: 60,
 } as const;
+
+/**
+ * How many signatures one browser may keep. localStorage is only a few
+ * megabytes and an uploaded logo can be 1.5 MB on its own, so the ceiling is
+ * low on purpose — see LIMITS.logoUrl.
+ */
+export const MAX_SIGNATURES = 10;

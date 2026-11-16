@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { SignatureData, SignatureTemplate } from '../types';
 import { providers } from '../data/providers';
-import { copyHtmlToClipboard, downloadHtmlFile, type CopyResult } from '../utils/exportHelpers';
+import { copyHtmlToClipboard, downloadBlob, downloadHtmlFile, type CopyResult } from '../utils/exportHelpers';
+import { buildVCard, vcardFilename } from '../utils/vcard';
+import { qrPngBlob } from '../utils/qrCode';
 import {
   compatibilityWarnings,
   formatBytes,
@@ -95,6 +97,57 @@ function CompatibilityNotes({ html, warnings }: { html: string; warnings: Compat
   );
 }
 
+/**
+ * The contact card. Both outputs are files rather than markup, so nothing a
+ * mail client strips applies to them — but a QR only helps inside a signature
+ * once it is hosted, which the copy says plainly.
+ */
+function ContactCard({ data }: { data: SignatureData }) {
+  const { addToast } = useToast();
+
+  function handleVCard() {
+    downloadBlob(new Blob([buildVCard(data)], { type: 'text/vcard;charset=utf-8' }), vcardFilename(data));
+    addToast('Downloaded contact card — attach it to an email or import it');
+  }
+
+  async function handleQr() {
+    try {
+      const blob = await qrPngBlob(buildVCard(data));
+      downloadBlob(blob, vcardFilename(data).replace(/\.vcf$/, '-qr.png'));
+      addToast('Downloaded QR code — host it, then paste the link as your logo');
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Could not create the QR code.', 'error');
+    }
+  }
+
+  return (
+    <div className="space-y-2 border-t border-gray-200 dark:border-gray-800 pt-4">
+      <h3 className="font-medium text-gray-900 dark:text-white">Contact card</h3>
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={handleVCard}
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors"
+        >
+          Download .vcf
+        </button>
+        <button
+          type="button"
+          onClick={() => void handleQr()}
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors"
+        >
+          Download QR code
+        </button>
+      </div>
+      <p className="text-xs text-hint">
+        The QR holds these contact details, so scanning it adds the contact without a network. It is
+        generated here — nothing is sent to a QR service. To show it inside a signature, host the PNG
+        and paste the link, the same as a logo.
+      </p>
+    </div>
+  );
+}
+
 export default function ExportPanel({ data, template }: Props) {
   const { addToast } = useToast();
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
@@ -166,6 +219,8 @@ export default function ExportPanel({ data, template }: Props) {
           <ExportActions showCopy showDownload copyStatus={copyStatus} onCopy={() => void handleCopy()} onDownload={handleDownload} />
         </div>
       )}
+
+      <ContactCard data={data} />
     </div>
   );
 }

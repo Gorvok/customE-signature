@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { parseSignatureData, parseSharedConfig } from './parseConfig';
+import { parseLibrary, parseSharedConfig, parseSignatureData } from './parseConfig';
 import { defaultData } from '../data/defaults';
 import { sampleData } from '../data/sampleData';
-import { LIMITS } from '../data/options';
+import { LIMITS, MAX_SIGNATURES } from '../data/options';
+import { DEFAULT_TEMPLATE } from '../templates';
 
 describe('parseSignatureData', () => {
   it('returns the defaults for anything that is not an object', () => {
@@ -113,5 +114,69 @@ describe('parseSharedConfig', () => {
     const out = parseSharedConfig({ data: { iconStyle: '"><img src=x onerror=alert(1)>', socials: { github: 'a' } } });
     expect(out?.data.iconStyle).toBe('brand');
     expect(out?.data.socials).toEqual({ github: 'a' });
+  });
+});
+
+describe('parseLibrary', () => {
+  const ok = (over: Record<string, unknown> = {}) => ({
+    id: 'abc123def',
+    name: 'Work',
+    data: { fullName: 'Jane' },
+    templateId: 'elegant',
+    ...over,
+  });
+
+  it('rejects anything that is not a library', () => {
+    for (const input of [null, undefined, 42, 'x', {}, { items: 'no' }, { items: [] }]) {
+      expect(parseLibrary(input), JSON.stringify(input)).toBeNull();
+    }
+  });
+
+  it('keeps a well-formed entry and coerces its data', () => {
+    const result = parseLibrary({ activeId: 'abc123def', items: [ok()] });
+    expect(result?.activeId).toBe('abc123def');
+    expect(result?.items).toHaveLength(1);
+    expect(result?.items[0]?.data.fullName).toBe('Jane');
+    expect(result?.items[0]?.templateId).toBe('elegant');
+  });
+
+  it('drops entries with an unusable or duplicated id', () => {
+    const result = parseLibrary({
+      items: [
+        ok(),
+        ok({ id: 'short' }),
+        ok({ id: 'has spaces!' }),
+        ok({ id: 42 }),
+        ok(),
+      ],
+    });
+    expect(result?.items).toHaveLength(1);
+  });
+
+  it('drops an entry with no data object rather than inventing one', () => {
+    expect(parseLibrary({ items: [ok({ data: undefined })] })).toBeNull();
+    expect(parseLibrary({ items: [ok({ data: 'nope' })] })).toBeNull();
+  });
+
+  it('falls back to a real entry when activeId names none', () => {
+    expect(parseLibrary({ activeId: 'ghost', items: [ok()] })?.activeId).toBe('abc123def');
+    expect(parseLibrary({ items: [ok()] })?.activeId).toBe('abc123def');
+  });
+
+  it('caps the number of entries', () => {
+    const items = Array.from({ length: MAX_SIGNATURES + 5 }, (_, i) => ok({ id: `id${String(i).padStart(6, '0')}` }));
+    expect(parseLibrary({ items })?.items).toHaveLength(MAX_SIGNATURES);
+  });
+
+  it('caps the name and supplies one when missing', () => {
+    expect(parseLibrary({ items: [ok({ name: 'x'.repeat(500) })] })?.items[0]?.name).toHaveLength(
+      LIMITS.signatureName,
+    );
+    expect(parseLibrary({ items: [ok({ name: 42 })] })?.items[0]?.name).toBe('Untitled signature');
+  });
+
+  it('replaces an unknown template id with the default', () => {
+    const result = parseLibrary({ items: [ok({ templateId: 'nope' })] });
+    expect(result?.items[0]?.templateId).toBe(DEFAULT_TEMPLATE.id);
   });
 });

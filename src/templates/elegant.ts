@@ -13,6 +13,7 @@ import {
   renderDisclaimer,
   renderSocialLinks,
 } from '../utils/templateHelpers';
+import { withUtm } from '../utils/utm';
 
 /** The name is always set in a serif regardless of the chosen body font. */
 const SERIF = 'Georgia, Times New Roman, Times, serif';
@@ -41,7 +42,7 @@ export const elegant = {
     const contact = contactLinks(data, { color: mutedColor, accent: data.primaryColor });
     if (data.address.trim()) contact.push(`<span style="color: ${mutedColor};">${esc(data.address.trim())}</span>`);
 
-    const cta = renderCtaButton(data.ctaLabel, data.ctaUrl, { bg: data.primaryColor, fg: '#FFFFFF', font: data.fontFamily });
+    const cta = renderCtaButton(data.ctaLabel, withUtm(data.ctaUrl, data), { bg: data.primaryColor, fg: '#FFFFFF', font: data.fontFamily });
 
     // A 1px line, a dot, and another line. The lines sit in nested tables so
     // they stay 1px tall next to the 6px dot (a cell's background fills the

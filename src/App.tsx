@@ -9,10 +9,11 @@ import SignaturePreview from './components/SignaturePreview';
 import TemplateSelector from './components/TemplateSelector';
 import ExportPanel from './components/ExportPanel';
 import SharePanel from './components/SharePanel';
+import SignatureLibrary from './components/SignatureLibrary';
 import UpdatePrompt from './components/UpdatePrompt';
 
 export default function App() {
-  const { data, templateId, setData, setTemplateId, applyConfig, reset } = useSignatureState();
+  const { data, templateId, setData, setTemplateId, applyConfig, reset, signatures } = useSignatureState();
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const { theme, toggle } = useTheme();
   const { addToast } = useToast();
@@ -113,7 +114,16 @@ export default function App() {
 
         {/* Two-column: Form + Preview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className={mobileTab === 'edit' ? 'block' : 'hidden lg:block'}>
+          <div className={`${mobileTab === 'edit' ? 'block' : 'hidden lg:block'} space-y-4`}>
+            <SignatureLibrary
+              items={signatures.items}
+              activeId={signatures.activeId}
+              onSelect={signatures.select}
+              onCreate={signatures.create}
+              onDuplicate={signatures.duplicate}
+              onRename={signatures.rename}
+              onRemove={signatures.remove}
+            />
             <SignatureForm data={data} onChange={setData} />
           </div>
           <div className={`${mobileTab === 'preview' ? 'block' : 'hidden lg:block'} space-y-8 lg:sticky lg:top-24 lg:self-start`}>
