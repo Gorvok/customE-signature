@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { templates } from './index';
 import { sampleData } from '../data/sampleData';
+import { findDarkModeIssues, formatDarkModeIssues } from '../utils/darkMode';
+import { defaultData } from '../data/defaults';
 
 /** Templates on a transparent background that must paint their own white for non-inverting dark-mode clients. */
 const LIGHT_TEMPLATES = ['modern-light', 'minimal', 'corporate', 'elegant', 'compact-card'];
@@ -67,6 +69,22 @@ for (const template of templates) {
     it('uses a full font stack ending in a generic family', () => {
       expect(html).toMatch(/font-family: [^;"]*(sans-serif|serif|monospace)/);
       expect(html).not.toMatch(/font-family: Inter;/);
+    });
+
+    it('survives a client in dark mode', () => {
+      // Every run of text must sit on a background the markup itself paints,
+      // and be readable on it. Nothing may rely on the client's canvas: in
+      // dark mode that canvas is near-black. See utils/darkMode.ts.
+      const issues = findDarkModeIssues(html);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
+    });
+
+    it('survives dark mode with the default colors too', () => {
+      // The sample data picks a deliberate palette; the defaults are black on
+      // white, which is what a first-time visitor's signature uses.
+      const bare = template.render({ ...defaultData, fullName: 'Jane Doe', disclaimer: 'Confidential.' });
+      const issues = findDarkModeIssues(bare);
+      expect(issues, `\n${formatDarkModeIssues(issues)}`).toEqual([]);
     });
   });
 }

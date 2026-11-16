@@ -1,6 +1,8 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  MUTED_TEXT,
+  LIGHT_SURFACE,
   finalizeHtml,
   fontStack,
   nameWithPronouns,
@@ -52,10 +54,10 @@ export const modernLight = {
           <td style="vertical-align: top;">
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td style="font-size: 18px; font-weight: bold; color: ${textColor}; font-family: ${font};">${nameWithPronouns(data, 'font-size: 12px; font-weight: normal; color: #777777;')}</td>
+                <td style="font-size: 18px; font-weight: bold; color: ${textColor}; font-family: ${font};">${nameWithPronouns(data, `font-size: 12px; font-weight: normal; color: ${MUTED_TEXT};`)}</td>
               </tr>
               ${role ? `<tr><td style="font-size: 12px; color: ${accentColor}; font-family: ${font}; padding-top: 2px;">${role}</td></tr>` : ''}
-              ${data.address.trim() ? `<tr><td style="font-size: 12px; color: #777777; font-family: ${font}; padding-top: 2px;">${esc(data.address.trim())}</td></tr>` : ''}
+              ${data.address.trim() ? `<tr><td style="font-size: 12px; color: ${MUTED_TEXT}; font-family: ${font}; padding-top: 2px;">${esc(data.address.trim())}</td></tr>` : ''}
               ${contact.length ? `<tr><td style="padding-top: 6px; font-family: ${font};">${contact.join(' &nbsp;|&nbsp; ')}</td></tr>` : ''}
               ${cta ? `<tr><td style="padding-top: 10px;">${cta}</td></tr>` : ''}
               ${socialLinks ? `<tr><td style="padding-top: 8px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${socialLinks}</tr></table></td></tr>` : ''}
@@ -66,6 +68,6 @@ export const modernLight = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`);
   },
 } satisfies SignatureTemplate;

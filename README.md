@@ -17,6 +17,7 @@ A free, open-source web app for creating professional email signatures. No login
 - **Polished UX**: one-click sample data, collapsible form sections with quick-jump nav, a realistic email-window preview (desktop/mobile width, light/dark background, raw-HTML view), color-palette presets, and toast feedback
 - **Installable PWA** with offline support and an in-app prompt when a new version has been deployed
 - **Light & dark mode** with system-preference detection, plus reduced-motion and keyboard-focus support
+- **Dark-mode safe**: every template paints its own background and picks text to suit it, so a client in dark mode cannot leave gray small print on a near-black canvas. The export panel also warns when your own color choices are unreadable, or when you pick a client that recolors content in dark mode while using a dark template
 - **Mail-client checks**: the signature's size and character count are shown against Gmail's limits, and an uploaded logo is flagged when the client you picked strips embedded images — the browser preview renders them perfectly, so this is otherwise invisible until a recipient tells you
 - **Logo URL help**: a Google Drive or Dropbox *share* link is converted to a direct image link in one click, `http` is upgraded to `https`, and the link is checked to confirm it really loads an image
 - **Optional link tagging**: add campaign (`utm_*`) parameters to your website, booking and call-to-action links for attribution. Off by default, and social profiles are never tagged
@@ -72,6 +73,14 @@ under a new path and leave the current files in place.
   Drawing the code as a table of cells would avoid an image, but measures at
   ~14 KB of markup for a short URL and ~60 KB for a whole vCard, well past
   Gmail's allowance.
+- **Clients that rewrite colors in dark mode** (Outlook.com, Yahoo Mail) can
+  recolor light text even on a background the signature paints itself, so a
+  dark template may arrive with its text harder to read. The export panel says
+  so when you pick one of those clients; a light template avoids it. The
+  downloaded HTML file declares `color-scheme: light dark`, which stops Apple
+  Mail and Outlook from force-inverting an installed signature, but those
+  metas need a real document and do nothing for markup pasted into a
+  signature editor.
 - **The call-to-action button in Outlook for Windows** keeps its shape only
   when the downloaded HTML file is installed. Pasting into a signature editor
   drops the Outlook-specific fallback, and Outlook then shows a styled link.
@@ -94,6 +103,16 @@ snapshot, and must neutralize malicious input. Component tests (Testing
 Library and user-event) cover the error boundary, the sandboxed preview
 frame, keyboard reordering and the uploader, and an axe-core run over the
 whole app asserts no accessibility violations.
+
+Dark mode is enforced the same way. `darkMode.ts` walks the generated markup
+tracking which background each run of text actually sits on, and every
+template must pass: no text may rely on the client's own canvas (in dark mode
+that canvas is near-black), and every text/background pair must clear WCAG AA
+for its size. No single text color clears 4.5:1 against both white and
+near-black — the two requirements are arithmetically incompatible, which a
+test demonstrates over the whole gray axis — so painting a background is the
+only fix, not a stylistic preference. The same checker runs in the UI, where
+the colors are the person's own choice.
 
 Rules that email clients impose are enforced rather than left in comments:
 `emailSafety.ts` checks every template's output for markup a client breaks on

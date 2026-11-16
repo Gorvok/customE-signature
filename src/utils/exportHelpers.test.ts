@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { copyHtmlToClipboard, htmlToPlainText } from './exportHelpers';
+import { copyHtmlToClipboard, downloadHtmlFile, htmlToPlainText } from './exportHelpers';
 import { templates } from '../templates';
 import { sampleData } from '../data/sampleData';
 
@@ -63,5 +63,45 @@ describe('copyHtmlToClipboard', () => {
   it('reports failed when nothing works', async () => {
     stubClipboard(vi.fn(() => Promise.reject(new Error('denied'))), vi.fn(() => Promise.reject(new Error('denied'))));
     await expect(copyHtmlToClipboard('<b>x</b>')).resolves.toBe('failed');
+  });
+});
+
+describe('downloadHtmlFile', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  /** The document handed to the browser, read back from the Blob. */
+  async function capture(): Promise<string> {
+    const blobs: Blob[] = [];
+    vi.stubGlobal('URL', {
+      ...URL,
+      createObjectURL: (blob: Blob) => {
+        blobs.push(blob);
+        return 'blob:stub';
+      },
+      revokeObjectURL: () => {},
+    });
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    downloadHtmlFile('<table><tr><td>Signature</td></tr></table>', 'sig.html');
+    expect(blobs).toHaveLength(1);
+    return blobs[0]!.text();
+  }
+
+  it('declares that the content handles both color schemes', async () => {
+    // Without this, Apple Mail and Outlook force-invert the colors of an
+    // installed signature in dark mode.
+    const document_ = await capture();
+    expect(document_).toContain('<meta name="color-scheme" content="light dark">');
+    expect(document_).toContain('<meta name="supported-color-schemes" content="light dark">');
+  });
+
+  it('wraps the signature in a complete document', async () => {
+    const document_ = await capture();
+    expect(document_.startsWith('<!DOCTYPE html>')).toBe(true);
+    expect(document_).toContain('<meta charset="UTF-8">');
+    expect(document_).toContain('<td>Signature</td>');
+    expect(document_.trimEnd().endsWith('</body></html>')).toBe(true);
   });
 });

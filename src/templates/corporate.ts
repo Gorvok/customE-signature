@@ -1,6 +1,8 @@
 import type { RenderOptions, SignatureData, SignatureTemplate } from '../types';
 import {
   esc,
+  MUTED_TEXT,
+  LIGHT_SURFACE,
   finalizeHtml,
   fontStack,
   roleLine,
@@ -23,7 +25,7 @@ export const corporate = {
     const accent = esc(data.primaryColor);
     const font = fontStack(data.fontFamily);
     const textDark = '#2d2d2d';
-    const textMuted = '#777777';
+    const textMuted = MUTED_TEXT;
 
     const socialLinks = renderSocialLinks(data.socials, {
       style: data.iconStyle,
@@ -67,6 +69,6 @@ export const corporate = {
     </td>
   </tr>
 </table>
-${renderDisclaimer(data.disclaimer, data.fontFamily)}`);
+${renderDisclaimer(data.disclaimer, { font: data.fontFamily, background: LIGHT_SURFACE })}`);
   },
 } satisfies SignatureTemplate;

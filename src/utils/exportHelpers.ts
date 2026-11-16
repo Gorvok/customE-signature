@@ -87,8 +87,25 @@ export function downloadBlob(blob: Blob, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
-/** Download the signature as a complete HTML document (what Thunderbird and Outlook's file import expect). */
+/**
+ * Download the signature as a complete HTML document (what Thunderbird and
+ * Outlook's file import expect).
+ *
+ * The color-scheme metas declare that the content handles both schemes, which
+ * is what stops Apple Mail and Outlook from force-inverting its colors in
+ * dark mode. They only work in a real document, so they belong here rather
+ * than in the markup that gets pasted into a signature editor — which is also
+ * why the templates paint their own backgrounds instead of relying on this.
+ */
 export function downloadHtmlFile(html: string, filename = 'email-signature.html'): void {
-  const fullHtml = `<!DOCTYPE html>\n<html><head><meta charset="UTF-8"></head><body>\n${html}\n</body></html>`;
+  const fullHtml = [
+    '<!DOCTYPE html>',
+    '<html><head><meta charset="UTF-8">',
+    '<meta name="color-scheme" content="light dark">',
+    '<meta name="supported-color-schemes" content="light dark">',
+    '</head><body>',
+    html,
+    '</body></html>',
+  ].join('\n');
   downloadBlob(new Blob([fullHtml], { type: 'text/html' }), filename);
 }

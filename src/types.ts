@@ -66,6 +66,12 @@ export interface EmailProvider {
    * export panel warns when one is in use. See compatibility.ts.
    */
   rendersEmbeddedImages: boolean;
+  /**
+   * Whether this client rewrites the colors of message content in dark mode.
+   * Outlook.com and Yahoo Mail recolor light text even when the markup paints
+   * its own background, so a dark signature is a risk there. See darkMode.ts.
+   */
+  recolorsInDarkMode: boolean;
 }
 
 export type SocialPlatform = {

@@ -20,7 +20,10 @@ import {
   spacerCell,
   PRODUCTION_ICON_BASE,
   logoAlt,
+  MUTED_TEXT,
 } from './templateHelpers';
+import { findDarkModeIssues } from './darkMode';
+import { AA_CONTRAST, contrastRatio } from './color';
 import { templates } from '../templates';
 import { parseSignatureData } from './parseConfig';
 import { sampleData } from '../data/sampleData';
@@ -161,8 +164,29 @@ describe('renderCtaButton', () => {
 
 describe('renderDisclaimer', () => {
   it('escapes text and returns empty when blank', () => {
-    expect(renderDisclaimer('<script>', 'Inter')).toContain('&lt;script&gt;');
-    expect(renderDisclaimer('   ', 'Inter')).toBe('');
+    expect(renderDisclaimer('<script>', { font: 'Inter' })).toContain('&lt;script&gt;');
+    expect(renderDisclaimer('   ', { font: 'Inter' })).toBe('');
+  });
+
+  it('paints the background it is given, so small print survives dark mode', () => {
+    const html = renderDisclaimer('Confidential.', { font: 'Inter', background: '#ffffff' });
+    expect(html).toContain('bgcolor="#ffffff"');
+    expect(html).toContain('background-color: #ffffff');
+    expect(findDarkModeIssues(html)).toEqual([]);
+  });
+
+  it('paints nothing when the caller nests it inside a painted container', () => {
+    const html = renderDisclaimer('Confidential.', { font: 'Inter', color: '#f8fafc' });
+    expect(html).not.toContain('bgcolor');
+    // On its own it is unreadable; inside the dark box it is not.
+    expect(findDarkModeIssues(html)).not.toEqual([]);
+    expect(findDarkModeIssues(`<td bgcolor="#0f172a">${html}</td>`)).toEqual([]);
+  });
+
+  it('defaults to a gray that clears WCAG AA on a light surface', () => {
+    const html = renderDisclaimer('Confidential.', { font: 'Inter', background: '#ffffff' });
+    expect(html).toContain(`color: ${MUTED_TEXT}`);
+    expect(contrastRatio(MUTED_TEXT, '#ffffff')!).toBeGreaterThanOrEqual(AA_CONTRAST);
   });
 });
 

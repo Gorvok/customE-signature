@@ -134,6 +134,17 @@ export function buildSocialUrl(platformId: string, value: string): string {
   return platform.urlPrefix + trimmed.replace(/^@/, '');
 }
 
+/**
+ * Muted text on a light surface. The grays this project reached for by habit
+ * (#999999, #888888, #777777) measure 2.85:1, 3.54:1 and 4.47:1 on white, all
+ * under WCAG's 4.5:1 for small text. This one clears it on white (4.83:1) and
+ * on the #f8f8f8 panel bold-banner paints (4.60:1).
+ */
+export const MUTED_TEXT = '#6b7280';
+
+/** The white surface the light templates paint, so dark mode cannot take it away. */
+export const LIGHT_SURFACE = '#ffffff';
+
 /** The chosen font plus email-safe fallbacks, escaped for a style attribute. */
 export function fontStack(font: string): string {
   const stack = (FONT_STACKS as Record<string, string>)[font] ?? `${font}, Arial, sans-serif`;
@@ -303,10 +314,32 @@ export function renderCtaButton(label: string, url: string, { bg, fg, font }: Ct
 </div>`;
 }
 
-/** Render a small legal/confidentiality disclaimer block, or '' when empty. */
-export function renderDisclaimer(text: string, font: string, color = '#999999'): string {
+interface DisclaimerOptions {
+  font: string;
+  /** Text color; defaults to the muted gray, which is readable on a light surface. */
+  color?: string;
+  /**
+   * Background painted behind the text. Required unless the disclaimer sits
+   * inside a container that paints one already, because small print on the
+   * client's own canvas is the first thing to disappear in dark mode —
+   * see darkMode.ts.
+   */
+  background?: string;
+}
+
+/**
+ * Render a small legal/confidentiality disclaimer block, or '' when empty.
+ *
+ * With a background it is a painted one-cell table rather than a bare div: it
+ * is usually placed after the signature's main table, where nothing else
+ * declares a background for it to inherit.
+ */
+export function renderDisclaimer(text: string, { font, color = MUTED_TEXT, background }: DisclaimerOptions): string {
   if (!text.trim()) return '';
-  return `<div style="margin-top: 10px; max-width: 480px; font-size: 10px; line-height: 1.5; color: ${esc(color)}; font-family: ${fontStack(font)};">${esc(text)}</div>`;
+  const cell = `<td style="padding-top: 10px; max-width: 480px; font-size: 10px; line-height: 1.5; color: ${esc(color)}; font-family: ${fontStack(font)};">${esc(text)}</td>`;
+  if (!background) return `<table cellpadding="0" cellspacing="0" border="0"><tr>${cell}</tr></table>`;
+  const bg = esc(background);
+  return `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bg}" style="background-color: ${bg};"><tr>${cell}</tr></table>`;
 }
 
 interface SocialLinkOptions {

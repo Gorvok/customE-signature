@@ -1,4 +1,6 @@
 import type { EmailProvider, SignatureData } from '../types';
+import { isDarkColor } from './color';
+import { findDarkModeIssues, paintedBackgrounds } from './darkMode';
 
 /**
  * Gmail's signature editor stores roughly this many characters. A logo
@@ -92,6 +94,32 @@ export function compatibilityWarnings({
         message: `At ${formatBytes(bytes)} this signature is large enough for Gmail to clip your messages, hiding the end behind "View entire message".`,
       });
     }
+  }
+
+  // The colors are the person's own choice, so a pair that cannot be read is
+  // theirs to fix. (The template-level rule — that text must sit on a
+  // background the markup paints — is enforced by a test, since no choice in
+  // the UI can cause or fix it.)
+  for (const issue of findDarkModeIssues(html)) {
+    if (issue.rule !== 'low-contrast') continue;
+    warnings.push({
+      id: `low-contrast-${issue.color}-${issue.background ?? 'none'}`,
+      level: 'warning',
+      message: issue.message,
+    });
+  }
+
+  // A signature that paints a dark surface is at the mercy of the clients
+  // that recolor content in dark mode. Only raised for a client known to do
+  // it, because there is nothing to fix otherwise.
+  if (provider?.recolorsInDarkMode && paintedBackgrounds(html).some(isDarkColor)) {
+    warnings.push({
+      id: 'dark-surface-recolored',
+      level: 'caution',
+      message:
+        `${provider.name} rewrites colors in dark mode, and this signature paints a dark background. ` +
+        'Light text on it may be recolored to something harder to read — a light template avoids that.',
+    });
   }
 
   return warnings;

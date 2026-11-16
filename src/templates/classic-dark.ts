@@ -49,7 +49,7 @@ export const classicDark = {
 
     // The disclaimer lives inside the dark box: in the secondary (light)
     // color it would be invisible on the email's own white background.
-    const disclaimer = renderDisclaimer(data.disclaimer, data.fontFamily, secondaryRaw);
+    const disclaimer = renderDisclaimer(data.disclaimer, { font: data.fontFamily, color: secondaryRaw });
 
     return finalizeHtml(`<table cellpadding="0" cellspacing="0" border="0" bgcolor="${primary}" style="background-color: ${primary}; border: 1px solid ${secondary}; border-radius: 5px; font-family: ${font};">
   <tr>
