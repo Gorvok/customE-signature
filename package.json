@@ -31,7 +31,7 @@
     "@tailwindcss/vite": "^4.3.5",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.12",
+    "@testing-library/user-event": "^14.6.13",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -48,7 +48,7 @@
     "typescript-eslint": "^8.73.0",
     "vite": "^8.3.8",
     "vite-plugin-pwa": "^2.0.0",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   },
   "comments": {
     "typescript": "Held at 6.0.x on purpose, with a tilde rather than a caret. typescript-eslint's typescript peer is `>=4.8.4 <6.1.0`, because typed linting runs on the classic (JavaScript) compiler API, so 6.1 would break the type-aware rules as surely as 7 would. TypeScript 7's native compiler can already drive typed linting through typescript-eslint's experimental tsgo backend — see the README — but it is installed *alongside* a classic build under the @typescript/native alias, never in this slot. Dependabot's typescript 7 PR therefore stays blocked until that peer range opens, however green `tsc` alone looks.",
